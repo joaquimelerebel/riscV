@@ -45,5 +45,12 @@ goal : utilisation de threads dans le user space
 
 # Documentation zephyr 
 
-* CONFIGi\_HW\_STACK\_PROTECTION is an optional feature which detects stack buffer overflows when the system is running in **supervisor mode**. [...] Use compiler-assisted CONFIG\_STACK\_CANARIES for stack frames.
+* CONFIG\_HW\_STACK\_PROTECTION is an optional feature which detects stack buffer overflows when the system is running in **supervisor mode**. [...] Use compiler-assisted CONFIG\_STACK\_CANARIES for stack frames.
+
+
+
+# modification de la compilation zephyr 
+* On peut modifier le code zephyr a partir du fichier de config zephyr qui sont les prj.conf 
+* Dans les fichiers Kconfig y'a les differentes options de configuration du zephyr 
+* ces fichiers sont dans le repo dockerzephyr/zephyr/... 
 
