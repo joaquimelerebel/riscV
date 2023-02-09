@@ -136,7 +136,9 @@ RUN pip3 install wheel pip -U &&\
 		     statistics numpy \
 		     imgtool \
 		     protobuf \
-		     GitPython
+		     GitPython \
+		     pandas \
+		     openpyxl
 
 # Install Zephyr SDK
 RUN mkdir -p /opt/toolchains && \
