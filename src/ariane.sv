@@ -49,8 +49,14 @@ module ariane import ariane_pkg::*; #(
 `else
   // memory side, AXI Master
   output ariane_axi::req_t             axi_req_o,
-  input  ariane_axi::resp_t            axi_resp_i
+  input  ariane_axi::resp_t            axi_resp_i,
 `endif
+
+  // mods for the nop thingy
+  output scoreboard_entry_t        thingy_entry_id_issue,
+  output scoreboard_entry_t        issue_entry_id_issue
+  //output logic[3:0]                     led            
+
 );
 
   // ------------------------------------------
@@ -79,10 +85,15 @@ module ariane import ariane_pkg::*; #(
   // --------------
   // ID <-> ISSUE
   // --------------
-  scoreboard_entry_t        issue_entry_id_issue;
+  //scoreboard_entry_t        issue_entry_id_issue;
   logic                     issue_entry_valid_id_issue;
   logic                     is_ctrl_fow_id_issue;
   logic                     issue_instr_issue_id;
+
+  // NOP THINGY 
+  //scoreboard_entry_t        thingy_entry_id_issue;
+
+
 
   // --------------
   // ISSUE <-> EX
@@ -237,6 +248,13 @@ module ariane import ariane_pkg::*; #(
   dcache_req_o_t [2:0]      dcache_req_ports_cache_ex;
   logic                     dcache_commit_wbuffer_empty;
   logic                     dcache_commit_wbuffer_not_ni;
+  
+  
+  
+
+  
+  
+  
 
   // --------------
   // Frontend
@@ -277,7 +295,7 @@ module ariane import ariane_pkg::*; #(
     .fetch_entry_valid_i        ( fetch_valid_if_id          ),
     .fetch_entry_ready_o        ( fetch_ready_id_if          ),
 
-    .issue_entry_o              ( issue_entry_id_issue       ),
+    .issue_entry_o              ( thingy_entry_id_issue       ),
     .issue_entry_valid_o        ( issue_entry_valid_id_issue ),
     .is_ctrl_flow_o             ( is_ctrl_fow_id_issue       ),
     .issue_instr_ack_i          ( issue_instr_issue_id       ),
@@ -292,6 +310,22 @@ module ariane import ariane_pkg::*; #(
     .tw_i                       ( tw_csr_id                  ),
     .tsr_i                      ( tsr_csr_id                 )
   );
+
+
+
+// add the parser
+//parser_nop_custom nop_thingy (
+//   .rstn_i(rst_n),
+//   .clk_i(clk),
+ //  .entry_score_i(thingy_entry_id_issue),
+   //.entry_score_o(issue_entry_id_issue),
+   //.CFI_exception_o(led[0]),
+   //.has_detected_CFI_ex_o(led[1]),
+   //.has_detected_JALR_o(led[2]),
+   //.detect_JALR_o(led[3])
+//);
+
+
 
   // ---------
   // Issue
