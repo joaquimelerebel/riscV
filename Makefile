@@ -122,6 +122,7 @@ src :=  $(filter-out src/ariane_regfile.sv, $(wildcard src/*.sv))              \
         $(wildcard fpga/src/axi2apb/src/*.sv)                                  \
         $(wildcard fpga/src/apb_timer/*.sv)                                    \
         $(wildcard fpga/src/axi_slice/src/*.sv)                                \
+        $(wildcard fpga/src/ariane_wart_custom/*.sv)                           \
         $(wildcard src/axi_node/src/*.sv)                                      \
         $(wildcard src/axi_riscv_atomics/src/*.sv)                             \
         $(wildcard src/axi_mem_if/src/*.sv)                                    \
