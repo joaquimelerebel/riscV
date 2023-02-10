@@ -30,8 +30,8 @@ module parser_nop_custom
     parameter nop_imm = 5'b1
 )
 (
-    input  logic                                rstn_i, 
     input  logic                                clk_i,
+    input  logic                                rst_ni,
     input  logic                                flush_i,
     
     input logic[3:0]                            debug_leds,
@@ -93,7 +93,7 @@ module parser_nop_custom
     
    
     always_ff @(posedge clk_i) begin
-        if(rstn_i == 1'b0) begin 
+        if(rst_ni == 1'b0) begin 
             state <= IDLE;
          end else begin 
             state <= next_state;
