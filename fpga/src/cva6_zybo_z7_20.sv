@@ -115,6 +115,7 @@ logic sd_clk_sys;
 logic ps_clock_out;
 
 logic rst_n, rst;
+logic rst_n, rst;
 logic rtc;
 
 
@@ -147,7 +148,7 @@ logic [NBSlave-1:0] pc_asserted;
 logic dmi_trst_n;
 
 // NOP thingy signal
-ariane_pkg::scoreboard_entry_t   issue_entry_s;
+//ariane_pkg::scoreboard_entry_t   issue_entry_s;
 
 rstgen i_rstgen_main (
     .clk_i        ( clk                      ),
@@ -531,16 +532,16 @@ axi_adapter_32 #(
 );
 
 // add the parser NOP HTINGY
-ariane_pkg::scoreboard_entry_t        thingy_entry_id_issue;
-ariane_pkg::scoreboard_entry_t        issue_entry_id_issue;
+//ariane_pkg::scoreboard_entry_t        thingy_entry_id_issue;
+//ariane_pkg::scoreboard_entry_t        issue_entry_id_issue;
 
-parser_nop_custom nop_thingy (
-   .rstn_i(rst_n),
-   .clk_i(clk),
-   .debug_leds(led),
-   .entry_score_i(thingy_entry_id_issue),
-   .entry_score_o(issue_entry_id_issue)
-);
+//parser_nop_custom nop_thingy (
+//   .rstn_i(rst_n),
+//   .clk_i(clk),
+//   .debug_leds(led),
+//   .entry_score_i(thingy_entry_id_issue),
+//   .entry_score_o(issue_entry_id_issue)
+//);
 
 // ---------------
 // Core
@@ -561,8 +562,9 @@ ariane #(
     .debug_req_i  ( debug_req_irq       ),
     .axi_req_o    ( axi_ariane_req      ),
     .axi_resp_i   ( axi_ariane_resp     ),
-    .thingy_entry_id_issue(thingy_entry_id_issue),
-    .issue_entry_id_issue(issue_entry_id_issue)
+    //.thingy_entry_id_issue(thingy_entry_id_issue),
+    //.issue_entry_id_issue(issue_entry_id_issue),
+    .led(led)
 );
 
 axi_master_connect i_axi_master_connect_ariane (.axi_req_i(axi_ariane_req), .axi_resp_o(axi_ariane_resp), .master(slave[0]));

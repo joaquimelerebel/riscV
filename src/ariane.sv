@@ -53,9 +53,9 @@ module ariane import ariane_pkg::*; #(
 `endif
 
   // mods for the nop thingy
-  output scoreboard_entry_t        thingy_entry_id_issue,
-  output scoreboard_entry_t        issue_entry_id_issue
-  //output logic[3:0]                     led            
+  //output scoreboard_entry_t        thingy_entry_id_issue,
+  //output scoreboard_entry_t        issue_entry_id_issue
+  output logic[3:0]                     led            
 
 );
 
@@ -85,13 +85,13 @@ module ariane import ariane_pkg::*; #(
   // --------------
   // ID <-> ISSUE
   // --------------
-  //scoreboard_entry_t        issue_entry_id_issue;
+  (* mark_debug = "true" *) scoreboard_entry_t        issue_entry_id_issue;
   logic                     issue_entry_valid_id_issue;
   logic                     is_ctrl_fow_id_issue;
   logic                     issue_instr_issue_id;
 
   // NOP THINGY 
-  //scoreboard_entry_t        thingy_entry_id_issue;
+  (* mark_debug = "true" *) scoreboard_entry_t        thingy_entry_id_issue;
 
 
 
@@ -314,17 +314,14 @@ module ariane import ariane_pkg::*; #(
 
 
 // add the parser
-//parser_nop_custom nop_thingy (
-//   .rstn_i(rst_n),
-//   .clk_i(clk),
- //  .entry_score_i(thingy_entry_id_issue),
-   //.entry_score_o(issue_entry_id_issue),
-   //.CFI_exception_o(led[0]),
-   //.has_detected_CFI_ex_o(led[1]),
-   //.has_detected_JALR_o(led[2]),
-   //.detect_JALR_o(led[3])
-//);
-
+parser_nop_custom nop_thingy (
+   .clk_i,
+   .rst_ni,
+   .flush_i(flush_ctrl_if),
+   .debug_leds(led),
+   .entry_score_i(thingy_entry_id_issue),
+   .entry_score_o(issue_entry_id_issue)
+);
 
 
   // ---------
