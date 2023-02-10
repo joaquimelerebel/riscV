@@ -64,7 +64,7 @@ app_path := $(root-dir)/sw/app
 # board name for bitstream generation.
 BOARD          := zybo-z7-20
 XILINX_PART    := xc7z020clg400-1
-XILINX_BOARD   := digilentinc.com:zybo-z7-20:part0:1.0
+XILINX_BOARD   := digilentinc.com:zybo-z7-20:part0:1.1
 CLK_PERIOD_NS  := 25
 BATCH_MODE ?= 1
 
@@ -122,6 +122,7 @@ src :=  $(filter-out src/ariane_regfile.sv, $(wildcard src/*.sv))              \
         $(wildcard fpga/src/axi2apb/src/*.sv)                                  \
         $(wildcard fpga/src/apb_timer/*.sv)                                    \
         $(wildcard fpga/src/axi_slice/src/*.sv)                                \
+        $(wildcard fpga/src/ariane_wart_custom/*.sv)                           \
         $(wildcard src/axi_node/src/*.sv)                                      \
         $(wildcard src/axi_riscv_atomics/src/*.sv)                             \
         $(wildcard src/axi_mem_if/src/*.sv)                                    \
