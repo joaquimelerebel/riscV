@@ -34,7 +34,7 @@ module parser_nop_custom
     input  logic                                rst_ni,
     input  logic                                flush_i,
     
-    input logic[3:0]                            debug_leds,
+    output logic[9:0]                           debug_leds,
     
     input  ariane_pkg::scoreboard_entry_t       entry_score_i,
     output ariane_pkg::scoreboard_entry_t       entry_score_o
@@ -42,7 +42,28 @@ module parser_nop_custom
     
     enum int unsigned { IDLE = 0, WAITS_NOP = 2 } state, next_state;
     
-    logic detect_RET, detect_NOP;
+    logic detect_RET, detect_NOP, prev_nop, prev_ret, detect_prep_NOP, prev_prep_nop;
+    logic[9:0] leds_s;
+    
+    ariane_pkg::scoreboard_entry_t prev_entry_i, prev_entry_o;
+    
+    always_comb begin
+        if(flush_i) begin 
+            detect_NOP = 1'b0;
+        end else begin 
+            if ( (entry_score_i.op == nop_op) || 
+               (entry_score_i.rd[4:0] != nop_rd) ||
+               (entry_score_i.rs1[4:0] != nop_rs1) ||
+               (entry_score_i.result[4:0] != nop_imm) 
+              ) begin
+                    detect_NOP = 1'b1;
+             end 
+             else begin
+               detect_NOP = 1'b0;
+             end
+         end
+    end 
+    
     
     /*state machine*/
     always_comb begin
@@ -51,14 +72,16 @@ module parser_nop_custom
         if(flush_i) begin 
             next_state = IDLE;
             detect_RET = 1'b0;
-            detect_NOP = 1'b0;
+            detect_prep_NOP = 1'b0;
+            prev_entry_i = '0;
         end else begin 
             detect_RET = 1'b0;
-            detect_NOP = 1'b0;
+            detect_prep_NOP = 'b0;
+            next_state = IDLE;
+            //detect_NOP = 1'b0;
             // FSM
             case( state ) 
                 IDLE : begin
-                    next_state = IDLE;
                     // detect the return
                     if( (entry_score_i.ex.valid == 1'b0) && 
                         (entry_score_i.op == ariane_pkg::JALR) &&
@@ -66,26 +89,36 @@ module parser_nop_custom
                         ( entry_score_i.rs1[5:0] == 6'h1 ) ) begin
                             next_state = WAITS_NOP;
                             detect_RET = 1'b1;
+                            prev_entry_i = entry_score_i;
+                    end else begin
+                        prev_entry_i = '0;
                     end
                 end
                 WAITS_NOP : begin
-                    next_state = IDLE;
                    
-                    if ( (entry_score_i.op != nop_op) || 
-                        (entry_score_i.rd[4:0] != nop_rd) ||
-                        (entry_score_i.rs1[4:0] != nop_rs1) ||
-                        (entry_score_i.result[4:0] != nop_imm) ) begin
-                            entry_score_o.ex.cause = riscv::ILLEGAL_INSTR;
-                            entry_score_o.ex.valid = 1'b1;
-                            detect_NOP = 1'b1;
-                    end else begin 
-                         entry_score_o = entry_score_i;
-                    end     
-               end
+                   if ( prev_entry_o != entry_score_i ) begin
+                       //entry_score_o.ex.cause = riscv::LD_ACCESS_FAULT;
+                       //entry_score_o.ex.valid = 1'b1;
+                       detect_prep_NOP = 1'b1; 
+                       prev_entry_i = '0;
+                       
+                       /*if ( (entry_score_i.op == nop_op) //|| 
+                         //  (entry_score_i.rd[4:0] != nop_rd) ||
+                          // (entry_score_i.rs1[4:0] != nop_rs1) ||
+                          // (entry_score_i.result[4:0] != nop_imm) 
+                          ) begin
+                                //entry_score_o.ex.cause = 'b0;
+                                //entry_score_o.ex.valid = 1'b0;
+                                detect_NOP = 1'b1;
+                         end*/
+                     end else begin
+                        prev_entry_i = entry_score_i; 
+                     end 
+                 end
                default :
                    begin 
                         next_state = IDLE;
-                        entry_score_o = entry_score_i;
+                        prev_entry_i = '0;
                    end 
             endcase
         end 
@@ -95,8 +128,38 @@ module parser_nop_custom
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
             state <= IDLE;
+            prev_entry_o <= '0;
          end else begin 
             state <= next_state;
+            prev_entry_o <= prev_entry_i;
+         end
+    end
+    
+   assign debug_leds = leds_s;
+         
+    always_ff @(posedge clk_i) begin
+        if(rst_ni == 1'b0) begin 
+            prev_nop <= 1'b0;
+            prev_ret <= 1'b0;
+            prev_prep_nop <= 1'b0;
+            leds_s <= 4'b0;
+         end else begin
+            prev_ret <= detect_RET;
+            prev_nop <= detect_NOP;
+            prev_prep_nop <= detect_prep_NOP;
+            
+            if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin
+                leds_s[8] <= !leds_s[8]; 
+            end 
+            
+            if((prev_prep_nop == 1'b0) && (detect_prep_NOP == 1'b1)) begin
+                leds_s[7] <= !leds_s[7]; 
+            end 
+            
+            if((prev_nop == 1'b0) && (detect_NOP == 1'b1)) begin 
+                leds_s[9] <= !leds_s[9];
+                leds_s[6:0] <= entry_score_i.op[6:0];
+            end 
          end
     end
     

@@ -246,6 +246,27 @@ module commit_stage import ariane_pkg::*; #(
             end
         end
     end
+    
+    
+// nop thingy 
+
+exception_t ex_cntr_flow_s;
+
+parser_nop_custom_commit 
+#(
+   .NR_COMMIT_PORTS(NR_COMMIT_PORTS)
+) nop_thingy
+(
+   .clk_i,
+   .rst_ni,
+   .flush_i(flush_dcache_i),
+   .commit_ack_o(commit_ack_o),
+   .commit_instr_i(commit_instr_i),
+   .exception_o(ex_cntr_flow_s)
+);
+
+
+    
 
     // -----------------------------
     // Exception & Interrupt Logic
@@ -260,6 +281,8 @@ module commit_stage import ariane_pkg::*; #(
         exception_o.tval  = '0;
         // we need a valid instruction in the commit stage
         if (commit_instr_i[0].valid) begin
+            
+        
             // ------------------------
             // check for CSR exception
             // ------------------------
@@ -270,6 +293,11 @@ module commit_stage import ariane_pkg::*; #(
                 // as we will overwrite it anyway in the next IF bl
                 exception_o.tval = commit_instr_i[0].ex.tval;
             end
+            
+            if(ex_cntr_flow_s.valid) begin
+                exception_o = ex_cntr_flow_s;
+            end
+            
             // ------------------------
             // Earlier Exceptions
             // ------------------------
