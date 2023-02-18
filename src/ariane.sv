@@ -55,7 +55,7 @@ module ariane import ariane_pkg::*; #(
   // mods for the nop thingy
   //output scoreboard_entry_t        thingy_entry_id_issue,
   //output scoreboard_entry_t        issue_entry_id_issue
-  output logic[3:0]                     led            
+  output logic[9:0]                     led            
 
 );
 
@@ -85,13 +85,13 @@ module ariane import ariane_pkg::*; #(
   // --------------
   // ID <-> ISSUE
   // --------------
-  (* mark_debug = "true" *) scoreboard_entry_t        issue_entry_id_issue;
+  scoreboard_entry_t        issue_entry_id_issue;
   logic                     issue_entry_valid_id_issue;
   logic                     is_ctrl_fow_id_issue;
   logic                     issue_instr_issue_id;
 
   // NOP THINGY 
-  (* mark_debug = "true" *) scoreboard_entry_t        thingy_entry_id_issue;
+  scoreboard_entry_t        thingy_entry_id_issue;
 
 
 
@@ -282,6 +282,17 @@ module ariane import ariane_pkg::*; #(
     .*
   );
 
+
+/*parser_nop_custom_fetch nop_thingy (
+   .clk_i,
+   .rst_ni,
+   .flush_i(flush_ctrl_if),
+   .debug_leds(led),
+   .entry_i(fetch_entry_if_id),
+   .entry_o(thingy_entry_id_issue)
+);*/
+
+
   // ---------
   // ID
   // ---------
@@ -291,11 +302,11 @@ module ariane import ariane_pkg::*; #(
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
-    .fetch_entry_i              ( fetch_entry_if_id          ),
+    .fetch_entry_i              ( fetch_entry_if_id      ),
     .fetch_entry_valid_i        ( fetch_valid_if_id          ),
     .fetch_entry_ready_o        ( fetch_ready_id_if          ),
 
-    .issue_entry_o              ( thingy_entry_id_issue       ),
+    .issue_entry_o              ( issue_entry_id_issue       ),
     .issue_entry_valid_o        ( issue_entry_valid_id_issue ),
     .is_ctrl_flow_o             ( is_ctrl_fow_id_issue       ),
     .issue_instr_ack_i          ( issue_instr_issue_id       ),
@@ -314,14 +325,16 @@ module ariane import ariane_pkg::*; #(
 
 
 // add the parser
-parser_nop_custom nop_thingy (
+/*parser_nop_custom nop_thingy (
    .clk_i,
    .rst_ni,
    .flush_i(flush_ctrl_if),
    .debug_leds(led),
    .entry_score_i(thingy_entry_id_issue),
    .entry_score_o(issue_entry_id_issue)
-);
+);*/
+
+
 
 
   // ---------
