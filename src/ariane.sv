@@ -52,9 +52,7 @@ module ariane import ariane_pkg::*; #(
   input  ariane_axi::resp_t            axi_resp_i,
 `endif
 
-  // mods for the nop thingy
-  //output scoreboard_entry_t        thingy_entry_id_issue,
-  //output scoreboard_entry_t        issue_entry_id_issue
+  // NOP THINGY project debug
   output logic[9:0]                     led            
 
 );
@@ -89,9 +87,6 @@ module ariane import ariane_pkg::*; #(
   logic                     issue_entry_valid_id_issue;
   logic                     is_ctrl_fow_id_issue;
   logic                     issue_instr_issue_id;
-
-  // NOP THINGY 
-  scoreboard_entry_t        thingy_entry_id_issue;
 
 
 
@@ -199,6 +194,8 @@ module ariane import ariane_pkg::*; #(
   logic                     single_step_csr_commit;
   riscv::pmpcfg_t [15:0]    pmpcfg;
   logic [15:0][53:0]        pmpaddr;
+  // nop thingy enable signal
+  logic                     nop_thingy_en;
   // ----------------------------
   // Performance Counters <-> *
   // ----------------------------
@@ -283,15 +280,6 @@ module ariane import ariane_pkg::*; #(
   );
 
 
-/*parser_nop_custom_fetch nop_thingy (
-   .clk_i,
-   .rst_ni,
-   .flush_i(flush_ctrl_if),
-   .debug_leds(led),
-   .entry_i(fetch_entry_if_id),
-   .entry_o(thingy_entry_id_issue)
-);*/
-
 
   // ---------
   // ID
@@ -321,18 +309,6 @@ module ariane import ariane_pkg::*; #(
     .tw_i                       ( tw_csr_id                  ),
     .tsr_i                      ( tsr_csr_id                 )
   );
-
-
-
-// add the parser
-/*parser_nop_custom nop_thingy (
-   .clk_i,
-   .rst_ni,
-   .flush_i(flush_ctrl_if),
-   .debug_leds(led),
-   .entry_score_i(thingy_entry_id_issue),
-   .entry_score_o(issue_entry_id_issue)
-);*/
 
 
 
@@ -530,6 +506,7 @@ module ariane import ariane_pkg::*; #(
     .fence_o                ( fence_commit_controller       ),
     .sfence_vma_o           ( sfence_vma_commit_controller  ),
     .flush_commit_o         ( flush_commit                  ),
+    .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
     .*
   );
 
@@ -587,6 +564,7 @@ module ariane import ariane_pkg::*; #(
     .perf_we_o              ( we_csr_perf                   ),
     .pmpcfg_o               ( pmpcfg                        ),
     .pmpaddr_o              ( pmpaddr                       ),
+    .nop_thingy_en_o        ( nop_thingy_en                 ),
     .debug_req_i,
     .ipi_i,
     .irq_i,
