@@ -51,7 +51,9 @@ module commit_stage import ariane_pkg::*; #(
     output logic                                    fence_i_o,          // flush I$ and pipeline
     output logic                                    fence_o,            // flush D$ and pipeline
     output logic                                    flush_commit_o,     // request a pipeline flush
-    output logic                                    sfence_vma_o        // flush TLBs and pipeline
+    output logic                                    sfence_vma_o,        // flush TLBs and pipeline
+    // nop thingy activation bit
+    input logic                                     csr_nop_thingy_en_i // enables the nop parser
 );
 
 // ila_0 i_ila_commit (
@@ -260,6 +262,7 @@ parser_nop_custom_commit
    .clk_i,
    .rst_ni,
    .flush_i(flush_dcache_i),
+   .csr_en_i(csr_nop_thingy_en_i),
    .commit_ack_o(commit_ack_o),
    .commit_instr_i(commit_instr_i),
    .exception_o(ex_cntr_flow_s)

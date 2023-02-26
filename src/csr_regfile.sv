@@ -85,7 +85,10 @@ module csr_regfile import ariane_pkg::*; #(
     output logic                  perf_we_o,
     // PMPs
     output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
-    output logic [15:0][53:0]     pmpaddr_o   // PMP addresses
+    output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
+    //NOP THINGY ACTIV
+    output logic                  nop_thingy_en_o             // enable signal for the nop thingy in commit block  
+    
 );
     // internal signal to keep track of access exceptions
     logic        read_access_exception, update_access_exception, privilege_violation;
@@ -143,6 +146,11 @@ module csr_regfile import ariane_pkg::*; #(
     logic [15:0][riscv::PLEN-3:0]        pmpaddr_q,  pmpaddr_d;
 
 
+    // NOP THINGY activation register creation
+    riscv::xlen_t nop_en_q,     nop_en_d;
+
+
+
     assign pmpcfg_o = pmpcfg_q[15:0];
     assign pmpaddr_o = pmpaddr_q;
 
@@ -152,6 +160,10 @@ module csr_regfile import ariane_pkg::*; #(
     // ----------------
     assign csr_addr = riscv::csr_t'(csr_addr_i);
     assign fs_o = mstatus_q.fs;
+    
+    // nop thingy assignement
+    assign nop_thingy_en_o = nop_en_q;
+    
     // ----------------
     // CSR Read logic
     // ----------------
@@ -303,6 +315,9 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR13:        csr_rdata = {10'b0, pmpaddr_q[13][riscv::PLEN-3:1], (pmpcfg_q[13].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
                 riscv::CSR_PMPADDR14:        csr_rdata = {10'b0, pmpaddr_q[14][riscv::PLEN-3:1], (pmpcfg_q[14].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
                 riscv::CSR_PMPADDR15:        csr_rdata = {10'b0, pmpaddr_q[15][riscv::PLEN-3:1], (pmpcfg_q[15].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
+                
+                //NOP CSR
+                riscv::CSR_EN_NOPTHINGY:      csr_rdata = nop_en_q; 
                 default: read_access_exception = 1'b1;
             endcase
         end
@@ -391,6 +406,8 @@ module csr_regfile import ariane_pkg::*; #(
 
         pmpcfg_d                = pmpcfg_q;
         pmpaddr_d               = pmpaddr_q;
+        
+        nop_en_d                = nop_en_q;
 
         // check for correct access rights and that we are writing
         if (csr_we) begin
@@ -641,7 +658,10 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR13:  if (!pmpcfg_q[13].locked && !(pmpcfg_q[14].locked && pmpcfg_q[14].addr_mode == riscv::TOR))  pmpaddr_d[13]  = csr_wdata[riscv::PLEN-3:0];
                 riscv::CSR_PMPADDR14:  if (!pmpcfg_q[14].locked && !(pmpcfg_q[15].locked && pmpcfg_q[15].addr_mode == riscv::TOR))  pmpaddr_d[14]  = csr_wdata[riscv::PLEN-3:0];
                 riscv::CSR_PMPADDR15:  if (!pmpcfg_q[15].locked)  pmpaddr_d[15]  = csr_wdata[riscv::PLEN-3:0];
-
+                
+                // nop thingy enabling/diabling
+                riscv::CSR_EN_NOPTHINGY : nop_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
+                
                 default: update_access_exception = 1'b1;
             endcase
         end
@@ -1127,6 +1147,10 @@ module csr_regfile import ariane_pkg::*; #(
             // pmp
             pmpcfg_q               <= '0;
             pmpaddr_q              <= '0;
+            
+            //nop register
+            nop_en_q               <= {riscv::XLEN{1'b0}};
+            
         end else begin
             priv_lvl_q             <= priv_lvl_d;
             // floating-point registers
@@ -1177,6 +1201,9 @@ module csr_regfile import ariane_pkg::*; #(
                     pmpaddr_q[i] <= '0;
                 end
             end
+            
+            // nop thingy 
+            nop_en_q               <= nop_en_d;
         end
     end
 
