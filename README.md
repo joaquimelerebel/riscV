@@ -71,7 +71,7 @@ $ make program_cva6_fpga
 When the bitstream is loaded, the green LED `done` lights up.
 ![alt text](./docs/pictures/20201204_160542.jpg)
 
-4. Get a hyperterminal configured on /dev/ttyUSB0 11520-8-N-1
+4. Get a hyperterminal configured on /dev/ttyUSB0 115200-8-N-1
 
 Now, the hardware is ready and the hyperterminal is connected to the UART output of the FPGA. We can now start the software.
 
@@ -84,6 +84,7 @@ Now, the hardware is ready and the hyperterminal is connected to the UART output
 The developer docker image can be built using the following command from the zephyr-docker folder:
 
 ```
+cd zephyr-docker
 docker build -f Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t zephyr-build:v1 .
 ```
 
@@ -240,3 +241,30 @@ exit
 ```
 This result shows that the penetration test has succeeded.
 
+#### Building and executing the perf_baseline test application
+
+The perf_baseline test application is measuring performance of the HW and SW on the FPGA by performing multiple compute, stack access and heap manipulations. This application is generated similarly than RIPE:
+
+```
+west build -p -b cv32a6_zybo /workdir/perf_baseline/
+```
+This step should give you the memory size of the application as follow :
+```
+Memory region         Used Size  Region Size  %age Used
+             RAM:       61936 B         1 GB      0.01%
+        IDT_LIST:          0 GB         2 KB      0.00%
+```
+
+The execution is also similar:
+```
+west debug
+```
+
+On the hyperterminal, you should have the output :
+```
+*** Booting Zephyr OS build zephyr-v3.2.0-327-g869365ab012b  ***
+Begining of execution with depth 12, call number 50, seed value 63728127.000000
+SUCCESS: computed value 868200.000000 - duration: 25.300611 sec 632515274 cycles
+```
+
+Your execution duration can be a little different than our, but the computed value should be the same.
