@@ -60,11 +60,7 @@ module cva6_zybo_z7_20 (
   input  logic     tdi       ,
   output wire      tdo       ,
   input  logic     rx        ,
-  output logic     tx	     ,
-
-
-  //added for the debug
-  output wire[3:0] led
+  output logic     tx
 
 );
 // 24 MByte in 8 byte words
@@ -147,8 +143,6 @@ logic [NBSlave-1:0] pc_asserted;
 
 logic dmi_trst_n;
 
-// NOP thingy signal
-//ariane_pkg::scoreboard_entry_t   issue_entry_s;
 
 rstgen i_rstgen_main (
     .clk_i        ( clk                      ),
@@ -531,18 +525,6 @@ axi_adapter_32 #(
     .axi_resp_i            ( dm_axi_m_resp             )
 );
 
-// add the parser NOP HTINGY
-//ariane_pkg::scoreboard_entry_t        thingy_entry_id_issue;
-//ariane_pkg::scoreboard_entry_t        issue_entry_id_issue;
-
-//parser_nop_custom nop_thingy (
-//   .rstn_i(rst_n),
-//   .clk_i(clk),
-//   .debug_leds(led),
-//   .entry_score_i(thingy_entry_id_issue),
-//   .entry_score_o(issue_entry_id_issue)
-//);
-
 // ---------------
 // Core
 // ---------------
@@ -561,10 +543,7 @@ ariane #(
     .time_irq_i   ( timer_irq           ),
     .debug_req_i  ( debug_req_irq       ),
     .axi_req_o    ( axi_ariane_req      ),
-    .axi_resp_i   ( axi_ariane_resp     ),
-    //.thingy_entry_id_issue(thingy_entry_id_issue),
-    //.issue_entry_id_issue(issue_entry_id_issue),
-    .led(led)
+    .axi_resp_i   ( axi_ariane_resp     )
 );
 
 axi_master_connect i_axi_master_connect_ariane (.axi_req_i(axi_ariane_req), .axi_resp_o(axi_ariane_resp), .master(slave[0]));

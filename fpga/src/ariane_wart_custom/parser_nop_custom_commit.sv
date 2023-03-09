@@ -50,7 +50,7 @@ module parser_nop_custom_commit
 
 function logic is_ret(ariane_pkg::scoreboard_entry_t entry);
         if( (entry.op == ariane_pkg::JALR)  &&
-            (entry.rd[5:0] == 6'b0)         &&
+            (entry.rd[5:0] == 6'h0)         &&
             (entry.rs1[5:0] == 6'h1 ) )     begin
             is_ret = 1'b1;
         end else begin 

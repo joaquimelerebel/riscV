@@ -49,12 +49,8 @@ module ariane import ariane_pkg::*; #(
 `else
   // memory side, AXI Master
   output ariane_axi::req_t             axi_req_o,
-  input  ariane_axi::resp_t            axi_resp_i,
+  input  ariane_axi::resp_t            axi_resp_i
 `endif
-
-  // NOP THINGY project debug
-  output logic[9:0]                     led            
-
 );
 
   // ------------------------------------------
