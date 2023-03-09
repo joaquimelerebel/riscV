@@ -31,6 +31,7 @@ module parser_nop_custom_commit
     input  logic                                                    clk_i,
     input  logic                                                    rst_ni,
     input  logic                                                    flush_i,
+    input  logic                                                    csr_en_i,
     // does the commit stages wants to commit the nth instruction
     input logic [NR_COMMIT_PORTS-1:0]                               commit_ack_o,
     // what instruction will be commited
@@ -70,17 +71,8 @@ function logic is_nop(ariane_pkg::scoreboard_entry_t entry);
 endfunction
 
 
-
-
-
-
     /*state machine*/
-    always_comb begin
-        /*exception_o.valid = 1'b0;
-        exception_o.cause = '0;
-        exception_o.tval  = '0;*/
-        
-        
+    always_comb begin        
         detect_RET = 1'b0;
         detect_prep_NOP = 1'b0;
         detect_NOP = 1'b0;
@@ -100,15 +92,10 @@ endfunction
                     // check if the ret is in the second that might be ACK at the same time 
                     if( commit_ack_o[1] == 1'b1 ) begin
                         detect_prep_NOP = 1'b1;
-                        
-                        //exception_o.cause = riscv::BREAKPOINT;
-                        //exception_o.valid = 1'b1;
                
                         next_state = IDLE;
                         
                         if ( is_nop(commit_instr_i[1]) )    begin
-                            //exception_o.cause = 'b0;
-                            //exception_o.valid = 1'b0;
                             detect_NOP = 1'b1;
                          end
                     end
@@ -131,13 +118,8 @@ endfunction
                     
                     detect_prep_NOP = 1'b1;
                     next_state = IDLE;
-                    
-                    //exception_o.cause = riscv::BREAKPOINT;
-                    //exception_o.valid = 1'b1;
                
                     if ( is_nop(commit_instr_i[0]) )    begin
-                            //exception_o.cause = 'b0;
-                            //exception_o.valid = 1'b0;
                             detect_NOP = 1'b1;
                      end
                end
@@ -167,7 +149,11 @@ endfunction
             exception_o.cause <= '0;
             exception_o.tval  <= '0;
          end else begin
+         `ifdef NOP_CSR
+            if(detect_prep_NOP && !detect_NOP && csr_en_i) begin
+         `else 
             if(detect_prep_NOP && !detect_NOP) begin
+         `endif 
                 exception_o.cause <= riscv::BREAKPOINT;
                 exception_o.valid <= 1'b1;
             end else begin 
