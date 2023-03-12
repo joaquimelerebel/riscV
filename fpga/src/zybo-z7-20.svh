@@ -15,3 +15,6 @@
 
 // to use BRAM in FPGA fabric  
 `define BRAM
+
+// nop thingy CSR definition
+`define NOP_CSR
