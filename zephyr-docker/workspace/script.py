@@ -4,62 +4,69 @@ import re
 import subprocess as sub
 import time
 from numpy import linspace
-import pandas as pd
+#import pandas as pd
+from multiprocessing import Process, Pipe
+import signal
+import serial
+import os, sys
+
 
 # will output data in the csl 
 VERBOSE=True
 # will try to connect to the board and flash the different test to it 
 # otherwise, will test in qemu
 BOARD_TEST=True
-BAUD_RATE=115200
-SERIAL_FILE="/dev/ttyUSB1"
 
-
-
-CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
-#CHOSEN_ATTACK = [4]
+GDB_CACHE="/workdir/gdbcache"
 
 ATTACK_FILEPATH="/workdir/ripe/src/ripe_attack_generator.c"
 ATTACK_MODIFIED_FILEPATH="/workdir/ripe_modified/src/ripe_attack_generator.c"
-CACHE_FILE="/workdir/cache_output_file"
-CACHE_FILE2="/workdir/cache_trash_file"
+
+PERF_FILEPATH="/workdir/perf_baseline/"
+
 RIPE_FILEPATH="/workdir/ripe"
 RIPE_FILEPATH_MOD="/workdir/ripe_modified"
+
 
 if BOARD_TEST :
 	BOARD="cv32a6_zybo" 
 else :
 	BOARD="qemu_riscv32" 
 
-EXCEL_OK_ATTACKS="/workdir/are_ok_attacks.xlsx"
-
 # time to wait before force closing the core (in sec)
-TIME_WAIT=0.5
-
-# still on hold -> will be the benchmark for the different 
-# applications 
-APP_FILEPATH=["/workdir/zephyr/samples/hello_world"]
+TIME_WAIT_GDB=10
 
 # different options available possible for the tests
 # comment the ones you don't want to test
-
-tecniques=["DIRECT", "INDIRECT"]
+techniques=["DIRECT", "INDIRECT"]
 inject_params=["INJECTED_CODE_NO_NOP", "DATA_ONLY", "RETURN_INTO_LIBC", "RETURN_ORIENTED_PROGRAMMING"]
-# inject_params=["INJECTED_CODE_NO_NOP"]
 code_ptrs=["RET_ADDR", "FUNC_PTR_STACK_VAR", "VAR_LEAK", "LONGJMP_BUF_HEAP", "STRUCT_FUNC_PTR_HEAP"]
-# code_ptrs=["RET_ADDR"]
 locations=["STACK", "HEAP"]
-# locations=["STACK"]
 functions=["MEMCPY", "SPRINTF", "HOMEBREW"]
-# functions=["MEMCPY"]
 
 
 options=["technique", "inject_param", "code_ptr", "location", "function"]
 
 
 
+if len(sys.argv) > 0 : 
+	CHOSEN_ATTACK = [int(sys.argv[1])]
+else : 
+	CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
+	
+
+SERIAL_FILE="/dev/ttyUSB1"
+
+if len(sys.argv) > 1 :
+	SERIAL_FILE=sys.argv[2]
+
+GCC_MOD = 0
+if len(sys.argv) > 2 :
+	GCC_MOD=int(sys.argv[3])
+
+
 class Attack() :
-	def __init__(self, t, i, c, l, f, att_filepath, ripe_file_path,  classic=False) :
+	def __init__(self, t, i, c, l, f, att_filepath, ripe_file_path,  classic=False, perf=False) :
 		self.technique = t
 		self.inject_param = i
 		self.code_ptr = c
@@ -69,14 +76,7 @@ class Attack() :
 		self.att_filepath = att_filepath
 		self.ripe_file_path = ripe_file_path
 		self.classic = classic
-
-	def to_dict(self):
-		diction = {}
-		index = 0
-		for opt in options : 
-			diction[opt] = self.arr[index]
-			index += 1
-		return diction
+		self.perf = perf
 
 	#setup technique
 	def setup(self, nb) : 
@@ -100,42 +100,51 @@ class Attack() :
 				m+=1
 
 	# build for qemu or the board
-	def build(self) :		
-		
+	def build(self) :
+		if GCC_MOD :	
+			if VERBOSE :
+				print(f"\n--------------\nsudo sh gcc_creation_script.sh\n-------------------------\n")
+				p=sub.Popen(f"sudo sh gcc_creation_script.sh", shell=True, stdout=sub.DEVNULL)
+			else :	
+				p=sub.Popen(f"sudo sh gcc_creation_script.sh", shell=True, stdout=sub.DEVNULL)
+			p.communicate()
+
 		if VERBOSE :
 			print(f"\n--------------\nsudo west build -p -b {BOARD} {self.ripe_file_path}\n-------------------------\n")
-			p=sub.Popen(f"sudo west build -p -b {BOARD} {self.ripe_file_path}", shell=True)
+			p=sub.Popen(f"sudo west build -p -b {BOARD} {self.ripe_file_path}", shell=True, stdout=sub.DEVNULL)
 		else : 
 			p=sub.Popen(f"sudo west build -p -b {BOARD} {self.ripe_file_path}", shell=True, stdout=sub.DEVNULL)
 		p.communicate()
 
+
 	def run(self):
 		if BOARD_TEST :
 			# create the gdb input file
-			p=sub.Popen(f"echo 'c\nc\nc\nc\n' > {CACHE_FILE2}", shell=True)
+			p=sub.Popen(f"echo 'c\nc\nq\n' > {GDB_CACHE}", shell=True)
 			p.communicate()
-
-			p2=sub.Popen(f"sudo cu -l {SERIAL_FILE} -s {BAUD_RATE} &> {CACHE_FILE}", shell=True)
+			
 			
 			if VERBOSE :
 				print(f"\n-----------------------\nsudo west debug\n-------------------\n")
-				p=sub.Popen(f"sudo west debug < {CACHE_FILE2}", shell=True)
+				p=sub.Popen(f"sudo west debug < {GDB_CACHE}", shell=True)
 			else : 
-				p=sub.Popen(f"sudo west debug < {CACHE_FILE2}", shell=True, stdout=sub.DEVNULL)
+				p=sub.Popen(f"sudo west debug < {GDB_CACHE}", shell=True, stdout=sub.DEVNULL)
 			
-			time.sleep(TIME_WAIT)
+			time.sleep(TIME_WAIT_GDB)
 			p.kill()
-			p2.kill()
+			#p2.kill()
+			
+
 			
 			#clean gdb/cu behind
 			if VERBOSE :
 				print(f"\n-----------------------\nsudo pkill gdb\n-------------------\n")
 				p3=sub.Popen(f"sudo pkill gdb", shell=True)
-				print(f"\n-----------------------\nsudo pkill cu\n-------------------\n")
-				p4=sub.Popen(f"sudo pkill cu", shell=True)
+				print(f"\n-----------------------\nkill serial process\n-------------------\n")
+				# p4=sub.Popen(f"sudo pkill cu", shell=True)
 			else :
 				p3=sub.Popen(f"sudo pkill gdb", shell=True, stdout=sub.DEVNULL)
-				p4=sub.Popen(f"sudo pkill cu", shell=True, stdout=sub.DEVNULL)
+				# p4=sub.Popen(f"sudo pkill cu",  shell=True, stdout=sub.DEVNULL)
 			
 			
 		else :
@@ -158,13 +167,7 @@ class Attack() :
 			p.communicate()
 		
 		
-		with open(CACHE_FILE, "rb") as f : 
-			result=f.read()
-		print(b"===result==== : " + result)
-		return result
 						
-
-
 
 attacks_array = ["technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_ptr= RET_ADDR;location = STACK;function = MEMCPY;",
 				"technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_ptr= FUNC_PTR_STACK_VAR;location = STACK;function = MEMCPY;",
@@ -176,29 +179,6 @@ attacks_array = ["technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_pt
 				"technique = INDIRECT;inject_param = RETURN_INTO_LIBC;code_ptr= LONGJMP_BUF_HEAP;location = HEAP;function = MEMCPY;",
 				"technique = DIRECT;inject_param = RETURN_ORIENTED_PROGRAMMING;code_ptr= RET_ADDR;location = STACK;function = MEMCPY;",
 				"technique = DIRECT;inject_param = RETURN_ORIENTED_PROGRAMMING;code_ptr= STRUCT_FUNC_PTR_HEAP;location = HEAP;function = SPRINTF;"]
-
-def classic_app() :
-	scoreboard = []
-	for app in APP_FILEPATH :
-		print(f"\n====== APP SCENARIO {app} =========\n")
-		# build
-		print(f"--------------\n\n\nsudo west build -p -b {BOARD} {app}\n\n\n -------------------------")
-		p=sub.Popen(f"sudo west build -p -b {BOARD} app", shell=True)
-		p.communicate()
-
-		# run 
-		print(f"\n-----------------------\nsudo west build -t run\n-------------------\n")
-		p=sub.Popen(f"sudo west build -t run &> {CACHE_FILE}", shell=True)
-		time.sleep(TIME_WAIT)
-		p.kill()
-		with open(CACHE_FILE, "rb") as f : 
-			result=f.read()
-		print(result)
-		if b"function reached." in result :
-			scoreboard.append(True)
-		else :
-			scoreboard.append(False)
-	return scoreboard
 
 def is_OK(attack) :
 	if ((attack.inject_param == "INJECTED_CODE_NO_NOP") and
@@ -311,7 +291,7 @@ def is_OK(attack) :
 def classic_attack(attacks_nb = linspace(1, 10, 10, dtype=int)) : 
 	scoreboard = []
 	for nb in attacks_nb :
-		attaque = Attack(None, None, None, None, None, ATTACK_MODIFIED_FILEPATH, RIPE_FILEPATH_MOD, True)
+		attaque = Attack(None, None, None, None, None, ATTACK_FILEPATH, RIPE_FILEPATH, True)
 		
 		if is_OK(attaque):
 			print(f"\n====== ATTACK SCENARIO {nb} =========\n")
@@ -323,98 +303,55 @@ def classic_attack(attacks_nb = linspace(1, 10, 10, dtype=int)) :
 			attaque.build()
 
 			# run 
-			result=attaque.run()
-
+			attaque.run()
 			
-			new_node = attaque.to_dict()
-			
-			# evaluate
-			if b"function reached." in result or b"Secret data leaked" in result :
-				new_node["result"] = False
-			else :
-				new_node["result"] = True
-			
-			scoreboard.append(new_node)
-
-			if VERBOSE : 	
-				try :
-					result = result.decode("utf-8")
-				except Exception :
-					print("NOT PRINTABLE")
-				finally : 	
-					print(result)
-			new_node["output"] = result
 		nb += 1	
 
-	scoreboard_pd = pd.DataFrame(scoreboard)
-	scoreboard_pd.to_excel(EXCEL_OK_ATTACKS)
-
-	return scoreboard
-
-
-
-def do_each_tests() :
-	scoreboard=[]
-	nb = 0
-	for t in tecniques : 
-		for i in inject_params :
-			for c in code_ptrs : 
-				for l in locations :
-					for f in functions :
-						attaque = Attack(t, i, c, l, f, ATTACK_MODIFIED_FILEPATH, RIPE_FILEPATH_MOD, False)
-						if is_OK(attaque) :
-							print(f"\n====== ATTACK SCENARIO {nb} =========\n")
-							
-							# setup technique 
-							attaque.setup(nb)
-							
-							# build
-							attaque.build()
-
-							# run 
-							result=attaque.run()
-			
-							
-							new_node = attaque.to_dict()
-							
-							# evaluate
-							if b"function reached." in result or b"Secret data leaked" in result :
-								new_node["result"] = False
-							else :
-								new_node["result"] = True
-							
-							scoreboard.append(new_node)
-
-							if VERBOSE : 	
-								try :
-									result = result.decode("utf-8")
-								except Exception :
-									print("NOT PRINTABLE")
-								finally : 	
-									print(result)
-							new_node["output"] = result
-						nb += 1	
-
-	scoreboard_pd = pd.DataFrame(scoreboard)
-	scoreboard_pd.to_excel(EXCEL_OK_ATTACKS)
-	return scoreboard
 	
+	return scoreboard
+
+def quality_test() : 
+	attaque = Attack(None, None, None, None, None, PERF_FILEPATH, PERF_FILEPATH, False, True)
+
+	print(f"\n====== CHECK PERFORMANCE =========\n")
+							
+	# build
+	attaque.build()
+
+	# run 
+	result=attaque.run()
+		
+	new_node = attaque.to_dict()
+			
+	new_node["result"] = True
+			
+	new_node["output"] = result
+
+
+	return [new_node]
 
 
 def display_attack_scoreboard(scoreboard, attack_nb=linspace(1, 10, 10, dtype=int)) :
+	# os.system('clear')
 	print("\n\n\n==============\nATTACK SCOREBOARD\n==============\n\n\n")
-	for i in range(0,len(attack_nb)) :
-		print(attacks_array[attack_nb[i]-1].replace(";", "\n"))
-		if scoreboard[i] :
-			print("\U0000274C" + f" attack attack_nb[i] not prevented\n\n".upper())
-		else : 
-			print("\U00002705" + f" attack attack_nb[i] prevented\n\n".upper())
+	
+	with open(OUTPUT_FILE, "w") as f :
+		for i in range(0,len(attack_nb)) :
+			f.write(f"{attack_nb[i]} {scoreboard[i]['result']}\n")
+			f.write(f"{scoreboard[i]['output']}")
+
+			if VERBOSE :
+				if not scoreboard[i]["result"] :
+					print("\U0000274C" + f" attack {attack_nb[i]} not prevented\n\n".upper())
+				else : 
+					print("\U00002705" + f" attack {attack_nb[i]} prevented\n\n".upper())
 
 
 
 
-#do_each_tests()
-scoreboard = classic_attack(CHOSEN_ATTACK)
-display_attack_scoreboard(scoreboard, CHOSEN_ATTACK)
+if CHOSEN_ATTACK[0] <= 10 :
+	classic_attack(CHOSEN_ATTACK)
+else : 
+	scoreboard=quality_test()
 
 
