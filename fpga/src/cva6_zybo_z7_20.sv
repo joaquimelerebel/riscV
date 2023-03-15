@@ -60,6 +60,7 @@ module cva6_zybo_z7_20 (
   input  logic     tdi       ,
   output wire      tdo       ,
   input  logic     rx        ,
+  output logic[3:0] leds,
   output logic     tx
 
 );
@@ -110,7 +111,6 @@ logic sd_clk_sys;
 
 logic ps_clock_out;
 
-logic rst_n, rst;
 logic rst_n, rst;
 logic rtc;
 
@@ -543,6 +543,7 @@ ariane #(
     .time_irq_i   ( timer_irq           ),
     .debug_req_i  ( debug_req_irq       ),
     .axi_req_o    ( axi_ariane_req      ),
+    .leds(leds),
     .axi_resp_i   ( axi_ariane_resp     )
 );
 

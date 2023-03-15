@@ -372,11 +372,12 @@ package riscv;
         CSR_PMPADDR14      = 12'h3BE,
         CSR_PMPADDR15      = 12'h3BF,
         // nop thingy enable CSR
-        CSR_EN_NOPTHINGY   = 12'hF10,
+        CSR_EN_NOPTHINGY   = 12'h3FF,
+        
         CSR_MVENDORID      = 12'hF11,
         CSR_MARCHID        = 12'hF12,
         CSR_MIMPID         = 12'hF13,
-        CSR_MHARTID        = 12'hF14,
+        CSR_MHARTID        = 12'hF14,   
         CSR_MCYCLE         = 12'hB00,
         CSR_MINSTRET       = 12'hB02,
         // Performance counters (Machine Mode)

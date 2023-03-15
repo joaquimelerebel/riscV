@@ -38,6 +38,7 @@ module ariane import ariane_pkg::*; #(
   // Timer facilities
   input  logic                         time_irq_i,   // timer interrupt in (async)
   input  logic                         debug_req_i,  // debug request (async)
+  output logic[3:0]                     leds,
 `ifdef FIRESIM_TRACE
   // firesim trace port
   output traced_instr_pkg::trace_port_t trace_o,
@@ -50,7 +51,7 @@ module ariane import ariane_pkg::*; #(
   // memory side, AXI Master
   output ariane_axi::req_t             axi_req_o,
   input  ariane_axi::resp_t            axi_resp_i
-`endif
+`endif 
 );
 
   // ------------------------------------------
@@ -503,6 +504,7 @@ module ariane import ariane_pkg::*; #(
     .sfence_vma_o           ( sfence_vma_commit_controller  ),
     .flush_commit_o         ( flush_commit                  ),
     .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
+    .leds(leds),
     .*
   );
 
