@@ -316,8 +316,10 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR14:        csr_rdata = {10'b0, pmpaddr_q[14][riscv::PLEN-3:1], (pmpcfg_q[14].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
                 riscv::CSR_PMPADDR15:        csr_rdata = {10'b0, pmpaddr_q[15][riscv::PLEN-3:1], (pmpcfg_q[15].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
                 
-                //NOP CSR
+                //NOP CSR                
                 riscv::CSR_EN_NOPTHINGY:      csr_rdata = nop_en_q; 
+                
+                
                 default: read_access_exception = 1'b1;
             endcase
         end
@@ -659,8 +661,9 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR14:  if (!pmpcfg_q[14].locked && !(pmpcfg_q[15].locked && pmpcfg_q[15].addr_mode == riscv::TOR))  pmpaddr_d[14]  = csr_wdata[riscv::PLEN-3:0];
                 riscv::CSR_PMPADDR15:  if (!pmpcfg_q[15].locked)  pmpaddr_d[15]  = csr_wdata[riscv::PLEN-3:0];
                 
-                // nop thingy enabling/diabling
+                // nop thingy enabling/disabling 
                 riscv::CSR_EN_NOPTHINGY : nop_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
+                
                 
                 default: update_access_exception = 1'b1;
             endcase

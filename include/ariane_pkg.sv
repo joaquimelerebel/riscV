@@ -442,7 +442,7 @@ package ariane_pkg;
                                // comparisons
                                LTS, LTU, GES, GEU, EQ, NE,
                                // jumps
-                               JALR, BRANCH,
+                               JAL, JALR, BRANCH,
                                // set lower than operations
                                SLTS, SLTU,
                                // CSR functions

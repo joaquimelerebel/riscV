@@ -952,6 +952,7 @@ module decoder import ariane_pkg::*; (
                 // --------------------------------
                 riscv::OpcodeBranch: begin
                     imm_select              = SBIMM;
+                    instruction_o.op        = ariane_pkg::BRANCH;
                     instruction_o.fu        = CTRL_FLOW;
                     instruction_o.rs1[4:0]  = instr.stype.rs1;
                     instruction_o.rs2[4:0]  = instr.stype.rs2;
@@ -985,6 +986,7 @@ module decoder import ariane_pkg::*; (
                 // Jump and link
                 riscv::OpcodeJal: begin
                     instruction_o.fu        = CTRL_FLOW;
+                    instruction_o.op        = ariane_pkg::JAL;
                     imm_select              = JIMM;
                     instruction_o.rd[4:0]   = instr.utype.rd;
                     is_control_flow_instr_o = 1'b1;
