@@ -11,15 +11,15 @@ import os, sys
 import unicodedata, itertools
 
 
-#CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
-CHOSEN_ATTACK = [4]
-TIME_WAIT_GDB=10
+CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
+#CHOSEN_ATTACK = [4]
+TIME_WAIT_GDB=15
 TIME_WAIT_NEXT_STEP=4
 
 
 EXCEL_OK_ATTACKS="excel_output"
 
-GCC_MOD = 0
+GCC_MOD = 1
 
 attacks_array = ["technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_ptr= RET_ADDR;location = STACK;function = MEMCPY;",
 				"technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_ptr= FUNC_PTR_STACK_VAR;location = STACK;function = MEMCPY;",
