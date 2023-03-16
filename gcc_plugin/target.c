@@ -1,15 +1,20 @@
 #include <stdio.h>
 
 
-int f2()
+int f2(int x)
 {
-    return 7;
+    return 2 + x;
+}
+
+int f3(int x)
+{
+    return 3 + x;
 }
 
 void f1()
 {
     int a = 5;
-    a = a + 5 + f2();
+    a = a + 5 + (f2(1) == f3(0));
     return;
 }
 

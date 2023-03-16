@@ -4,7 +4,7 @@ HOST_GCC = g++
 # The gcc that will support our plugin 
 TARGET_GCC = gcc
 
-RISCV_GCC = /opt/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc
+RISCV_GCC = /opt/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc.real
 RISCV_OBJDUMP = /opt/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-objdump
 
 
