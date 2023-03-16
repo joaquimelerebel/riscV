@@ -53,8 +53,8 @@ module parser_nop_custom_commit
     
     logic prev_detect_prep_NOP_CALL, prev_detect_prep_NOP_RET;
        
-    //logic prev_nop_ret, prev_nop_call;  
-    //logic[3:0] leds_s;
+    logic prev_nop_ret, prev_nop_call;  
+    logic[3:0] leds_s;
        
     ariane_pkg::scoreboard_entry_t prev_entry;
     
@@ -71,8 +71,7 @@ function logic is_ret(ariane_pkg::scoreboard_entry_t entry);
 endfunction
 
 function logic is_call(ariane_pkg::scoreboard_entry_t entry);
-        if( ( entry.fu == ariane_pkg::CTRL_FLOW  ) && 
-            ( entry.rd[5:0] != 6'h0              ) &&
+        if( ( entry.rd[5:0] == 6'h1 /*ajouter le 5*/              ) &&
             (     ( entry.op == ariane_pkg::JALR ) ||
                   ( entry.op == ariane_pkg::JAL  ) ) 
           ) begin
@@ -238,8 +237,11 @@ endfunction
          end
     end
    
-   assign leds[0] = csr_en_i;
-   
+   /*assign leds[0] = csr_en_i;
+    
+   assign leds[1] = detect_NOP_CALL;
+   assign leds[2] = detect_NOP_RET;
+     */ 
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
             exception_o.valid <= 1'b0;
@@ -260,8 +262,8 @@ endfunction
         end
     end
    
-   /*
-   assign leds = '0;
+   
+   //assign leds = '0;
       
    assign leds = leds_s;
          
@@ -301,6 +303,6 @@ endfunction
                 
             end 
          end
-    end*/
+    end
     
 endmodule

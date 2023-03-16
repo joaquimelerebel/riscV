@@ -37,7 +37,7 @@ module parser_nop_custom_commit_v2
     input logic [NR_COMMIT_PORTS-1:0]                               commit_ack_o,
     // what instruction will be commited
     input  ariane_pkg::scoreboard_entry_t [NR_COMMIT_PORTS-1:0]     commit_instr_i,
-    output logic [3:0]                                              leds, 
+    output logic [9:0]                                              leds, 
     output ariane_pkg::exception_t                                  exception_o
    
 );
@@ -110,7 +110,7 @@ endfunction
         detect_NOP_RET = 1'b0;
         
         // FSM
-        case( state_CALL ) 
+        case( state_RET ) 
             IDLE : begin
                 next_state_RET = IDLE;
                 
@@ -171,7 +171,7 @@ endfunction
         detect_NOP_CALL = 1'b0;
         
         // FSM
-        case( state_RET ) 
+        case( state_CALL ) 
             IDLE : begin
                 next_state_CALL = IDLE;
                 
@@ -244,7 +244,7 @@ endfunction
     end
    
     
-    assign leds[0] = csr_en_i;
+    //assign leds[0] = csr_en_i;
 
     // assign the exception
     always_ff @(posedge clk_i) begin
@@ -256,21 +256,24 @@ endfunction
             if( detect_prep_NOP_CALL && !detect_NOP_CALL && csr_en_i) begin
                 exception_o.cause <= riscv::BREAKPOINT;
                 exception_o.valid <= 1'b1;
+                //exception_o.tval <= commit_instr_i[0].pc;
             end else 
             if( detect_prep_NOP_RET && !detect_NOP_RET && csr_en_i) begin
                 exception_o.cause <= riscv::BREAKPOINT;
                 exception_o.valid <= 1'b1;
+                //exception_o.tval <= commit_instr_i[0].pc;
             end else begin 
                 exception_o.valid <= 1'b0;
                 exception_o.cause <= '0;
+                
             end
          end
     end
     
     
-     /*      
+    
     logic prev_nop_ret, prev_nop_call;  
-    logic[3:0] leds_s;
+    logic[9:0] leds_s;
     
     //assign leds = '0;
     //assign leds[0] = detect_prep_NOP_CALL;
@@ -296,6 +299,7 @@ endfunction
             prev_detect_prep_NOP_RET <= detect_prep_NOP_RET;
             //prev_prep_nop <= detect_prep_NOP;
             
+            leds_s[4] = csr_en_i;
             
             if((prev_detect_prep_NOP_RET == 1'b0) && (detect_prep_NOP_RET == 1'b1)) begin
                 leds_s[0] <= !leds_s[0]; 
@@ -315,6 +319,6 @@ endfunction
                 
             end 
          end
-    end*/
+    end
     
 endmodule
