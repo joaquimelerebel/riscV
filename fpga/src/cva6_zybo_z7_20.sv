@@ -60,7 +60,7 @@ module cva6_zybo_z7_20 (
   input  logic     tdi       ,
   output wire      tdo       ,
   input  logic     rx        ,
-  output logic[3:0] leds,
+  output logic[9:0] leds,
   output logic     tx
 
 );
