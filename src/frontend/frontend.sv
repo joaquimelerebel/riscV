@@ -16,7 +16,8 @@
 // change request from the back-end and does branch prediction.
 
 module frontend import ariane_pkg::*; #(
-  parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig
+  parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig,
+  parameter CFI_ADDR_RST = 32'b0
 ) (
   input  logic               clk_i,              // Clock
   input  logic               rst_ni,             // Asynchronous reset active low
@@ -43,7 +44,9 @@ module frontend import ariane_pkg::*; #(
   // instruction output port -> to processor back-end
   output fetch_entry_t       fetch_entry_o,       // fetch entry containing all relevant data for the ID stage
   output logic               fetch_entry_valid_o, // instruction in IF is valid
-  input  logic               fetch_entry_ready_i  // ID acknowledged this instruction
+  input  logic               fetch_entry_ready_i,  // ID acknowledged this instruction
+  // cfi signal error
+  input  logic               commit_cfi_signal_i 
 );
     // Instruction Cache Registers, from I$
     logic [FETCH_WIDTH-1:0] icache_data_q;
@@ -306,6 +309,8 @@ module frontend import ariane_pkg::*; #(
       if (eret_i) npc_d = epc_i;
       // 5. Exception/Interrupt
       if (ex_valid_i) npc_d = trap_vector_base_i;
+      // 5.5 if a cfi signal has occured we reset the execution
+      if (commit_cfi_signal_i) npc_d = CFI_ADDR_RST;
       // 6. Pipeline Flush because of CSR side effects
       // On a pipeline flush start fetching from the next address
       // of the instruction in the commit stage

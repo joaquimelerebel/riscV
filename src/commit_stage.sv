@@ -54,6 +54,7 @@ module commit_stage import ariane_pkg::*; #(
     output logic                                    sfence_vma_o,        // flush TLBs and pipeline
     // nop thingy activation bit
     output logic[9:0]                               leds,
+    output logic                                    cfi_signal,
     input logic                                     csr_nop_thingy_en_i // enables the nop parser
 );
 
@@ -69,7 +70,8 @@ module commit_stage import ariane_pkg::*; #(
 //     .probe7(1'b0), // input wire [0:0]  probe7
 //     .probe8(1'b0), // input wire [0:0]  probe8
 //     .probe9(1'b0) // input wire [0:0]  probe9
-// );
+//);
+
 
     for (genvar i = 0; i < NR_COMMIT_PORTS; i++) begin : gen_waddr
       assign waddr_o[i] = commit_instr_i[i].rd[4:0];
@@ -255,10 +257,10 @@ module commit_stage import ariane_pkg::*; #(
 
 exception_t ex_cntr_flow_s;
 
-parser_nop_custom_commit_v2 
+parser_nop_custom_commit_call
 #(
    .NR_COMMIT_PORTS(NR_COMMIT_PORTS)
-) nop_thingy
+) nop_thingy_call
 (
    .clk_i,
    .rst_ni,
@@ -267,10 +269,9 @@ parser_nop_custom_commit_v2
    .commit_ack_o(commit_ack_o),
    .commit_instr_i(commit_instr_i),
    .leds(leds),
+   .cfi_signal(cfi_signal),
    .exception_o(ex_cntr_flow_s)
 );
-
-
     
 
     // -----------------------------
@@ -299,9 +300,7 @@ parser_nop_custom_commit_v2
                 exception_o.tval = commit_instr_i[0].ex.tval;
             end
             
-            if(ex_cntr_flow_s.valid) begin
-                exception_o = ex_cntr_flow_s;
-            end
+           
             
             // ------------------------
             // Earlier Exceptions
@@ -310,6 +309,12 @@ parser_nop_custom_commit_v2
             // faults for example
             if (commit_instr_i[0].ex.valid) begin
                 exception_o = commit_instr_i[0].ex;
+            end
+            
+            // NOP exception 
+            // has the most right -> can fuck up somethings maybe check
+             if(ex_cntr_flow_s.valid) begin
+                exception_o = ex_cntr_flow_s;
             end
         end
         // Don't take any exceptions iff:

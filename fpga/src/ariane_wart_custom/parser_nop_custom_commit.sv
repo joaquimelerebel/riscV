@@ -249,12 +249,14 @@ endfunction
             exception_o.tval  <= '0;
         end else begin
             if( detect_prep_NOP_CALL && !detect_NOP_CALL && csr_en_i) begin
-                exception_o.cause <= riscv::BREAKPOINT;
+                exception_o.cause <= riscv::INSTR_ADDR_MISALIGNED;
                 exception_o.valid <= 1'b1;
+                //exception_o.tval <= prev_entry.pc;
             end else 
             if( detect_prep_NOP_RET && !detect_NOP_RET && csr_en_i) begin
-                exception_o.cause <= riscv::BREAKPOINT;
+                exception_o.cause <= riscv::INSTR_ADDR_MISALIGNED;
                 exception_o.valid <= 1'b1;
+                //exception_o.tval <= prev_entry.pc;
             end else begin 
                 exception_o.valid <= 1'b0;
                 exception_o.cause <= '0;

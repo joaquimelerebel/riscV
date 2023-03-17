@@ -294,6 +294,7 @@ package riscv;
     localparam logic [XLEN-1:0] ENV_CALL_MMODE        = 11; // environment call from machine mode
     localparam logic [XLEN-1:0] INSTR_PAGE_FAULT      = 12; // Instruction page fault
     localparam logic [XLEN-1:0] LOAD_PAGE_FAULT       = 13; // Load page fault
+    localparam logic [XLEN-1:0] CFI_NOP_ERROR         = 14; // Call or Ret not followed by the good nop 
     localparam logic [XLEN-1:0] STORE_PAGE_FAULT      = 15; // Store page fault
     localparam logic [XLEN-1:0] DEBUG_REQUEST         = 24; // Debug request
 
