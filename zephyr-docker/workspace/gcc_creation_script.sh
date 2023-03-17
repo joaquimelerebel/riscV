@@ -1,4 +1,13 @@
 #!/bin/sh
+
+# apply changes to the libs 
+export WORKDIR_PATH=/workdir
+export ZEPHYR_SDK_PATH=/opt/toolchains/zephyr-sdk-0.15.1
+
+cd /workdir/zephyr-patch
+echo "\n\n" | sudo /workdir/zephyr-patch/copy-zephyr-files.py > /dev/null
+cd /workdir
+
 cd /opt/toolchains/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/
 
 cat /workdir/gcc_replacement.sh > riscv64-zephyr-elf-gcc.wrapper

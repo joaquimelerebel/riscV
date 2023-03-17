@@ -161,6 +161,12 @@ module ariane import ariane_pkg::*; #(
   logic [NR_COMMIT_PORTS-1:0][riscv::XLEN-1:0] wdata_commit_id;
   logic [NR_COMMIT_PORTS-1:0]       we_gpr_commit_id;
   logic [NR_COMMIT_PORTS-1:0]       we_fpr_commit_id;
+  
+  // --------------
+  // COMMIT <-> CTRL
+  // --------------
+  logic                     commit_cfi_signal;
+  
   // --------------
   // CSR <-> *
   // --------------
@@ -268,6 +274,7 @@ module ariane import ariane_pkg::*; #(
     .set_debug_pc_i      ( set_debug_pc                  ),
     .epc_i               ( epc_commit_pcgen              ),
     .eret_i              ( eret                          ),
+    .commit_cfi_signal_i ( commit_cfi_signal             ),
     .trap_vector_base_i  ( trap_vector_base_commit_pcgen ),
     .ex_valid_i          ( ex_commit.valid               ),
     .fetch_entry_o       ( fetch_entry_if_id             ),
@@ -504,6 +511,7 @@ module ariane import ariane_pkg::*; #(
     .sfence_vma_o           ( sfence_vma_commit_controller  ),
     .flush_commit_o         ( flush_commit                  ),
     .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
+    .cfi_signal             ( commit_cfi_signal             ),
     .leds(leds),
     .*
   );

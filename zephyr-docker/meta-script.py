@@ -11,8 +11,8 @@ import os, sys
 import unicodedata, itertools
 
 
-CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
-#CHOSEN_ATTACK = [4]
+#CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
+#CHOSEN_ATTACK = [1]
 TIME_WAIT_GDB=15
 TIME_WAIT_NEXT_STEP=4
 

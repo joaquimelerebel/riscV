@@ -68,8 +68,7 @@ function logic is_ret(ariane_pkg::scoreboard_entry_t entry);
 endfunction
 
 function logic is_call(ariane_pkg::scoreboard_entry_t entry);
-        if( ( entry.fu == ariane_pkg::CTRL_FLOW  ) && 
-            ( entry.rd[5:0] != 6'h0              ) &&
+        if( ( entry.rd[5:0] != 6'h0              ) &&
             (     ( entry.op == ariane_pkg::JALR ) ||
                   ( entry.op == ariane_pkg::JAL  ) ) 
           ) begin
