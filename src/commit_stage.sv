@@ -254,8 +254,21 @@ module commit_stage import ariane_pkg::*; #(
     
     
 // nop thingy 
+exception_t ex_cntr_flow_s, ex_cntr_flow_ret, ex_cntr_flow_call;
 
-exception_t ex_cntr_flow_s;
+always_comb begin : exceptions
+    ex_cntr_flow_s = '0;
+    
+    if(ex_cntr_flow_ret.valid) begin
+         ex_cntr_flow_s =  ex_cntr_flow_ret;
+    end 
+    else if(ex_cntr_flow_call.valid) begin 
+        ex_cntr_flow_s = ex_cntr_flow_call;
+    end 
+end
+
+logic cfi_signal_ret, cfi_signal_call;
+assign cfi_signal = cfi_signal_ret | cfi_signal_call;
 
 parser_nop_custom_commit_call
 #(
@@ -266,13 +279,44 @@ parser_nop_custom_commit_call
    .rst_ni,
    .flush_i(flush_dcache_i),
    .csr_en_i(csr_nop_thingy_en_i),
-   .commit_ack_o(commit_ack_o),
+   .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
    .leds(leds),
-   .cfi_signal(cfi_signal),
-   .exception_o(ex_cntr_flow_s)
+   .cfi_signal(cfi_signal_call),
+   .exception_o(ex_cntr_flow_s_call)
 );
     
+parser_nop_custom_commit_ret
+#(
+   .NR_COMMIT_PORTS(NR_COMMIT_PORTS)
+) nop_thingy_ret
+(
+   .clk_i,
+   .rst_ni,
+   .flush_i(flush_dcache_i),
+   .csr_en_i(csr_nop_thingy_en_i),
+   .commit_ack_i(commit_ack_o),
+   .commit_instr_i(commit_instr_i),
+   //.leds(leds),
+   .cfi_signal(cfi_signal_ret),
+   .exception_o(ex_cntr_flow_s_ret)
+);
+/*
+parser_nop_custom_commit_v2
+#(
+   .NR_COMMIT_PORTS(NR_COMMIT_PORTS)
+) nop_thingy
+(
+   .clk_i,
+   .rst_ni,
+   .flush_i(flush_dcache_i),
+   .csr_en_i(csr_nop_thingy_en_i),
+   .commit_ack_i(commit_ack_o),
+   .commit_instr_i(commit_instr_i),
+   .leds(leds),
+   .cfi_signal(cfi_signal_ret),
+   .exception_o(ex_cntr_flow_s_ret)
+);*/
 
     // -----------------------------
     // Exception & Interrupt Logic
