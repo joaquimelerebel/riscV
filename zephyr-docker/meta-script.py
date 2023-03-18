@@ -11,11 +11,13 @@ import os, sys
 import unicodedata, itertools
 
 
-#CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
-#CHOSEN_ATTACK = [1]
+CHOSEN_ATTACK = linspace(1, 10, 10, dtype=int)
+#CHOSEN_ATTACK = [10]
 TIME_WAIT_GDB=15
 TIME_WAIT_NEXT_STEP=4
 
+
+USER_NOT_SUDO="ulysse"
 
 EXCEL_OK_ATTACKS="excel_output"
 
@@ -52,7 +54,14 @@ def attack_classique():
 	for att in CHOSEN_ATTACK:
 		c_node={}
 		
+		# reprogram the fpga 
+		p=sub.Popen(f"sudo -u {USER_NOT_SUDO} make -C .. program_cva6_fpga", shell=True)
+		p.communicate()
+		
+
+
 		setup_serial()
+
 
 		# run 
 		print(f"\n-----------------------\nsudo docker run -ti --privileged -v /dev:/dev -v `realpath workspace`:/workdir zephyr-build:v1 /bin/bash -c 'cd /workdir; sudo python script.py {att} {SERIAL_PATH} {GCC_MOD}\n-------------------\n")
