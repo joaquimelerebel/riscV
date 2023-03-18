@@ -410,7 +410,10 @@ module csr_regfile import ariane_pkg::*; #(
         pmpaddr_d               = pmpaddr_q;
         
         nop_en_d                = nop_en_q;
-
+        
+        // check if we want to reset the value in the CSR nop args
+        
+        
         // check for correct access rights and that we are writing
         if (csr_we) begin
             unique case (csr_addr.address)

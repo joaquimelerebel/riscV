@@ -34,10 +34,11 @@ module parser_nop_custom_commit_v2
     input  logic                                                    flush_i,
     input  logic                                                    csr_en_i,
     // does the commit stages wants to commit the nth instruction
-    input logic [NR_COMMIT_PORTS-1:0]                               commit_ack_o,
+    input logic [NR_COMMIT_PORTS-1:0]                               commit_ack_i,
     // what instruction will be commited
     input  ariane_pkg::scoreboard_entry_t [NR_COMMIT_PORTS-1:0]     commit_instr_i,
     output logic [9:0]                                              leds, 
+    output logic                                                    cfi_signal,
     output ariane_pkg::exception_t                                  exception_o
    
 );
@@ -114,14 +115,14 @@ endfunction
                 next_state_RET = IDLE;
                 
                 // detect the return
-                if( (commit_ack_o[0] == 1'b1)                   && 
+                if( (commit_ack_i[0] == 1'b1)                   && 
                     (commit_instr_i[0].ex.valid == 1'b0)        && 
                     is_ret(commit_instr_i[0]) )                 begin
                         next_state_RET = WAITS_NOP;
                         detect_RET = 1'b1;
                     
                     // check if the ret is in the second that might be ACK at the same time 
-                    if( commit_ack_o[1] == 1'b1 ) begin
+                    if( commit_ack_i[1] == 1'b1 ) begin
                         detect_prep_NOP_RET = 1'b1;
                
                         next_state_RET = IDLE;
@@ -132,7 +133,7 @@ endfunction
                     end
      
                 end else 
-                if( (commit_ack_o[1] == 1'b1)                  && 
+                if( (commit_ack_i[1] == 1'b1)                  && 
                     (commit_instr_i[1].ex.valid == 1'b0)       && 
                     is_ret(commit_instr_i[1]) )                begin
                             next_state_RET = WAITS_NOP;
@@ -145,7 +146,7 @@ endfunction
                // only check the first one because means that the jalr was on the commit_instr_i[0] and commit_instr_i[1] was not commited at the same time 
                // or on commit_instr_i[1] and not the ret is on commit[0]
                if ( (prev_entry != commit_instr_i[0])   &&
-                    (commit_ack_o[0] == 1'b1))          begin
+                    (commit_ack_i[0] == 1'b1))          begin
                     
                     detect_prep_NOP_RET = 1'b1;
                     next_state_RET = IDLE;
@@ -175,14 +176,14 @@ endfunction
                 next_state_CALL = IDLE;
                 
                 // detect the return
-                if( (commit_ack_o[0] == 1'b1)                   && 
+                if( (commit_ack_i[0] == 1'b1)                   && 
                     (commit_instr_i[0].ex.valid == 1'b0)        && 
                     is_call(commit_instr_i[0]) )                 begin
                         next_state_CALL = WAITS_NOP;
                         detect_CALL = 1'b1;
                     
                     // check if the ret is in the second that might be ACK at the same time 
-                    if( commit_ack_o[1] == 1'b1 ) begin
+                    if( commit_ack_i[1] == 1'b1 ) begin
                         detect_prep_NOP_CALL = 1'b1;
                
                         next_state_CALL = IDLE;
@@ -193,7 +194,7 @@ endfunction
                     end
      
                 end else 
-                if( (commit_ack_o[1] == 1'b1)                  && 
+                if( (commit_ack_i[1] == 1'b1)                  && 
                     (commit_instr_i[1].ex.valid == 1'b0)       && 
                     is_call(commit_instr_i[1]) )                begin
                             next_state_CALL = WAITS_NOP;
@@ -206,7 +207,7 @@ endfunction
                // only check the first one because means that the jalr was on the commit_instr_i[0] and commit_instr_i[1] was not commited at the same time 
                // or on commit_instr_i[1] and not the ret is on commit[0]
                if ( (prev_entry != commit_instr_i[0])   &&
-                    (commit_ack_o[0] == 1'b1))          begin
+                    (commit_ack_i[0] == 1'b1))          begin
                     
                     detect_prep_NOP_CALL = 1'b1;
                     next_state_CALL = IDLE;
@@ -251,20 +252,23 @@ endfunction
             exception_o.valid <= 1'b0;
             exception_o.cause <= '0;
             exception_o.tval  <= '0;
+            cfi_signal <= '0;
          end else begin
             if( detect_prep_NOP_CALL && !detect_NOP_CALL && csr_en_i) begin
                 exception_o.cause <= riscv::BREAKPOINT;
                 exception_o.valid <= 1'b1;
+                cfi_signal <= '1;
                 //exception_o.tval <= commit_instr_i[0].pc;
             end else 
             if( detect_prep_NOP_RET && !detect_NOP_RET && csr_en_i) begin
                 exception_o.cause <= riscv::BREAKPOINT;
                 exception_o.valid <= 1'b1;
+                cfi_signal <= '1;
                 //exception_o.tval <= commit_instr_i[0].pc;
             end else begin 
                 exception_o.valid <= 1'b0;
                 exception_o.cause <= '0;
-                
+                cfi_signal <= '0;
             end
          end
     end

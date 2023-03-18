@@ -6,7 +6,7 @@ import shutil
 from os import environ
 
 WORKDIR_PATH = environ.get('WORKDIR_PATH')
-ZEPHYR_SDK_PATH = environ.get('ZEPHYR_SK_PATH')
+ZEPHYR_SDK_PATH = environ.get('ZEPHYR_SDK_PATH')
 
 if WORKDIR_PATH is None:
   WORKDIR_PATH = input('Workdir Path (/workdir): ') or "/workdir"
