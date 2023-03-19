@@ -3,7 +3,6 @@
  * Heavily based on the blog post of Grabiele Serra :
  * https://gabrieleserra.ml/blog/2020-08-27-an-introduction-to-gcc-and-gccs-plugins.html
  */
-
 #include <iostream>
 #include <gcc-plugin.h>
 #include <rtl.h>
@@ -14,16 +13,36 @@
 #include <attribs.h>
 #include <memmodel.h>
 #include <emit-rtl.h>
+#include <function.h>
 
 #define INSN_FROM_RTX(rtx) (rtx_insn *)(rtx)
 
 #define ADD_NOP "li zero, 1"
-#define ADD2_NOP "li zero, 2"
+
+char GENERIC_NOP[24];
+char CSR_WRITE[24];
+
+char *nop(uint16_t imm)
+{
+    sprintf(GENERIC_NOP, "li zero, %d", imm);
+    return GENERIC_NOP;
+}
+
+char *csrwi(uint8_t imm)
+{
+    sprintf(CSR_WRITE, "csrwi 0x3FE, %d", imm);
+    return CSR_WRITE;
+}
 
 /**
  * When 1 enables verbose printing
  */
-#undef __DEBUG__
+#undef DEBUG
+
+/**
+ * Generate code for runtime of number of arguments
+*/
+#define RUNTIME_ARG_CHECK
 
 /**
  * Name of this plugin
@@ -137,7 +156,7 @@ extern void register_attribute(const struct attribute_spec *attr);
  */
 static tree handle_instrument_attribute(tree *node, tree name, tree args, int flags, bool *no_add_attrs)
 {
-#if __DEBUG__ == 1
+#if DEBUG == 1
     fprintf(stderr, "> Found attribute\n");
 
     fprintf(stderr, "\tnode = ");
@@ -174,59 +193,143 @@ rtx_insn *seek_till_fn_prologue(basic_block bb)
  * Create a nop instruction and insert it after the given stmt
  */
 
-static void insert_nop(rtx_insn *insn, const char *opcode)
+static void insert_asm(rtx_insn *insn, const char *opcode, bool before = false)
 {
     tree string = build_string(strlen(opcode), opcode);
-    location_t loc = INSN_LOCATION(BB_HEAD(ENTRY_BLOCK_PTR_FOR_FN(cfun)->next_bb)); // INSN_LOCATION(insn);
+    location_t loc = INSN_LOCATION(insn) || INSN_LOCATION(BB_HEAD(ENTRY_BLOCK_PTR_FOR_FN(cfun)->next_bb)); // INSN_LOCATION(insn);
 
     rtx body = gen_rtx_ASM_INPUT_loc(VOIDmode, ggc_strdup(TREE_STRING_POINTER(string)), loc);
-    emit_insn_after(body, insn);
+    if (before)
+        emit_insn_before(body, insn);
+    else
+        emit_insn_after(body, insn);
 }
 
 /**
  * For each function lookup attributes and attach profiling function
  */
+
+struct argument_count
+{
+    int count;
+    bool is_variadic;
+};
+
+static void get_argument_count(tree fn, struct argument_count *p)
+{
+
+    int count = 0;
+
+    tree arg = arg = TYPE_ARG_TYPES(TREE_TYPE(fn));
+    for (int idx = 0; arg && arg != void_list_node; arg = TREE_CHAIN(arg), idx++)
+        count++;
+
+    p->count = count;
+    p->is_variadic = (count && (arg != void_list_node));
+}
+
+int is_indirect_call(rtx_insn *insn)
+{
+    rtx pattern_expr = PATTERN(insn);
+
+    if (GET_CODE(pattern_expr) == PARALLEL)
+    {
+        int num_ops = XVECLEN(pattern_expr, 0);
+        for (int i = 0; i < num_ops; i++)
+        {
+            rtx op_expr = XVECEXP(pattern_expr, 0, i);
+            if (GET_CODE(op_expr) == CALL)
+            {
+                return GET_CODE(XVECEXP(op_expr, 0, 0)) != SYMBOL_REF;
+            }
+            else if (GET_CODE(op_expr) == SET)
+            {
+                return GET_CODE(XEXP(XVECEXP(op_expr, 1, 0), 0)) != SYMBOL_REF;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/* might break some code - be careful */
+static int count_call_ins_arguments(rtx_insn *insn)
+{
+    int count = 0;
+    rtx arg_list = CALL_INSN_FUNCTION_USAGE(insn);
+    while (arg_list && GET_CODE(arg_list) == EXPR_LIST)
+    {
+        ++count;
+        arg_list = XEXP(arg_list, 1);
+    }
+
+    return count;
+}
+
 static unsigned int instrument_assignments_plugin_exec(void)
 {
     // get the FUNCTION_DECL of the function whose body we are reading
     tree fndef = current_function_decl;
-
+#ifdef DEBUG
     // print the function name
     fprintf(stderr, "\n> Inspecting function '%s'\n", FN_NAME(fndef));
+#endif 
+    /* Traverse the parameter list and count the number of non-variadic parameters */
 
     // get function entry block
     basic_block entry = ENTRY_BLOCK_PTR_FOR_FN(cfun)->next_bb;
 
-    // warn the user we are adding a profiling function
-    fprintf(stderr, "\n\t [function start] adding nop after RTL: \n");
-#ifdef __DEBUG__
+#ifdef RUNTIME_ARG_CHECK
+    struct argument_count c;
+    get_argument_count(fndef, &c);
+    uint32_t call_nop_imm = (1 << 1) | (c.count << 2) | (c.is_variadic << 10);
+#else
+    uint32_t call_nop_imm = (1 << 1);
+#endif
+
+#ifdef DEBUG
+    fprintf(stderr, "[function start] adding nop %s\n", nop(call_nop_imm));
+    fprintf(stderr, "Function %s uses %d arguments it is%s variadic\n", IDENTIFIER_POINTER(DECL_NAME(fndef)), c.count, c.is_variadic ? "" : " not");
     print_rtl_single(stderr, BB_HEAD(entry));
 #endif
 
     // insert nop at the beginning of the function
-    insert_nop(BB_HEAD(entry), ADD2_NOP);
+    insert_asm(BB_HEAD(entry), nop(call_nop_imm));
 
     // insert nop after each call instruction
     rtx_insn *ins = BB_HEAD(entry);
     while (ins)
     {
+
         if (GET_CODE(ins) == CALL_INSN)
         {
-            fprintf(stderr, "\n\t [call instruction] adding nop after RTL: \n");
-#ifdef __DEBUG__
+
+#ifdef RUNTIME_ARG_CHECK
+            bool is_indirect = is_indirect_call(ins);
+            if (is_indirect)
+            {
+#ifdef DEBUG
+                fprintf(stderr, "Indirect call: prefixing with %s\n", csrwi(count_call_ins_arguments(ins)));
+#endif
+                insert_asm(ins, csrwi(count_call_ins_arguments(ins)), true);
+            }
+#endif
+
+#ifdef DEBUG
+            fprintf(stderr, "[call instruction] adding nop %s: \n", ADD_NOP);
             print_rtl_single(stderr, ins);
 #endif
 
-            insert_nop(ins, ADD_NOP);
+            insert_asm(ins, ADD_NOP); // handle insertions carefully, maybe they offset each other (divfloat in libgcc.., or maybe not)
         }
 
         ins = next_insn(ins);
     }
 
     // when __debug__ging, shows the rtl outputted
-#ifdef __DEBUG__
-        fprintf(stderr, "\n> --------------------- \n> - RTL AFTER \n> --------------------- \n\n");
-        print_rtl(stderr, BB_HEAD(entry));
+#ifdef DEBUG
+    fprintf(stderr, "\n> --------------------- \n> - RTL AFTER \n> --------------------- \n\n");
+    print_rtl(stderr, BB_HEAD(entry));
 #endif
     return 0;
 }

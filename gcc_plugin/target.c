@@ -1,27 +1,38 @@
 #include <stdio.h>
+#include <stdarg.h>
 
+void printk(const char*, ...);
+int f3(int, int);
+void f1(int);
 
-int f2(int x)
-{
-    return 2 + x;
+int f(int x) {
+    return -x;
 }
 
-int f3(int x)
+int f3(int x, int y)
 {
-    return 3 + x;
+    return x + f(1);
 }
 
-void f1()
+void printk(const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    printf(fmt, ap);
+    va_end(ap);
+}
+
+void f1(int x)
 {
     int a = 5;
-    a = a + 5 + (f2(1) == f3(0));
+    a = a + 5 + f3(0, 5);
     return;
 }
 
 __attribute((profiled)) int main()
 {
-    volatile (*ptr)(void) = &f1+5;
-    f1();
+    printk("%s\n", "Hello world");
+    volatile (*ptr)(void) = &f1+4;
+    f1(5);
     (*ptr)();
     return 1;
 }
