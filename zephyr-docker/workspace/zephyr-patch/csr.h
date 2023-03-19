@@ -237,4 +237,5 @@
 
 #if defined(CONFIG_CUSTOM_PROT)
 #define CSR_CUSTOM_PROT 0x3FF
+#define CSR_CHECK_ARGS  0x3FE
 #endif
