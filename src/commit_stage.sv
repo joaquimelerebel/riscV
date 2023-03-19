@@ -55,7 +55,9 @@ module commit_stage import ariane_pkg::*; #(
     // nop thingy activation bit
     output logic[9:0]                               leds,
     output logic                                    cfi_signal,
-    input logic                                     csr_nop_thingy_en_i // enables the nop parser
+    input  logic                                    csr_nop_thingy_en_i, // enables the nop parser
+    output logic                                    rst_nop_id_csr_o,
+    input  logic[8:0]                               csr_indi_nb_args_i                                     
 );
 
 // ila_0 i_ila_commit (
@@ -283,6 +285,8 @@ parser_nop_custom_commit_call
    .commit_instr_i(commit_instr_i),
    .leds(leds),
    .cfi_signal(cfi_signal_call),
+   .csr_indi_nb_args_i(csr_indi_nb_args_i),
+   .rst_nop_id_csr_o(rst_nop_id_csr_o),
    .exception_o(ex_cntr_flow_s_call)
 );
     

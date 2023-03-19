@@ -372,6 +372,8 @@ package riscv;
         CSR_PMPADDR13      = 12'h3BD,
         CSR_PMPADDR14      = 12'h3BE,
         CSR_PMPADDR15      = 12'h3BF,
+        // csr that contains the number of args in next function
+        CSR_ID_INDI_CALL   = 12'h3FE,
         // nop thingy enable CSR
         CSR_EN_NOPTHINGY   = 12'h3FF,
         

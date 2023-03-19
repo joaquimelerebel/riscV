@@ -197,8 +197,13 @@ module ariane import ariane_pkg::*; #(
   logic                     single_step_csr_commit;
   riscv::pmpcfg_t [15:0]    pmpcfg;
   logic [15:0][53:0]        pmpaddr;
+  
   // nop thingy enable signal
   logic                     nop_thingy_en;
+  
+  logic[8:0]                nop_indi_nb_args;
+  logic                     rst_nop_id_i;
+  
   // ----------------------------
   // Performance Counters <-> *
   // ----------------------------
@@ -512,6 +517,8 @@ module ariane import ariane_pkg::*; #(
     .flush_commit_o         ( flush_commit                  ),
     .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
     .cfi_signal             ( commit_cfi_signal             ),
+    .rst_nop_id_csr_o       ( rst_nop_id                    ),
+    .csr_indi_nb_args_i     ( nop_indi_nb_args              ),
     .leds(leds),
     .*
   );
@@ -571,6 +578,8 @@ module ariane import ariane_pkg::*; #(
     .pmpcfg_o               ( pmpcfg                        ),
     .pmpaddr_o              ( pmpaddr                       ),
     .nop_thingy_en_o        ( nop_thingy_en                 ),
+    .nop_indi_nb_args_o     ( nop_indi_nb_args              ),
+    .rst_nop_id_i           ( rst_nop_id                    ),
     .debug_req_i,
     .ipi_i,
     .irq_i,
