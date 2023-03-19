@@ -87,7 +87,9 @@ module csr_regfile import ariane_pkg::*; #(
     output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
     output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
     //NOP THINGY ACTIV
-    output logic                  nop_thingy_en_o             // enable signal for the nop thingy in commit block  
+    output logic                  nop_thingy_en_o,             // enable signal for the nop thingy in commit block
+    output logic[8:0]             nop_indi_nb_args_o,
+    input logic                   rst_nop_id_i  
     
 );
     // internal signal to keep track of access exceptions
@@ -148,7 +150,7 @@ module csr_regfile import ariane_pkg::*; #(
 
     // NOP THINGY activation register creation
     riscv::xlen_t nop_en_q,     nop_en_d;
-
+    riscv::xlen_t nop_id_q,     nop_id_d;
 
 
     assign pmpcfg_o = pmpcfg_q[15:0];
@@ -163,6 +165,7 @@ module csr_regfile import ariane_pkg::*; #(
     
     // nop thingy assignement
     assign nop_thingy_en_o = nop_en_q;
+    assign nop_indi_nb_args_o = nop_id_q[8:0];
     
     // ----------------
     // CSR Read logic
@@ -318,7 +321,7 @@ module csr_regfile import ariane_pkg::*; #(
                 
                 //NOP CSR                
                 riscv::CSR_EN_NOPTHINGY:      csr_rdata = nop_en_q; 
-                
+                riscv::CSR_ID_INDI_CALL:      csr_rdata = nop_id_q;
                 
                 default: read_access_exception = 1'b1;
             endcase
@@ -410,9 +413,13 @@ module csr_regfile import ariane_pkg::*; #(
         pmpaddr_d               = pmpaddr_q;
         
         nop_en_d                = nop_en_q;
-        
+        nop_id_d                = nop_id_q;
         // check if we want to reset the value in the CSR nop args
-        
+        // reset to all ones so that we can differentiate writting 
+        // nb args 0 and csr reseted 
+        if( rst_nop_id_i ) begin
+            nop_id_d = '1;
+        end
         
         // check for correct access rights and that we are writing
         if (csr_we) begin
@@ -667,6 +674,7 @@ module csr_regfile import ariane_pkg::*; #(
                 // nop thingy enabling/disabling 
                 riscv::CSR_EN_NOPTHINGY : nop_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
                 
+                riscv::CSR_ID_INDI_CALL : nop_id_d    = csr_wdata;  
                 
                 default: update_access_exception = 1'b1;
             endcase
@@ -1156,6 +1164,7 @@ module csr_regfile import ariane_pkg::*; #(
             
             //nop register
             nop_en_q               <= {riscv::XLEN{1'b0}};
+            nop_id_q               <= {riscv::XLEN{1'b1}};
             
         end else begin
             priv_lvl_q             <= priv_lvl_d;
@@ -1210,6 +1219,7 @@ module csr_regfile import ariane_pkg::*; #(
             
             // nop thingy 
             nop_en_q               <= nop_en_d;
+            nop_id_q               <= nop_id_d;
         end
     end
 
