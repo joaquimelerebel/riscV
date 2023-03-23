@@ -37,12 +37,12 @@ char *csrwi(uint8_t imm)
 /**
  * When 1 enables verbose printing
  */
-#undef DEBUG
+#define DEBUG 0
 
 /**
  * Generate code for runtime of number of arguments
 */
-#define RUNTIME_ARG_CHECK
+#define RUNTIME_ARG_CHECK 1 // 0
 
 /**
  * Name of this plugin
@@ -122,7 +122,7 @@ extern void print_generic_stmt(FILE *file, tree t, dump_flags_t flags);
 
 /**
  * The global singleton context aka "g". The name is chosen to be easy to type
- * in a __debug__ger. Represents the 'global state' of GCC
+ * in a DEBUGger. Represents the 'global state' of GCC
  *
  * GCC's internal state can be divided into zero or more "parallel universe" of
  * state; an instance of the class context is one such context of state
@@ -270,26 +270,32 @@ static unsigned int instrument_assignments_plugin_exec(void)
 {
     // get the FUNCTION_DECL of the function whose body we are reading
     tree fndef = current_function_decl;
-#ifdef DEBUG
+#if DEBUG == 1
     // print the function name
-    fprintf(stderr, "\n> Inspecting function '%s'\n", FN_NAME(fndef));
+    fprintf(stderr, "\n> Inspecting function '%s' | RUNTIME_ARG_CHECK = %d\n", FN_NAME(fndef), RUNTIME_ARG_CHECK);
 #endif 
     /* Traverse the parameter list and count the number of non-variadic parameters */
 
     // get function entry block
     basic_block entry = ENTRY_BLOCK_PTR_FOR_FN(cfun)->next_bb;
 
-#ifdef RUNTIME_ARG_CHECK
+
+#if RUNTIME_ARG_CHECK == 1
     struct argument_count c;
     get_argument_count(fndef, &c);
     uint32_t call_nop_imm = (1 << 1) | (c.count << 2) | (c.is_variadic << 10);
+#if DEBUG >= 1
+    fprintf(stderr, "Function %s uses %d arguments it is%s variadic\n", IDENTIFIER_POINTER(DECL_NAME(fndef)), c.count, c.is_variadic ? "" : " not");
+#endif
 #else
     uint32_t call_nop_imm = (1 << 1);
 #endif
 
-#ifdef DEBUG
+#if DEBUG >= 1
     fprintf(stderr, "[function start] adding nop %s\n", nop(call_nop_imm));
-    fprintf(stderr, "Function %s uses %d arguments it is%s variadic\n", IDENTIFIER_POINTER(DECL_NAME(fndef)), c.count, c.is_variadic ? "" : " not");
+#endif
+
+#if DEBUG == 2
     print_rtl_single(stderr, BB_HEAD(entry));
 #endif
 
@@ -304,19 +310,22 @@ static unsigned int instrument_assignments_plugin_exec(void)
         if (GET_CODE(ins) == CALL_INSN)
         {
 
-#ifdef RUNTIME_ARG_CHECK
+#if RUNTIME_ARG_CHECK == 1
             bool is_indirect = is_indirect_call(ins);
             if (is_indirect)
             {
-#ifdef DEBUG
+#if DEBUG == 1
                 fprintf(stderr, "Indirect call: prefixing with %s\n", csrwi(count_call_ins_arguments(ins)));
 #endif
                 insert_asm(ins, csrwi(count_call_ins_arguments(ins)), true);
             }
 #endif
 
-#ifdef DEBUG
+#if DEBUG >= 1
             fprintf(stderr, "[call instruction] adding nop %s: \n", ADD_NOP);
+#endif
+
+#if DEBUG == 2
             print_rtl_single(stderr, ins);
 #endif
 
@@ -326,8 +335,8 @@ static unsigned int instrument_assignments_plugin_exec(void)
         ins = next_insn(ins);
     }
 
-    // when __debug__ging, shows the rtl outputted
-#ifdef DEBUG
+    // when DEBUGging, shows the rtl outputted
+#if DEBUG == 2
     fprintf(stderr, "\n> --------------------- \n> - RTL AFTER \n> --------------------- \n\n");
     print_rtl(stderr, BB_HEAD(entry));
 #endif
