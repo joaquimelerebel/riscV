@@ -256,21 +256,30 @@ module commit_stage import ariane_pkg::*; #(
     
     
 // nop thingy 
-exception_t ex_cntr_flow_s, ex_cntr_flow_ret, ex_cntr_flow_call;
+ariane_pkg::exception_t ex_cntr_flow_s;
+ariane_pkg::exception_t ex_cntr_flow_ret;
+ariane_pkg::exception_t ex_cntr_flow_call;
+
 
 always_comb begin : exceptions
     ex_cntr_flow_s = '0;
-    
+    //cfi_signal = '0;
+     
     if(ex_cntr_flow_ret.valid) begin
          ex_cntr_flow_s =  ex_cntr_flow_ret;
+         //cfi_signal = '1;
     end 
     else if(ex_cntr_flow_call.valid) begin 
         ex_cntr_flow_s = ex_cntr_flow_call;
+        //cfi_signal = '1;
     end 
 end
 
 logic cfi_signal_ret, cfi_signal_call;
+// debug NOP TO DESTROY
 assign cfi_signal = cfi_signal_ret | cfi_signal_call;
+
+
 
 parser_nop_custom_commit_call
 #(
@@ -283,11 +292,11 @@ parser_nop_custom_commit_call
    .csr_en_i(csr_nop_thingy_en_i),
    .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
-   .leds(leds),
+   .leds(leds[4:0]),
    .cfi_signal(cfi_signal_call),
    .csr_indi_nb_args_i(csr_indi_nb_args_i),
    .rst_nop_id_csr_o(rst_nop_id_csr_o),
-   .exception_o(ex_cntr_flow_s_call)
+   .exception_o(ex_cntr_flow_call)
 );
     
 parser_nop_custom_commit_ret
@@ -301,12 +310,13 @@ parser_nop_custom_commit_ret
    .csr_en_i(csr_nop_thingy_en_i),
    .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
-   //.leds(leds),
+   .leds(leds[8:5]),
    .cfi_signal(cfi_signal_ret),
-   .exception_o(ex_cntr_flow_s_ret)
+   .exception_o(ex_cntr_flow_ret)
 );
-/*
-parser_nop_custom_commit_v2
+
+
+/*parser_nop_custom_commit_v2
 #(
    .NR_COMMIT_PORTS(NR_COMMIT_PORTS)
 ) nop_thingy
