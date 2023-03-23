@@ -2,16 +2,10 @@
 #include <stdarg.h>
 
 void printk(const char*, ...);
-int f3(int, int);
 void f1(int);
 
 int f(int x) {
     return -x;
-}
-
-int f3(int x, int y)
-{
-    return x + f(1);
 }
 
 void printk(const char* fmt, ...) {
@@ -24,6 +18,7 @@ void printk(const char* fmt, ...) {
 void f1(int x)
 {
     int a = 5;
+    extern int f3(int, int);
     a = a + 5 + f3(0, 5);
     return;
 }
@@ -35,4 +30,9 @@ __attribute((profiled)) int main()
     f1(5);
     (*ptr)();
     return 1;
+}
+
+int f3(int x, int y)
+{
+    return x + f(1);
 }
