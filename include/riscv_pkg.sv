@@ -29,13 +29,15 @@ package riscv;
     } vm_mode_t;
 
     localparam XLEN = 32;
-
+    
+    localparam FPU_EN = '1;
     // Warning: When using STD_CACHE, configuration must be PLEN=56 and VLEN=64
     // Warning: VLEN must be superior or equal to PLEN
     localparam VLEN       = (XLEN == 32) ? 32 : 64;    // virtual address length
     localparam PLEN       = (XLEN == 32) ? 32 : 56;    // physical address length
 
     localparam IS_XLEN64  = (XLEN == 32) ? 1'b0 : 1'b1;
+    localparam IS_XLEN32  = (XLEN == 64) ? 1'b0 : 1'b1;
     localparam ModeW      = (XLEN == 32) ? 1 : 4;
     localparam ASIDW      = (XLEN == 32) ? 9 : 16;
     localparam PPNW       = (XLEN == 32) ? 22 : 44;
