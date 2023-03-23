@@ -102,6 +102,8 @@ function logic is_nop_call(ariane_pkg::scoreboard_entry_t entry);
         end
 endfunction
 
+
+
     
     /*state machine for the RET*/
     always_comb begin        
@@ -230,15 +232,15 @@ endfunction
             state_RET <= IDLE;
             state_CALL <= IDLE;
 
-            prev_detect_CALL <= '0;
-            prev_detect_RET  <= '0;
+            //prev_detect_CALL <= '0;
+            //prev_detect_RET  <= '0;
             prev_entry <= '0;
          end else begin 
             state_CALL <= next_state_CALL;
             state_RET <= next_state_RET;
 
-            prev_detect_RET  <= detect_RET; 
-            prev_detect_CALL <= detect_CALL;
+            //prev_detect_RET  <= detect_RET; 
+            //prev_detect_CALL <= detect_CALL;
             prev_entry <= commit_instr_i[0];
          end
     end
