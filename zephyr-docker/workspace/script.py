@@ -180,112 +180,6 @@ attacks_array = ["technique = DIRECT;inject_param = INJECTED_CODE_NO_NOP;code_pt
 				"technique = DIRECT;inject_param = RETURN_ORIENTED_PROGRAMMING;code_ptr= RET_ADDR;location = STACK;function = MEMCPY;",
 				"technique = DIRECT;inject_param = RETURN_ORIENTED_PROGRAMMING;code_ptr= STRUCT_FUNC_PTR_HEAP;location = HEAP;function = SPRINTF;"]
 
-def is_OK(attack) :
-	if ((attack.inject_param == "INJECTED_CODE_NO_NOP") and
-	  (not (attack.function == "MEMCPY") and not (attack.function == "HOMEBREW"))):
-		return False;
-	
-	if (attack.inject_param == "RETURN_ORIENTED_PROGRAMMING" and
-	  attack.technique != "DIRECT") :
-		return False;
-
-	if (attack.inject_param == "DATA_ONLY") :
-		if (attack.code_ptr != "VAR_BOF" and
-			attack.code_ptr != "VAR_IOF" and
-			attack.code_ptr != "VAR_LEAK") : 
-			return False;
-
-		if ((attack.code_ptr == "VAR_LEAK" or attack.code_ptr == "VAR_IOF") and attack.technique == "INDIRECT") :
-			return False;
-		
-
-		if (attack.location == "HEAP" and attack.technique == "INDIRECT") :
-			return False;
-		
-	elif (attack.code_ptr == "VAR_BOF" or
-		attack.code_ptr == "VAR_IOF" or
-		attack.code_ptr == "VAR_LEAK") :
-		return False;
-	
-	if( attack.location == "STACK" ):
-		if ((attack.technique == "DIRECT")) :
-			if ((attack.code_ptr == "FUNC_PTR_HEAP") or
-			  (attack.code_ptr == "FUNC_PTR_BSS") or
-			  (attack.code_ptr == "FUNC_PTR_DATA") or
-			  (attack.code_ptr == "LONGJMP_BUF_HEAP") or
-			  (attack.code_ptr == "LONGJMP_BUF_DATA") or
-			  (attack.code_ptr == "LONGJMP_BUF_BSS") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_HEAP") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_DATA") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_BSS") ) :
-			
-				return False;
-			elif ((attack.code_ptr == "FUNC_PTR_STACK_PARAM") and
-			  ((attack.function == "STRCAT") or
-			  (attack.function == "SNPRINTF") or
-			  (attack.function == "SSCANF") or
-			  (attack.function == "HOMEBREW"))) : 
-			
-				return False;
-				
-	if( attack.location == "HEAP" ):
-		if ((attack.technique == "DIRECT") and
-		  ((attack.code_ptr == "RET_ADDR") or
-		  (attack.code_ptr == "FUNC_PTR_STACK_VAR") or
-		  (attack.code_ptr == "FUNC_PTR_STACK_PARAM") or
-		  (attack.code_ptr == "FUNC_PTR_BSS") or
-		  (attack.code_ptr == "FUNC_PTR_DATA") or
-		  (attack.code_ptr == "LONGJMP_BUF_STACK_VAR") or
-		  (attack.code_ptr == "LONGJMP_BUF_STACK_PARAM") or
-		  (attack.code_ptr == "LONGJMP_BUF_BSS") or
-		  (attack.code_ptr == "LONGJMP_BUF_DATA") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_STACK") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_DATA") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_BSS") )) :
-		
-			return False;		
-
-	if( attack.location == "DATA" ):
-		if ((attack.technique == "DIRECT") and
-		  ((attack.code_ptr == "RET_ADDR") or
-		  (attack.code_ptr == "FUNC_PTR_STACK_VAR") or
-		  (attack.code_ptr == "FUNC_PTR_STACK_PARAM") or
-		  (attack.code_ptr == "FUNC_PTR_BSS") or
-		  (attack.code_ptr == "FUNC_PTR_HEAP") or
-		  (attack.code_ptr == "LONGJMP_BUF_STACK_VAR") or
-		  (attack.code_ptr == "LONGJMP_BUF_STACK_PARAM") or
-		  (attack.code_ptr == "LONGJMP_BUF_HEAP") or
-		  (attack.code_ptr == "LONGJMP_BUF_BSS") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_STACK") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_HEAP") or
-		  (attack.code_ptr == "STRUCT_FUNC_PTR_BSS") )) :
-		
-			return False;
-		
-	if( attack.location == "BSS" ):
-			if ((attack.technique == "DIRECT") and
-			  ((attack.code_ptr == "RET_ADDR") or
-			  (attack.code_ptr == "FUNC_PTR_STACK_VAR") or
-			  (attack.code_ptr == "FUNC_PTR_STACK_PARAM") or
-			  (attack.code_ptr == "FUNC_PTR_DATA") or
-			  (attack.code_ptr == "FUNC_PTR_HEAP") or
-			  (attack.code_ptr == "LONGJMP_BUF_STACK_VAR") or
-			  (attack.code_ptr == "LONGJMP_BUF_STACK_PARAM") or
-			  (attack.code_ptr == "LONGJMP_BUF_HEAP") or
-			  (attack.code_ptr == "LONGJMP_BUF_DATA") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_STACK") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_HEAP") or
-			  (attack.code_ptr == "STRUCT_FUNC_PTR_DATA") )) : 
-				
-				return False;
-			elif ((attack.technique == "INDIRECT") and
-			  (attack.code_ptr == "LONGJMP_BUF_HEAP") and
-			  (not(attack.function == "MEMCPY") and
-			  not(attack.function == "STRNCPY") and
-			  not(attack.function == "HOMEBREW"))) :
-				return False;
-
-	return True;
 
 
 def classic_attack(attacks_nb = linspace(1, 10, 10, dtype=int)) : 
@@ -329,23 +223,6 @@ def quality_test() :
 
 
 	return [new_node]
-
-
-def display_attack_scoreboard(scoreboard, attack_nb=linspace(1, 10, 10, dtype=int)) :
-	# os.system('clear')
-	print("\n\n\n==============\nATTACK SCOREBOARD\n==============\n\n\n")
-	
-	with open(OUTPUT_FILE, "w") as f :
-		for i in range(0,len(attack_nb)) :
-			f.write(f"{attack_nb[i]} {scoreboard[i]['result']}\n")
-			f.write(f"{scoreboard[i]['output']}")
-
-			if VERBOSE :
-				if not scoreboard[i]["result"] :
-					print("\U0000274C" + f" attack {attack_nb[i]} not prevented\n\n".upper())
-				else : 
-					print("\U00002705" + f" attack {attack_nb[i]} prevented\n\n".upper())
-
 
 
 

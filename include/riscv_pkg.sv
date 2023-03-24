@@ -30,7 +30,7 @@ package riscv;
 
     localparam XLEN = 32;
     
-    localparam FPU_EN = '1;
+    localparam FPU_EN = 1'b1;
     // Warning: When using STD_CACHE, configuration must be PLEN=56 and VLEN=64
     // Warning: VLEN must be superior or equal to PLEN
     localparam VLEN       = (XLEN == 32) ? 32 : 64;    // virtual address length
