@@ -192,7 +192,7 @@ skip_store_fp_caller_saved:
 	/* Handle context saving at SOC level. */
 	addi a0, sp, __z_arch_esf_t_soc_context_OFFSET
 	jal ra, __soc_save_context
-	li zero, 1
+/*	li zero, 1 */
 #endif /* CONFIG_RISCV_SOC_CONTEXT_SAVE */
 
 	/*
@@ -206,7 +206,7 @@ skip_store_fp_caller_saved:
 	 * returned via register a0 (1: interrupt, 0 exception)
 	 */
 	jal ra, __soc_is_irq
-	li zero, 1
+/*	li zero, 1 */
 
 	/* If a0 != 0, jump to is_interrupt */
 	bnez a0, is_interrupt
@@ -325,7 +325,7 @@ do_irq_offload:
 1:
 	/* Execute provided routine (argument is in a0 already). */
 	jalr ra, a1, 0
-	li zero, 1
+/*	li zero, 1 */
 
 	/* Leave through the regular IRQ exit path */
 	j irq_done
@@ -341,7 +341,7 @@ is_user_syscall:
 	 */
 	lr a0, ___cpu_t_current_OFFSET(s0)
 	call z_riscv_pmp_stackguard_enable
-#	li zero, 1
+/*	li zero, 1 */
 #endif
 
 	/* It is safe to re-enable IRQs now */
@@ -390,7 +390,7 @@ valid_syscall_id:
 
 	/* Execute syscall function */
 	jalr ra, t2, 0
-	li zero, 1
+/*	li zero, 1 */
 
 #if defined(CONFIG_RISCV_ISA_RV32E)
 	addi sp, sp, 4
@@ -418,7 +418,7 @@ is_interrupt:
 	bnez t0, 1f
 	lr a0, ___cpu_t_current_OFFSET(s0)
 	call z_riscv_pmp_stackguard_enable
-#	li zero, 1
+/*	li zero, 1 */
 	j 2f
 #endif /* CONFIG_USERSPACE */
 1:	/* Re-activate PMP for m-mode */
@@ -450,7 +450,7 @@ on_irq_stack:
 
 #ifdef CONFIG_TRACING_ISR
 	call sys_trace_isr_enter
-	li zero, 1
+/*	li zero, 1 */
 #endif
 
 	/* Get IRQ causing interrupt */
@@ -463,7 +463,7 @@ on_irq_stack:
 	 * Pass IRQ number to __soc_handle_irq via register a0
 	 */
 	jal ra, __soc_handle_irq
-	li zero, 1
+/*	li zero, 1 */
 
 	/*
 	 * Call corresponding registered function in _sw_isr_table.
@@ -481,7 +481,7 @@ on_irq_stack:
 
 	/* Call ISR function */
 	jalr ra, t1, 0
-	li zero, 1
+/*	li zero, 1 */
 
 #ifdef CONFIG_TRACING_ISR
     call sys_trace_isr_exit
@@ -499,7 +499,7 @@ irq_done:
 
 #ifdef CONFIG_STACK_SENTINEL
 	call z_check_stack_sentinel
-	li zero, 1
+/*	li zero, 1 */
 #endif
 
 check_reschedule:
@@ -516,7 +516,7 @@ check_reschedule:
 	sr a1, 0(sp)
 	mv a0, zero
 	call z_get_next_switch_handle
-	li zero, 1
+/*	li zero, 1 */
 	lr a1, 0(sp)
 	addi sp, sp, 16
 	beqz a0, no_reschedule
@@ -528,10 +528,10 @@ reschedule:
 	 * a1 = old thread
 	 */
 	call z_riscv_switch
-	li zero, 1
+/*	li zero, 1 */
 
 z_riscv_thread_start:
-	li zero, 1 #same as _isr_wrapper
+/*	li zero, 1 #same as _isr_wrapper */
 might_have_rescheduled:
 #ifdef CONFIG_SMP
 	/* reload s0 with &_current_cpu as it might have changed */
@@ -544,7 +544,7 @@ no_reschedule:
 	/* Restore context at SOC level */
 	addi a0, sp, __z_arch_esf_t_soc_context_OFFSET
 	jal ra, __soc_restore_context
-	li zero, 1
+/*	li zero, 1 */
 #endif /* CONFIG_RISCV_SOC_CONTEXT_SAVE */
 
 	/* Restore MEPC register */
@@ -588,7 +588,7 @@ no_fp:	/* make sure this is reflected in the restored mstatus */
 	/* Remove kernel stack guard and Reconfigure PMP for user mode */
 	lr a0, ___cpu_t_current_OFFSET(s0)
 	call z_riscv_pmp_usermode_enable
-#	li zero, 1
+/*	li zero, 1 */
 #endif
 
 	/* Set our per-thread usermode flag */

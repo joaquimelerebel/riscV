@@ -86,7 +86,7 @@ skip_store_fp_callee_saved:
 	 */
 	mv s0, a0
 	call z_riscv_pmp_stackguard_enable
-#	li zero, 1
+/*	li zero, 1 */
 	mv a0, s0
 #elif defined(CONFIG_USERSPACE)
 	/*
@@ -99,7 +99,7 @@ skip_store_fp_callee_saved:
 	beqz t0, not_user_task
 	mv s0, a0
 	call z_riscv_pmp_usermode_enable
-#	li zero, 1
+/*	li zero, 1 */
 	mv a0, s0
 not_user_task:
 #endif
@@ -107,7 +107,7 @@ not_user_task:
 #if CONFIG_INSTRUMENT_THREAD_SWITCHING
 	mv s0, a0
 	call z_thread_mark_switched_in
-#	li zero, 1
+/*	li zero, 1 */
 	mv a0, s0
 #endif
 

@@ -37,12 +37,22 @@ char *csrwi(uint8_t imm)
 /**
  * When 1 enables verbose printing
  */
-#define DEBUG 0
+#define DEBUG 1
 
 /**
  * Generate code for runtime of number of arguments
 */
 #define RUNTIME_ARG_CHECK 1 // 0
+
+/**
+ * Generate code for return verification
+*/
+#define RUNTIME_RET_ANNOTATION 0 // 1
+
+/**
+ * Generate code for call verification
+*/
+#define RUNTIME_CALL_ANNOTATION 1 // 0
 
 /**
  * Name of this plugin
@@ -270,7 +280,7 @@ static unsigned int instrument_assignments_plugin_exec(void)
 {
     // get the FUNCTION_DECL of the function whose body we are reading
     tree fndef = current_function_decl;
-#if DEBUG == 1
+#if DEBUG >= 1
     // print the function name
     fprintf(stderr, "\n> Inspecting function '%s' | RUNTIME_ARG_CHECK = %d\n", FN_NAME(fndef), RUNTIME_ARG_CHECK);
 #endif 
@@ -300,7 +310,10 @@ static unsigned int instrument_assignments_plugin_exec(void)
 #endif
 
     // insert nop at the beginning of the function
+
+#if RUNTIME_CALL_ANNOTATION == 1
     insert_asm(BB_HEAD(entry), nop(call_nop_imm));
+#endif
 
     // insert nop after each call instruction
     rtx_insn *ins = BB_HEAD(entry);
@@ -314,12 +327,14 @@ static unsigned int instrument_assignments_plugin_exec(void)
             bool is_indirect = is_indirect_call(ins);
             if (is_indirect)
             {
-#if DEBUG == 1
+#if DEBUG >= 1
                 fprintf(stderr, "Indirect call: prefixing with %s\n", csrwi(count_call_ins_arguments(ins)));
 #endif
                 insert_asm(ins, csrwi(count_call_ins_arguments(ins)), true);
             }
 #endif
+
+#if RUNTIME_RET_ANNOTATION == 1
 
 #if DEBUG >= 1
             fprintf(stderr, "[call instruction] adding nop %s: \n", ADD_NOP);
@@ -329,7 +344,8 @@ static unsigned int instrument_assignments_plugin_exec(void)
             print_rtl_single(stderr, ins);
 #endif
 
-            insert_asm(ins, ADD_NOP); // handle insertions carefully, maybe they offset each other (divfloat in libgcc.., or maybe not)
+            insert_asm(ins, ADD_NOP);
+#endif
         }
 
         ins = next_insn(ins);
