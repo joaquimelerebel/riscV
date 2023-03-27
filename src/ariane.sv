@@ -538,7 +538,7 @@ module ariane import ariane_pkg::*; #(
     .commit_ack_i           ( commit_ack                    ),
     .boot_addr_i            ( boot_addr_i[riscv::XLEN-1:0]  ),
     .hart_id_i              ( hart_id_i[riscv::XLEN-1:0]    ),
-    .ex_i                   ( ex_commit                     ),
+    .ex_d                   ( ex_commit                     ),
     .csr_op_i               ( csr_op_commit_csr             ),
     .csr_write_fflags_i     ( csr_write_fflags_commit_cs    ),
     .dirty_fp_state_i       ( dirty_fp_state                ),
@@ -606,7 +606,7 @@ module ariane import ariane_pkg::*; #(
     .dtlb_miss_i       ( dtlb_miss_ex_perf      ),
     .sb_full_i         ( sb_full                ),
     .if_empty_i        ( ~fetch_valid_if_id     ),
-    .ex_i              ( ex_commit              ),
+    .ex_d              ( ex_commit              ),
     .eret_i            ( eret                   ),
     .resolved_branch_i ( resolved_branch        )
   );

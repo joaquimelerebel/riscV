@@ -32,7 +32,7 @@ module csr_regfile import ariane_pkg::*; #(
     input  logic[riscv::XLEN-1:0] boot_addr_i,                // Address from which to start booting, mtvec is set to the same address
     input  logic[riscv::XLEN-1:0] hart_id_i,                  // Hart id in a multicore environment (reflected in a CSR)
     // we are taking an exception
-    input exception_t             ex_i,                       // We've got an exception from the commit stage, take it
+    input exception_t             ex_d,                       // We've got an exception from the commit stage, take it
 
     input  fu_op                  csr_op_i,                   // Operation to perform on the CSR file
     input  logic  [11:0]          csr_addr_i,                 // Address of the register to read/write
@@ -347,7 +347,7 @@ module csr_regfile import ariane_pkg::*; #(
         if (!debug_mode_q) begin
             // increase instruction retired counter
             for (int i = 0; i < NrCommitPorts; i++) begin
-                if (commit_ack_i[i] && !ex_i.valid) instret++;
+                if (commit_ack_i[i] && !ex_d.valid) instret++;
             end
             instret_d = instret;
             // increment the cycle count
@@ -712,15 +712,15 @@ module csr_regfile import ariane_pkg::*; #(
         trap_to_priv_lvl = riscv::PRIV_LVL_M;
         // Exception is taken and we are not in debug mode
         // exceptions in debug mode don't update any fields
-        if (!debug_mode_q && ex_i.cause != riscv::DEBUG_REQUEST && ex_i.valid) begin
+        if (!debug_mode_q && ex_d.cause != riscv::DEBUG_REQUEST && ex_d.valid) begin
             // do not flush, flush is reserved for CSR writes with side effects
             flush_o   = 1'b0;
             // figure out where to trap to
             // a m-mode trap might be delegated if we are taking it in S mode
             // first figure out if this was an exception or an interrupt e.g.: look at bit (XLEN-1)
             // the cause register can only be $clog2(riscv::XLEN) bits long (as we only support XLEN exceptions)
-            if ((ex_i.cause[riscv::XLEN-1] && mideleg_q[ex_i.cause[$clog2(riscv::XLEN)-1:0]]) ||
-                (~ex_i.cause[riscv::XLEN-1] && medeleg_q[ex_i.cause[$clog2(riscv::XLEN)-1:0]])) begin
+            if ((ex_d.cause[riscv::XLEN-1] && mideleg_q[ex_d.cause[$clog2(riscv::XLEN)-1:0]]) ||
+                (~ex_d.cause[riscv::XLEN-1] && medeleg_q[ex_d.cause[$clog2(riscv::XLEN)-1:0]])) begin
                 // traps never transition from a more-privileged mode to a less privileged mode
                 // so if we are already in M mode, stay there
                 trap_to_priv_lvl = (priv_lvl_o == riscv::PRIV_LVL_M) ? riscv::PRIV_LVL_M : riscv::PRIV_LVL_S;
@@ -734,18 +734,18 @@ module csr_regfile import ariane_pkg::*; #(
                 // this can either be user or supervisor mode
                 mstatus_d.spp  = priv_lvl_q[0];
                 // set cause
-                scause_d       = ex_i.cause;
+                scause_d       = ex_d.cause;
                 // set epc
                 sepc_d         = {{riscv::XLEN-riscv::VLEN{pc_i[riscv::VLEN-1]}},pc_i};
                 // set mtval or stval
                 stval_d        = (ariane_pkg::ZERO_TVAL
-                                  && (ex_i.cause inside {
+                                  && (ex_d.cause inside {
                                     riscv::ILLEGAL_INSTR,
                                     riscv::BREAKPOINT,
                                     riscv::ENV_CALL_UMODE,
                                     riscv::ENV_CALL_SMODE,
                                     riscv::ENV_CALL_MMODE
-                                  } || ex_i.cause[riscv::XLEN-1])) ? '0 : ex_i.tval;
+                                  } || ex_d.cause[riscv::XLEN-1])) ? '0 : ex_d.tval;
             // trap to machine mode
             end else begin
                 // update mstatus
@@ -753,18 +753,18 @@ module csr_regfile import ariane_pkg::*; #(
                 mstatus_d.mpie = mstatus_q.mie;
                 // save the previous privilege mode
                 mstatus_d.mpp  = priv_lvl_q;
-                mcause_d       = ex_i.cause;
+                mcause_d       = ex_d.cause;
                 // set epc
                 mepc_d         = {{riscv::XLEN-riscv::VLEN{pc_i[riscv::VLEN-1]}},pc_i};
                 // set mtval or stval
                 mtval_d        = (ariane_pkg::ZERO_TVAL
-                                  && (ex_i.cause inside {
+                                  && (ex_d.cause inside {
                                     riscv::ILLEGAL_INSTR,
                                     riscv::BREAKPOINT,
                                     riscv::ENV_CALL_UMODE,
                                     riscv::ENV_CALL_SMODE,
                                     riscv::ENV_CALL_MMODE
-                                  } || ex_i.cause[riscv::XLEN-1])) ? '0 : ex_i.tval;
+                                  } || ex_d.cause[riscv::XLEN-1])) ? '0 : ex_d.tval;
             end
 
             priv_lvl_d = trap_to_priv_lvl;
@@ -785,7 +785,7 @@ module csr_regfile import ariane_pkg::*; #(
             // trigger module fired
 
             // caused by a breakpoint
-            if (ex_i.valid && ex_i.cause == riscv::BREAKPOINT) begin
+            if (ex_d.valid && ex_d.cause == riscv::BREAKPOINT) begin
                 dcsr_d.prv = priv_lvl_o;
                 // check that we actually want to enter debug depending on the privilege level we are currently in
                 unique case (priv_lvl_o)
@@ -809,7 +809,7 @@ module csr_regfile import ariane_pkg::*; #(
             end
 
             // we've got a debug request
-            if (ex_i.valid && ex_i.cause == riscv::DEBUG_REQUEST) begin
+            if (ex_d.valid && ex_d.cause == riscv::DEBUG_REQUEST) begin
                 dcsr_d.prv = priv_lvl_o;
                 // save the PC
                 dpc_d = {{riscv::XLEN-riscv::VLEN{pc_i[riscv::VLEN-1]}},pc_i};
@@ -829,7 +829,7 @@ module csr_regfile import ariane_pkg::*; #(
                     // we saved the correct target address during execute
                     dpc_d = {{riscv::XLEN-riscv::VLEN{commit_instr_i[0].bp.predict_address[riscv::VLEN-1]}}, commit_instr_i[0].bp.predict_address};
                 // exception valid
-                end else if (ex_i.valid) begin
+                end else if (ex_d.valid) begin
                     dpc_d = {{riscv::XLEN-riscv::VLEN{1'b0}},trap_vector_base_o};
                 // return from environment
                 end else if (eret_o) begin
@@ -844,7 +844,7 @@ module csr_regfile import ariane_pkg::*; #(
             end
         end
         // go in halt-state again when we encounter an exception
-        if (debug_mode_q && ex_i.valid && ex_i.cause == riscv::BREAKPOINT) begin
+        if (debug_mode_q && ex_d.valid && ex_d.cause == riscv::BREAKPOINT) begin
             set_debug_pc_o = 1'b1;
         end
 
@@ -1022,7 +1022,7 @@ module csr_regfile import ariane_pkg::*; #(
             wfi_d = 1'b0;
         // or alternatively if there is no exception pending and we are not in debug mode wait here
         // for the interrupt
-        end else if (!debug_mode_q && csr_op_i == WFI && !ex_i.valid) begin
+        end else if (!debug_mode_q && csr_op_i == WFI && !ex_d.valid) begin
             wfi_d = 1'b1;
         end
     end
@@ -1043,8 +1043,8 @@ module csr_regfile import ariane_pkg::*; #(
         // check if we are in vectored mode, if yes then do BASE + 4 * cause
         // we are imposing an additional alignment-constraint of 64 * 4 bytes since
         // we want to spare the costly addition
-        if ((mtvec_q[0] || stvec_q[0]) && ex_i.cause[riscv::XLEN-1]) begin
-            trap_vector_base_o[7:2] = ex_i.cause[5:0];
+        if ((mtvec_q[0] || stvec_q[0]) && ex_d.cause[riscv::XLEN-1]) begin
+            trap_vector_base_o[7:2] = ex_d.cause[5:0];
         end
 
         epc_o = mepc_q[riscv::VLEN-1:0];
@@ -1230,7 +1230,7 @@ module csr_regfile import ariane_pkg::*; #(
     `ifndef VERILATOR
         // check that eret and ex are never valid together
         assert property (
-          @(posedge clk_i) !(eret_o && ex_i.valid))
+          @(posedge clk_i) !(eret_o && ex_d.valid))
         else begin $error("eret and exception should never be valid at the same time"); $stop(); end
     `endif
     //pragma translate_on

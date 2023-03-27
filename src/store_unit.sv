@@ -35,7 +35,7 @@ module store_unit import ariane_pkg::*; (
     output logic                     translation_req_o, // request address translation
     output logic [riscv::VLEN-1:0]   vaddr_o,           // virtual address out
     input  logic [riscv::PLEN-1:0]   paddr_i,           // physical address in
-    input  exception_t               ex_i,
+    input  exception_t               ex_d,
     input  logic                     dtlb_hit_i,       // will be one in the same cycle translation_req was asserted if it hits
     // address checker
     input  logic [11:0]              page_offset_i,
@@ -80,7 +80,7 @@ module store_unit import ariane_pkg::*; (
         st_valid               = 1'b0;
         st_valid_without_flush = 1'b0;
         pop_st_o               = 1'b0;
-        ex_o                   = ex_i;
+        ex_o                   = ex_d;
         trans_id_n             = lsu_ctrl_i.trans_id;
         state_d                     = state_q;
 
@@ -161,7 +161,7 @@ module store_unit import ariane_pkg::*; (
         // Access Exception
         // -----------------
         // we got an address translation exception (access rights, misaligned or page fault)
-        if (ex_i.valid && (state_q != IDLE)) begin
+        if (ex_d.valid && (state_q != IDLE)) begin
             // the only difference is that we do not want to store this request
             pop_st_o = 1'b1;
             st_valid = 1'b0;

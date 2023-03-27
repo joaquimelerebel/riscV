@@ -37,7 +37,7 @@ module perf_counters import ariane_pkg::*; (
   // from frontend
   input  logic                                    if_empty_i,
   // from PC Gen
-  input  exception_t                              ex_i,
+  input  exception_t                              ex_d,
   input  logic                                    eret_i,
   input  bp_resolve_t                             resolved_branch_i
 );
@@ -90,7 +90,7 @@ module perf_counters import ariane_pkg::*; (
         end
       end
 
-      if (ex_i.valid)
+      if (ex_d.valid)
         perf_counter_d[riscv::CSR_MEXCEPTION] = perf_counter_q[riscv::CSR_MEXCEPTION] + 1'b1;
 
       if (eret_i)

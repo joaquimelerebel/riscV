@@ -32,7 +32,7 @@ module load_unit import ariane_pkg::*; #(
     output logic                     translation_req_o,   // request address translation
     output logic [riscv::VLEN-1:0]   vaddr_o,             // virtual address out
     input  logic [riscv::PLEN-1:0]   paddr_i,             // physical address in
-    input  exception_t               ex_i,                // exception which may has happened earlier. for example: mis-aligned exception
+    input  exception_t               ex_d,                // exception which may has happened earlier. for example: mis-aligned exception
     input  logic                     dtlb_hit_i,          // hit on the dtlb, send in the same cycle as the request
     input  logic [riscv::PPNW-1:0]   dtlb_ppn_i,          // ppn on the dtlb, send in the same cycle as the request
     // address checker
@@ -74,7 +74,7 @@ module load_unit import ariane_pkg::*; #(
                                               ariane_pkg::DCACHE_INDEX_WIDTH-1 :
                                               ariane_pkg::DCACHE_INDEX_WIDTH];
     // directly output an exception
-    assign ex_o = ex_i;
+    assign ex_o = ex_d;
 
     // Check that NI operations follow the necessary conditions
     logic paddr_ni;
@@ -225,7 +225,7 @@ module load_unit import ariane_pkg::*; #(
                 // Exception
                 // ----------
                 // if we got an exception we need to kill the request immediately
-                if (ex_i.valid) begin
+                if (ex_d.valid) begin
                     req_port_o.kill_req = 1'b1;
                 end
             end
@@ -241,7 +241,7 @@ module load_unit import ariane_pkg::*; #(
         endcase
 
         // we got an exception
-        if (ex_i.valid && valid_i) begin
+        if (ex_d.valid && valid_i) begin
             // the next state will be the idle state
             state_d = IDLE;
             // pop load - but only if we are not getting an rvalid in here - otherwise we will over-write an incoming transaction
@@ -250,7 +250,7 @@ module load_unit import ariane_pkg::*; #(
         end
 
         // save the load data for later usage -> we should not clutter the load_data register
-        if (pop_ld_o && !ex_i.valid) begin
+        if (pop_ld_o && !ex_d.valid) begin
             load_data_d = in_data;
         end
 
@@ -274,7 +274,7 @@ module load_unit import ariane_pkg::*; #(
             if(!req_port_o.kill_req)
                 valid_o = 1'b1;
             // the output is also valid if we got an exception
-            if (ex_i.valid)
+            if (ex_d.valid)
                 valid_o = 1'b1;
         end
         // an exception occurred during translation (we need to check for the valid flag because we could also get an
@@ -282,7 +282,7 @@ module load_unit import ariane_pkg::*; #(
         // exceptions can retire out-of-order -> but we need to give priority to non-excepting load and stores
         // so we simply check if we got an rvalid if so we prioritize it by not retiring the exception - we simply go for another
         // round in the load FSM
-        if (valid_i && ex_i.valid && !req_port_i.data_rvalid) begin
+        if (valid_i && ex_d.valid && !req_port_i.data_rvalid) begin
             valid_o    = 1'b1;
             trans_id_o = lsu_ctrl_i.trans_id;
         // if we are waiting for the translation to finish do not give a valid signal yet

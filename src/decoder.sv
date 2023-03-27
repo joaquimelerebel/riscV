@@ -27,7 +27,7 @@ module decoder import ariane_pkg::*; (
     input  logic               is_illegal_i,            // illegal compressed instruction
     input  logic [31:0]        instruction_i,           // instruction from IF
     input  branchpredict_sbe_t branch_predict_i,
-    input  exception_t         ex_i,                    // if an exception occured in if
+    input  exception_t         ex_d,                    // if an exception occured in if
     input  logic [1:0]         irq_i,                   // external interrupt
     input  irq_ctrl_t          irq_ctrl_i,              // interrupt control and status information from CSRs
     // From CSR
@@ -85,7 +85,7 @@ module decoder import ariane_pkg::*; (
         ebreak                      = 1'b0;
         check_fprm                  = 1'b0;
 
-        if (~ex_i.valid) begin
+        if (~ex_d.valid) begin
             case (instr.rtype.opcode)
                 riscv::OpcodeSystem: begin
                     instruction_o.fu       = CSR;
@@ -1066,10 +1066,10 @@ module decoder import ariane_pkg::*; (
 
     always_comb begin : exception_handling
         interrupt_cause       = '0;
-        instruction_o.ex      = ex_i;
+        instruction_o.ex      = ex_d;
         // look if we didn't already get an exception in any previous
         // stage - we should not overwrite it as we retain order regarding the exception
-        if (~ex_i.valid) begin
+        if (~ex_d.valid) begin
             // if we didn't already get an exception save the instruction here as we may need it
             // in the commit stage if we got a access exception to one of the CSR registers
             instruction_o.ex.tval  = (is_compressed_i) ? {{riscv::XLEN-16{1'b0}}, compressed_instr_i} : {{riscv::XLEN-32{1'b0}}, instruction_i};
