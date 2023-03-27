@@ -1,4 +1,3 @@
-`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Team: "Les Vieux Briscards" for 3rd national RISC-V student contest 2022-2023  
 
@@ -232,12 +231,12 @@ always_ff @(posedge clk_i) begin
         push_s_s <= '0;
         pop_s_s <= '0;
         data_i_stack <= '0;
-        next_state_shadow_stack <= IDLE_SS;
+        state_shadow_stack <= IDLE_SS;
     end else begin
         push_s_s <= '0;
         pop_s_s <= '0;
         data_i_stack <= '0;
-        next_state_shadow_stack <= state_shadow_stack;
+        state_shadow_stack <= next_state_shadow_stack;
         
         // add the return address to the stack
         if(     (commit_ack_i[0] == 1'b1)                   && 

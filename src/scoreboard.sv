@@ -59,7 +59,7 @@ module scoreboard #(
   input ariane_pkg::bp_resolve_t                                resolved_branch_i,
   input logic [NR_WB_PORTS-1:0][ariane_pkg::TRANS_ID_BITS-1:0]  trans_id_i,  // transaction ID at which to write the result back
   input logic [NR_WB_PORTS-1:0][riscv::XLEN-1:0]                wbdata_i,    // write data in
-  input ariane_pkg::exception_t [NR_WB_PORTS-1:0]               ex_d,        // exception from a functional unit (e.g.: ld/st exception)
+  input ariane_pkg::exception_t [NR_WB_PORTS-1:0]               ex_i,        // exception from a functional unit (e.g.: ld/st exception)
   input logic [NR_WB_PORTS-1:0]                                 wt_valid_i   // data in is valid
 );
   localparam int unsigned BITS_ENTRIES = $clog2(NR_ENTRIES);
@@ -141,11 +141,11 @@ module scoreboard #(
         // save the target address of a branch (needed for debug in commit stage)
         mem_n[trans_id_i[i]].sbe.bp.predict_address = resolved_branch_i.target_address;
         // write the exception back if it is valid
-        if (ex_d[i].valid)
-          mem_n[trans_id_i[i]].sbe.ex = ex_d[i];
+        if (ex_i[i].valid)
+          mem_n[trans_id_i[i]].sbe.ex = ex_i[i];
         // write the fflags back from the FPU (exception valid is never set), leave tval intact
         else if (mem_q[trans_id_i[i]].sbe.fu inside {ariane_pkg::FPU, ariane_pkg::FPU_VEC})
-          mem_n[trans_id_i[i]].sbe.ex.cause = ex_d[i].cause;
+          mem_n[trans_id_i[i]].sbe.ex.cause = ex_i[i].cause;
       end
     end
 
@@ -271,9 +271,9 @@ module scoreboard #(
 
   // WB ports have higher prio than entries
   for (genvar k = 0; unsigned'(k) < NR_WB_PORTS; k++) begin : gen_rs_wb
-    assign rs1_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs1_i) & wt_valid_i[k] & (~ex_d[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs1_fpr(issue_instr_o.op));
-    assign rs2_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs2_i) & wt_valid_i[k] & (~ex_d[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs2_fpr(issue_instr_o.op));
-    assign rs3_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs3_i) & wt_valid_i[k] & (~ex_d[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_imm_fpr(issue_instr_o.op));
+    assign rs1_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs1_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs1_fpr(issue_instr_o.op));
+    assign rs2_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs2_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs2_fpr(issue_instr_o.op));
+    assign rs3_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs3_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_imm_fpr(issue_instr_o.op));
     assign rs_data[k]     = wbdata_i[k];
   end
   for (genvar k = 0; unsigned'(k) < NR_ENTRIES; k++) begin : gen_rs_entries
