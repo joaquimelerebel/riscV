@@ -190,7 +190,13 @@ endfunction
             rst_csr_q <= '0;
          end else begin 
             state_fw_cfi <= next_state_fw_cfi;
-            prev_entry <= commit_instr_i[0];
+
+            if(commit_ack_i[0]) begin
+                prev_entry <= commit_instr_i[0];
+            end else begin
+                prev_entry <= prev_entry;
+            end
+            
             rst_csr_q <= rst_csr_d;
          end
     end
@@ -227,7 +233,7 @@ ras_shadow_stack
 
 // add elements to the stack
 always_ff @(posedge clk_i) begin
-    if(rst_ni) begin
+    if(!rst_ni) begin
         push_s_s <= '0;
         pop_s_s <= '0;
         data_i_stack <= '0;
@@ -241,7 +247,7 @@ always_ff @(posedge clk_i) begin
         // add the return address to the stack
         if(     (commit_ack_i[0] == 1'b1)                   && 
                 (commit_instr_i[0].ex.valid == 1'b0)        && 
-                is_call(commit_instr_i[0]) )                begin
+                is_call( commit_instr_i[0]) )               begin
                 
                 data_i_stack <= commit_instr_i[0].pc + 4;
                 push_s_s <= '1;
