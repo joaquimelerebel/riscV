@@ -53,8 +53,9 @@ module fw_cfi_shadow_stack #(
 
 function logic is_call(ariane_pkg::scoreboard_entry_t entry);
         if( (   ( entry.op == ariane_pkg::JALR ) || 
-                (entry.op == ariane_pkg::JAL) )  &&
-                (entry.rd[5:0] == 6'b1) )     begin
+                (entry.op == ariane_pkg::JAL)  ) &&
+                (   (entry.rd[5:0] == 6'b1)      || 
+                    (entry.rd[5:0] == 6'h5)    )  )     begin
             is_call = 1'b1;
         end else begin 
             is_call = 1'b0;
@@ -64,7 +65,8 @@ endfunction
 function logic is_ret(ariane_pkg::scoreboard_entry_t entry);
         if( (entry.op == ariane_pkg::JALR)  &&
             (entry.rd[5:0] == 6'b0)         &&
-            (entry.rs1[5:0] == 6'h1 ) )     begin
+            (   (entry.rs1[5:0] == 6'h1 )   || 
+                (entry.rs1[5:0] == 6'h5 ) ) ) begin
             is_ret = 1'b1;
         end else begin 
             is_ret = 1'b0;
@@ -207,10 +209,10 @@ endfunction
 ///////////////////////////////////////////////////////////////////////   
    
 logic [(riscv::XLEN)-1:0]     data_i_stack, data_o_stack;
-logic                           push_s_s, pop_s_s;
-logic                           full_ss, usable_ss;
+logic                         push_s_s, pop_s_s;
+logic                         full_ss, usable_ss;
 
-logic                           detect_RET, detect_GOOD_RET, detect_prep_SS;
+logic                         detect_RET, detect_GOOD_RET, detect_prep_SS;
 
 enum int unsigned { IDLE_SS, WAITS_PC } state_shadow_stack, next_state_shadow_stack;
 
