@@ -19,7 +19,8 @@ module fw_cfi_shadow_stack #(
     parameter nop_rs1  = 5'b0,
     parameter nop_imm = 2'h2,
     parameter NR_COMMIT_PORTS = 2,
-    parameter SHADOW_STACK_SIZE = 3000
+    parameter SHADOW_STACK_SIZE = 100,
+    parameter ADD_SPACE_SS = 32
 )
 (
     input  logic                                                    clk_i,
@@ -205,10 +206,9 @@ endfunction
 ////////                     shadow stack                    //////////             
 ///////////////////////////////////////////////////////////////////////   
    
-logic [(riscv::XLEN/4)-1:0]     data_i_stack, data_o_stack;
-logic [riscv::XLEN-1:0]     data_cache;
+logic [(riscv::XLEN)-1:0]     data_i_stack, data_o_stack;
 logic                           push_s_s, pop_s_s;
-logic                           full_ss;
+logic                           full_ss, usable_ss;
 
 logic                           detect_RET, detect_GOOD_RET, detect_prep_SS;
 
@@ -216,8 +216,9 @@ enum int unsigned { IDLE_SS, WAITS_PC } state_shadow_stack, next_state_shadow_st
 
 // we only check the first LSB of the address to optimise the space
 ras_shadow_stack #(
-   .DATA_W(riscv::XLEN/4),
-   .DEPTH(SHADOW_STACK_SIZE)                             
+   .DATA_W(riscv::XLEN),
+   .ADD_DEPTH(ADD_SPACE_SS),
+   .REAL_DEPTH(SHADOW_STACK_SIZE)                             
 )
 ras_shadow_stack
 (
@@ -230,7 +231,8 @@ ras_shadow_stack
 
    .i_pop(pop_s_s),
    .o_data(data_o_stack),                   
-   .o_empty() //check the flag
+   .o_empty(), 
+   .o_usable_res(usable_ss)
 ); 
 
   
@@ -251,25 +253,24 @@ always_ff @(posedge clk_i) begin
         // add the return address to the stack
         if(     (commit_ack_i[0] == 1'b1)                   && 
                 (commit_instr_i[0].ex.valid == 1'b0)        && 
-                is_call( commit_instr_i[0]) )               begin
+                is_call( commit_instr_i[0])                 &&
+                csr_en_i                                    )               begin
                 
-                data_cache = commit_instr_i[0].pc + 4;
-                data_i_stack <= data_cache[7:0];
+                data_i_stack <= commit_instr_i[0].pc + 4;
                 push_s_s <= '1;
         end else 
         // cannot do 0 and 1 at the same time otherwise their is a problem in fw edge
         if(     (commit_ack_i[1] == 1'b1)                   && 
                 (commit_instr_i[1].ex.valid == 1'b0)        && 
-                is_call(commit_instr_i[1]) )                begin
+                is_call(commit_instr_i[1])                  &&
+                csr_en_i                                    )                begin
                 
-                data_cache = commit_instr_i[0].pc + 4;
-                data_i_stack <= data_cache[7:0];
-                
+                data_i_stack <= commit_instr_i[0].pc + 4;         
                 push_s_s <= '1;
         end            
         
         // detect that SS was used 
-        if(detect_GOOD_RET) begin
+        if(detect_GOOD_RET && csr_en_i) begin
             pop_s_s <= '1;
         end
     end
@@ -299,7 +300,7 @@ always_comb begin
            
                     next_state_shadow_stack = IDLE_SS;
                     
-                    if ( data_o_stack == commit_instr_i[1].pc[7:0] )    begin
+                    if ( !usable_ss || (data_o_stack == commit_instr_i[1].pc) )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -324,7 +325,7 @@ always_comb begin
                 detect_prep_SS = 1'b1;
                 next_state_shadow_stack = IDLE_SS;
            
-                if ( data_o_stack == commit_instr_i[0].pc[7:0] )    begin
+                if ( !usable_ss || (data_o_stack == commit_instr_i[0].pc) )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
@@ -352,7 +353,7 @@ end
    
     ariane_pkg::exception_t  ex_d, ex_q; 
     
-    logic is_ss_det, is_nop_det, is_full_det;
+    logic is_ss_det, is_nop_det;
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
@@ -361,12 +362,10 @@ end
             ex_d.tval  <= '0;
             is_nop_det <= '0;
             is_ss_det <= '0;
-            is_full_det <= '0;
          end else begin
          
             is_nop_det <= '0;
             is_ss_det <= '0;
-            is_full_det <= '0;
             ex_d.valid <= 1'b0;
             ex_d.cause <= '0;
             ex_d.tval  <= '0;
@@ -377,13 +376,6 @@ end
                 ex_d.valid <= 1'b1;
                 ex_d.tval <= prev_entry.pc;
                 is_ss_det <= '1;
-            end else 
-            if( full_ss && csr_en_i) begin
-                
-                ex_d.cause <= riscv::ILLEGAL_INSTR;
-                ex_d.valid <= 1'b1;
-                ex_d.tval <= prev_entry.pc;
-                is_full_det <= '1;
             end else 
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
@@ -469,10 +461,7 @@ end
             end else 
             if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_nop_det) ) begin 
                 leds_s[1] <= !leds_s[1];  
-            end else 
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_full_det) ) begin 
-                leds_s[2] <= !leds_s[2];  
-            end
+            end 
             
             if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
                 leds_s[5] <= !leds_s[5];  
