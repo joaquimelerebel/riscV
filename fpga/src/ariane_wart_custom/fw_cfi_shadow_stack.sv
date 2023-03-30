@@ -19,7 +19,7 @@ module fw_cfi_shadow_stack #(
     parameter nop_rs1  = 5'b0,
     parameter nop_imm = 2'h2,
     parameter NR_COMMIT_PORTS = 2,
-    parameter SHADOW_STACK_SIZE = 1000
+    parameter SHADOW_STACK_SIZE = 8192
 )
 (
     input  logic                                                    clk_i,
@@ -229,7 +229,9 @@ ras_shadow_stack
    .i_pop(pop_s_s),
    .o_data(data_o_stack),                   
    .o_empty() //check the flag
-);   
+); 
+
+  
 
 // add elements to the stack
 always_ff @(posedge clk_i) begin
