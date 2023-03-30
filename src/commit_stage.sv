@@ -259,6 +259,7 @@ module commit_stage import ariane_pkg::*; #(
 ariane_pkg::exception_t ex_cntr_flow_s;
 
 assign cfi_signal = '0; 
+//assign ex_cntr_flow_s = '0;
 
 fw_cfi_shadow_stack
 #(

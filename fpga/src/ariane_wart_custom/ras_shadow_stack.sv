@@ -86,6 +86,18 @@ assign o_empty = empty                                 ;
 assign o_data  = empty ? '0 : stack [stack_ptr_rg - 1] ;   
 
 
+/*---------------------------
+    DEBUG
+ ----------------------------*/
+ 
+always @ (posedge clk) begin
+    if(push) begin
+        $display("ss : push of = %x, at pos : %d",i_data, stack_ptr_rg);
+    end
+end 
+ 
+ 
+
 endmodule
 
 /*=============================================================================================================================*/

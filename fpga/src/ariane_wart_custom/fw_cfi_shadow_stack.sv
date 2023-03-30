@@ -19,7 +19,7 @@ module fw_cfi_shadow_stack #(
     parameter nop_rs1  = 5'b0,
     parameter nop_imm = 2'h2,
     parameter NR_COMMIT_PORTS = 2,
-    parameter SHADOW_STACK_SIZE = 100
+    parameter SHADOW_STACK_SIZE = 1000
 )
 (
     input  logic                                                    clk_i,
@@ -339,40 +339,51 @@ end
 
    
 ///////////////////////////////////////////////////////////////////////
-///////                           EXCEPTION                  //////////             
+///////                      EXCEPTION                       //////////             
 ///////////////////////////////////////////////////////////////////////
    
    
     ariane_pkg::exception_t  ex_d, ex_q; 
+    
+    logic is_ss_det, is_nop_det, is_full_det;
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
             ex_d.valid <= 1'b0;
             ex_d.cause <= '0;
             ex_d.tval  <= '0;
+            is_nop_det <= '0;
+            is_ss_det <= '0;
+            is_full_det <= '0;
          end else begin
+         
+            is_nop_det <= '0;
+            is_ss_det <= '0;
+            is_full_det <= '0;
+            ex_d.valid <= 1'b0;
+            ex_d.cause <= '0;
+            ex_d.tval  <= '0;
+            
             if( detect_prep_SS && !detect_GOOD_RET  && csr_en_i ) begin
                 
                 ex_d.cause <= riscv::ILLEGAL_INSTR;
                 ex_d.valid <= 1'b1;
                 ex_d.tval <= prev_entry.pc;
+                is_ss_det <= '1;
             end else 
             if( full_ss && csr_en_i) begin
                 
                 ex_d.cause <= riscv::ILLEGAL_INSTR;
                 ex_d.valid <= 1'b1;
                 ex_d.tval <= prev_entry.pc;
+                is_full_det <= '1;
             end else 
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
-                ex_d.cause <= riscv::BREAKPOINT;
+                ex_d.cause <= riscv::ILLEGAL_INSTR;
                 ex_d.valid <= 1'b1;
-                ex_d.tval <= '0;
-            end else begin 
-                
-                ex_d.valid <= 1'b0;
-                ex_d.cause <= '0;
-                ex_d.tval  <= '0;
+                ex_d.tval <= prev_entry.pc;
+                is_nop_det <= '1;
             end
          end
     end
@@ -434,7 +445,7 @@ end
             
             leds_s[9] <= csr_en_i;
             
-            if((prev_call == 1'b0) && (detect_CALL == 1'b1)) begin
+            /*if((prev_call == 1'b0) && (detect_CALL == 1'b1)) begin
                 leds_s[0] <= !leds_s[0]; 
             end 
             
@@ -444,13 +455,16 @@ end
             
             if((prev_nop == 1'b0) && (detect_NOP == 1'b1)) begin 
                 leds_s[2] <= !leds_s[2];                
-            end 
+            end*/ 
             
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (exception_o.cause == riscv::BREAKPOINT) ) begin 
-                leds_s[3] <= !leds_s[3];  
+            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_ss_det) ) begin 
+                leds_s[0] <= !leds_s[0];  
             end else 
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (exception_o.cause == riscv::INSTR_ACCESS_FAULT) ) begin 
-                leds_s[4] <= !leds_s[4];  
+            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_nop_det) ) begin 
+                leds_s[1] <= !leds_s[1];  
+            end else 
+            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_full_det) ) begin 
+                leds_s[2] <= !leds_s[2];  
             end
             
             if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
@@ -464,5 +478,23 @@ end
             end 
          end
     end
+    
+    
+    
+///////////////////////////////////////////////////////////////////////
+///////                         DEBUG                        //////////             
+///////////////////////////////////////////////////////////////////////
+
+always @ (posedge clk_i) begin
+    // print if detected a ss probleme
+    if(is_ss_det) begin
+        $display("ss probleme around : %x", commit_instr_i[0].pc);
+    end else 
+    if(is_nop_det) begin
+        $display("fw cfi probleme around : %x", commit_instr_i[0].pc);
+    end
+    
+end 
+    
     
 endmodule
