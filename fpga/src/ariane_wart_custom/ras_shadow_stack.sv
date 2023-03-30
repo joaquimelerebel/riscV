@@ -8,6 +8,7 @@
                   
    Developer    : Mitu Raj, chip@chipmunklogic.com at Chipmunk Logic ™, https://chipmunklogic.com
    Date         : Oct-02-2021
+   Modified to fit the need of the Shadow stack with an address space more important than the check space
 ===============================================================================================================================*/
 
 module ras_shadow_stack #(
@@ -32,7 +33,7 @@ module ras_shadow_stack #(
 /*-------------------------------------------------------------------------------------------------------------------------------
    Internal Registers/Signals
 -------------------------------------------------------------------------------------------------------------------------------*/
-//logic [DATA_W - 1 : 0]        stack [DEPTH]           ;
+logic [DATA_W - 1 : 0]        stack [DEPTH]           ;
 logic [$clog2(DEPTH+1)-1 : 0] stack_ptr_rg            ;
 logic                         push, pop, full, empty  ;
 
@@ -40,7 +41,7 @@ logic                         push, pop, full, empty  ;
 /*-------------------------------------------------------------------------------------------------------------------------------
    Changes by the team so that it is more optimized (using BRAM)
 -------------------------------------------------------------------------------------------------------------------------------*/
-i_xlnx_blk_mem_gen_for_lifo lifo(
+/*i_xlnx_blk_mem_gen_for_lifo lifo(
     .clka(clk),
     .wea(push),
     .addra(stack_ptr_rg),
@@ -49,7 +50,7 @@ i_xlnx_blk_mem_gen_for_lifo lifo(
     .clkb(clk),
     .addrb(stack_ptr_rg),
     .doutb(o_data)
-);
+);*/
 
 /*-------------------------------------------------------------------------------------------------------------------------------
    Synchronous logic to push and pop from Stack
@@ -59,7 +60,7 @@ always @ (posedge clk) begin
    // Reset
    if (!rstn) begin       
       
-      //stack        <= '{default: 1'b0} ;
+      stack        <= '{default: 1'b0} ;
       stack_ptr_rg <= 0                ;
 
    end
@@ -68,9 +69,9 @@ always @ (posedge clk) begin
    else begin      
       
       // Push to Stack    
-      /*if (push) begin
+      if (push) begin
          stack [stack_ptr_rg] <= i_data    ;               
-      end*/
+      end
       
       // Stack pointer update
       if (push & !pop) begin
@@ -97,7 +98,7 @@ assign pop     = i_pop  & !empty                       ;
 assign o_full  = full                                  ;
 assign o_empty = empty                                 ;  
 
-//assign o_data  = empty ? '0 : stack [stack_ptr_rg - 1] ;   
+assign o_data  = empty ? '0 : stack [stack_ptr_rg - 1] ;   
 
 
 /*---------------------------

@@ -19,7 +19,7 @@ module fw_cfi_shadow_stack #(
     parameter nop_rs1  = 5'b0,
     parameter nop_imm = 2'h2,
     parameter NR_COMMIT_PORTS = 2,
-    parameter SHADOW_STACK_SIZE = 8192
+    parameter SHADOW_STACK_SIZE = 3000
 )
 (
     input  logic                                                    clk_i,
@@ -205,7 +205,8 @@ endfunction
 ////////                     shadow stack                    //////////             
 ///////////////////////////////////////////////////////////////////////   
    
-logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack;
+logic [(riscv::XLEN/4)-1:0]     data_i_stack, data_o_stack;
+logic [riscv::XLEN-1:0]     data_cache;
 logic                           push_s_s, pop_s_s;
 logic                           full_ss;
 
@@ -213,8 +214,9 @@ logic                           detect_RET, detect_GOOD_RET, detect_prep_SS;
 
 enum int unsigned { IDLE_SS, WAITS_PC } state_shadow_stack, next_state_shadow_stack;
 
+// we only check the first LSB of the address to optimise the space
 ras_shadow_stack #(
-   .DATA_W(riscv::XLEN),
+   .DATA_W(riscv::XLEN/4),
    .DEPTH(SHADOW_STACK_SIZE)                             
 )
 ras_shadow_stack
@@ -251,7 +253,8 @@ always_ff @(posedge clk_i) begin
                 (commit_instr_i[0].ex.valid == 1'b0)        && 
                 is_call( commit_instr_i[0]) )               begin
                 
-                data_i_stack <= commit_instr_i[0].pc + 4;
+                data_cache = commit_instr_i[0].pc + 4;
+                data_i_stack <= data_cache[7:0];
                 push_s_s <= '1;
         end else 
         // cannot do 0 and 1 at the same time otherwise their is a problem in fw edge
@@ -259,7 +262,9 @@ always_ff @(posedge clk_i) begin
                 (commit_instr_i[1].ex.valid == 1'b0)        && 
                 is_call(commit_instr_i[1]) )                begin
                 
-                data_i_stack <= commit_instr_i[1].pc + 4;
+                data_cache = commit_instr_i[0].pc + 4;
+                data_i_stack <= data_cache[7:0];
+                
                 push_s_s <= '1;
         end            
         
@@ -294,7 +299,7 @@ always_comb begin
            
                     next_state_shadow_stack = IDLE_SS;
                     
-                    if ( data_o_stack == commit_instr_i[1].pc )    begin
+                    if ( data_o_stack == commit_instr_i[1].pc[7:0] )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -319,7 +324,7 @@ always_comb begin
                 detect_prep_SS = 1'b1;
                 next_state_shadow_stack = IDLE_SS;
            
-                if ( data_o_stack == commit_instr_i[0].pc )    begin
+                if ( data_o_stack == commit_instr_i[0].pc[7:0] )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
