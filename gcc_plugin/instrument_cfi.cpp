@@ -28,7 +28,7 @@ char generic_asm[ASM_BUFFER_SIZE];
 
 char *create_byte(uint32_t imm)
 {
-    snprintf(generic_asm, ASM_BUFFER_SIZE, ".word 0x%x", imm); //, ".byte 0x%02x, 0x%02x, 0x%02x, 0x%02x", imm & 0xff, (imm >> 8) & 0xff, (imm >> 16) & 0xff, (imm >> 24) & 0xff);
+    snprintf(generic_asm, ASM_BUFFER_SIZE, ".insn 0x%x", imm);
     return generic_asm;
 }
 
