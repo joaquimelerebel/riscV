@@ -187,18 +187,17 @@ def classic_attack(attacks_nb = linspace(1, 10, 10, dtype=int)) :
 	for nb in attacks_nb :
 		attaque = Attack(None, None, None, None, None, ATTACK_FILEPATH, RIPE_FILEPATH, True)
 		
-		if is_OK(attaque):
-			print(f"\n====== ATTACK SCENARIO {nb} =========\n")
-					
-			# setup technique 
-			attaque.setup(nb)
-			
-			# build
-			attaque.build()
+		print(f"\n====== ATTACK SCENARIO {nb} =========\n")
+				
+		# setup technique 
+		attaque.setup(nb)
+		
+		# build
+		attaque.build()
 
-			# run 
-			attaque.run()
-			
+		# run 
+		attaque.run()
+		
 		nb += 1	
 
 	

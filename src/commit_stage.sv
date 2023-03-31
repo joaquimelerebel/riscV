@@ -258,7 +258,7 @@ module commit_stage import ariane_pkg::*; #(
 // nop thingy 
 ariane_pkg::exception_t ex_cntr_flow_s;
 
-assign cfi_signal = '0; 
+//assign cfi_signal = '0; 
 //assign ex_cntr_flow_s = '0;
 
 fw_cfi_shadow_stack
@@ -273,7 +273,7 @@ fw_cfi_shadow_stack
    .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
    .leds(leds),
-   .cfi_signal(),
+   .cfi_signal(cfi_signal),
    .csr_indi_nb_args_i(csr_indi_nb_args_i),
    .rst_nop_id_csr_o(rst_nop_id_csr_o),
    .exception_o(ex_cntr_flow_s)

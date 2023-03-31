@@ -8,16 +8,11 @@
                   
    Developer    : Mitu Raj, chip@chipmunklogic.com at Chipmunk Logic ™, https://chipmunklogic.com
    Date         : Oct-02-2021
-   
-   Modified to fit the need of the Shadow Stack with an address space more important than the check space
-   we count the number of call but we disable the shadow stack when it is full, when we detect the counter is comming back
-   to a number addressable by the SS we re enable it.
 ===============================================================================================================================*/
 
 module ras_shadow_stack #(
                     parameter DATA_W     = 4           ,        // Data width
-                    parameter ADD_DEPTH  = 32          ,        // 2^ADD_DEPTH is the number of call that can be made  
-                    parameter REAL_DEPTH = 100                  // Depth of Stack                             
+                    parameter DEPTH      = 8                    // Depth of Stack                             
                  )
 
                 (
@@ -30,17 +25,16 @@ module ras_shadow_stack #(
 
                    input                   i_pop       ,        // Pop
                    output [DATA_W - 1 : 0] o_data      ,        // Read-data                   
-                   output                  o_empty     ,        // Empty signal
-                   output                  o_usable_res         // is the output ok for address check or not 
+                   output                  o_empty              // Empty signal
                 );
 
 
 /*-------------------------------------------------------------------------------------------------------------------------------
    Internal Registers/Signals
 -------------------------------------------------------------------------------------------------------------------------------*/
-logic [DATA_W - 1 : 0]        stack [REAL_DEPTH]      ;
-logic [ADD_DEPTH-1 : 0]       stack_ptr_rg            ;
-logic                         push, pop, full, empty, usable  ;
+logic [DATA_W - 1 : 0]        stack [DEPTH]           ;
+logic [$clog2(DEPTH+1)-1 : 0] stack_ptr_rg            ;
+logic                         push, pop, full, empty  ;
 
 
 /*-------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +54,7 @@ always @ (posedge clk) begin
    else begin      
       
       // Push to Stack    
-      if (push && !full) begin
+      if (push) begin
          stack [stack_ptr_rg] <= i_data    ;               
       end
       
@@ -71,7 +65,7 @@ always @ (posedge clk) begin
       else if (!push & pop) begin
          stack_ptr_rg <= stack_ptr_rg - 1  ;
       end
-    
+
    end
 
 end
@@ -80,18 +74,16 @@ end
 /*-------------------------------------------------------------------------------------------------------------------------------
    Continuous Assignments
 -------------------------------------------------------------------------------------------------------------------------------*/
-assign full    = (stack_ptr_rg == REAL_DEPTH)               ;
-assign usable  = (stack_ptr_rg <= REAL_DEPTH)               ;
-assign empty   = (stack_ptr_rg == 0         )               ;
+assign full    = (stack_ptr_rg == DEPTH)               ;
+assign empty   = (stack_ptr_rg == 0    )               ;
 
 assign push    = i_push & !full                        ;
 assign pop     = i_pop  & !empty                       ;
 
 assign o_full  = full                                  ;
-assign o_usable_res = usable                           ; 
 assign o_empty = empty                                 ;  
 
-assign o_data  = (empty && usable) ? '0 : stack [stack_ptr_rg - 1] ;   
+assign o_data  = empty ? '0 : stack [stack_ptr_rg - 1] ;   
 
 
 /*---------------------------
