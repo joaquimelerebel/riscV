@@ -401,7 +401,9 @@ int plugin_init(struct plugin_name_args *info, struct plugin_gcc_version *ver)
     pass.pass = &inst_pass;
 
     // get called after Control flow graph cleanup (see RTL passes)
-    pass.reference_pass_name = "*free_cfg";
+    // see https://gcc.gnu.org/onlinedocs/gccint/RTL-passes.html and https://github.com/gcc-mirror/gcc/blob/master/gcc/passes.def
+    // For reference Intel CET passe "pass_insert_endbranch" is inserted just after pass "pass_convert_to_eh_region_ranges"
+    pass.reference_pass_name = "eh_ranges";
 
     // after the first opt pass to be sure opt will not throw away our stuff
     pass.ref_pass_instance_number = 1;
