@@ -17,21 +17,19 @@
 
 #define INSN_FROM_RTX(rtx) (rtx_insn *)(rtx)
 
-#define ADD_NOP "li zero, 1"
+#define LI_MASK 0x00000013
+#define CSRWI_3FE_MASK 0x3fe05073
 
-char GENERIC_NOP[24];
-char CSR_WRITE[24];
+#define LI_ZERO(imm) create_byte(((imm << 20) | LI_MASK))
+#define CSRWI_3FE(imm) create_byte(((imm << 15) | CSRWI_3FE_MASK))
+#define ASM_BUFFER_SIZE 100
 
-char *nop(uint16_t imm)
+char generic_asm[ASM_BUFFER_SIZE];
+
+char *create_byte(uint32_t imm)
 {
-    sprintf(GENERIC_NOP, "li zero, %d", imm);
-    return GENERIC_NOP;
-}
-
-char *csrwi(uint8_t imm)
-{
-    sprintf(CSR_WRITE, "csrwi 0x3FE, %d", imm);
-    return CSR_WRITE;
+    snprintf(generic_asm, ASM_BUFFER_SIZE, ".word 0x%x", imm); //, ".byte 0x%02x, 0x%02x, 0x%02x, 0x%02x", imm & 0xff, (imm >> 8) & 0xff, (imm >> 16) & 0xff, (imm >> 24) & 0xff);
+    return generic_asm;
 }
 
 /**
@@ -263,7 +261,7 @@ static unsigned int instrument_assignments_plugin_exec(void)
 #endif
 
 #if DEBUG >= 1
-    fprintf(stderr, "[function start] adding nop %s\n", nop(call_nop_imm));
+    fprintf(stderr, "[function start] adding nop %s\n", LI_ZERO(call_nop_imm));
 #endif
 
 #if DEBUG == 2
@@ -273,7 +271,7 @@ static unsigned int instrument_assignments_plugin_exec(void)
     // insert nop at the beginning of the function
 
 #if RUNTIME_CALL_ANNOTATION == 1
-    insert_asm(BB_HEAD(entry), nop(call_nop_imm));
+    insert_asm(BB_HEAD(entry), LI_ZERO(call_nop_imm));
 #endif
 
     // insert nop after each call instruction
@@ -289,23 +287,23 @@ static unsigned int instrument_assignments_plugin_exec(void)
             if (is_indirect)
             {
 #if DEBUG >= 1
-                fprintf(stderr, "Indirect call: prefixing with %s\n", csrwi(count_call_ins_arguments(ins)));
+                fprintf(stderr, "Indirect call: prefixing with %s\n", CSRWI_3FE(count_call_ins_arguments(ins)));
 #endif
-                insert_asm(ins, csrwi(count_call_ins_arguments(ins)), true);
+                insert_asm(ins, CSRWI_3FE(count_call_ins_arguments(ins)), true);
             }
 #endif
 
 #if RUNTIME_RET_ANNOTATION == 1
 
 #if DEBUG >= 1
-            fprintf(stderr, "[call instruction] adding nop %s: \n", ADD_NOP);
+            fprintf(stderr, "[call instruction] adding nop %s: \n", LI_ZERO(1));
 #endif
 
 #if DEBUG == 2
             print_rtl_single(stderr, ins);
 #endif
 
-            insert_asm(ins, ADD_NOP);
+            insert_asm(ins, LI_ZERO(1));
 #endif
         }
 
