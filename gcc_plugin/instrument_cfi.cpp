@@ -40,7 +40,7 @@ char *csrwi(uint8_t imm)
 #define DEBUG 1
 
 /**
- * Generate code for runtime of number of arguments
+ * Generate code for runtime verification of number of arguments
 */
 #define RUNTIME_ARG_CHECK 1 // 0
 
@@ -142,44 +142,6 @@ extern void print_generic_stmt(FILE *file, tree t, dump_flags_t flags);
 extern gcc::context *g;
 
 // -----------------------------------------------------------------------------
-// GCC ATTRIBUTES MANAGEMENT (REGISTERING / CALLBACKS)
-// -----------------------------------------------------------------------------
-
-/**
- * Insert a single ATTR into the attribute table
- * @see Declared in plugin.h
- * @note Insert the attribute into the 'gnu' attributes namespace
- */
-extern void register_attribute(const struct attribute_spec *attr);
-
-/**
- * Attribute handler callback
- * @note NODE points to the node to which the attribute is to be applied. NAME
- * is the name of the attribute. ARGS is the TREE_LIST of arguments (may be
- * NULL). FLAGS gives information about the context of the attribute.
- * Afterwards, the attributes will be added unless *NO_ADD_ATTRS is set to true
- * (which should be done on error). Depending on FLAGS, any attributes to be
- * applied to another type or DECL later may be returned; otherwise the return
- * value should be NULL_TREE. This pointer may be NULL if no special handling is
- * required
- * @see Declared in tree-core.h
- */
-static tree handle_instrument_attribute(tree *node, tree name, tree args, int flags, bool *no_add_attrs)
-{
-#if DEBUG == 1
-    fprintf(stderr, "> Found attribute\n");
-
-    fprintf(stderr, "\tnode = ");
-    print_generic_stmt(stderr, *node, TDF_NONE);
-
-    fprintf(stderr, "\tname = ");
-    print_generic_stmt(stderr, name, TDF_NONE);
-#endif
-
-    return NULL_TREE;
-}
-
-// -----------------------------------------------------------------------------
 // PLUGIN INSTRUMENTATION LOGICS
 // -----------------------------------------------------------------------------
 
@@ -227,7 +189,6 @@ struct argument_count
 
 static void get_argument_count(tree fn, struct argument_count *p)
 {
-
     int count = 0;
 
     tree arg = arg = TYPE_ARG_TYPES(TREE_TYPE(fn));
