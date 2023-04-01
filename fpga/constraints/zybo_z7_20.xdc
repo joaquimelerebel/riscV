@@ -16,6 +16,8 @@ set_property -dict {PACKAGE_PIN W8 IOSTANDARD LVCMOS33} [get_ports tx]
 set_property -dict {PACKAGE_PIN U7 IOSTANDARD LVCMOS33} [get_ports rx]
 
 
+
+
 ## JTAG
 # minimize routing delay
 
