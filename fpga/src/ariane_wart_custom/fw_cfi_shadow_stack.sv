@@ -30,7 +30,6 @@ module fw_cfi_shadow_stack #(
     input logic [NR_COMMIT_PORTS-1:0]                               commit_ack_i,
     // what instruction will be commited
     input  ariane_pkg::scoreboard_entry_t [NR_COMMIT_PORTS-1:0]     commit_instr_i,
-    output logic[9:0]                                               leds, 
     // signal that their is an error -> put pc to 0 (needs to change for a proposer exception)
     output logic                                                    cfi_signal,
     // number of arguments from the csr (assigned when indirect call will come)
@@ -426,69 +425,6 @@ end
             end
          end
     end
-    
-   
-   logic[9:0] leds_s;
-   assign leds = leds_s;
-         
-    always_ff @(posedge clk_i) begin
-        if(rst_ni == 1'b0) begin 
-            prev_nop <= 1'b0;
-            prev_ret <= 1'b0;
-            prev_call <= 1'b0;
-            prev_prep_ss <= 1'b0;
-            prev_prep_nop <= 1'b0;
-            prev_good_ret <= 1'b0;
-            prev_ex <= '0;
-            leds_s <= '0;
-         end else begin
-         
-            prev_call <= detect_CALL;
-            prev_nop <= detect_NOP;
-            prev_prep_nop <= detect_prep_NOP;
-            
-            prev_ret <= detect_RET;
-            prev_prep_ss <= detect_prep_SS;
-            prev_good_ret <= detect_GOOD_RET;
-            
-            prev_ex <= exception_o.valid;
-            
-            leds_s[9] <= csr_en_i;
-            
-            /*if((prev_call == 1'b0) && (detect_CALL == 1'b1)) begin
-                leds_s[0] <= !leds_s[0]; 
-            end 
-            
-            if((prev_prep_nop == 1'b0) && (detect_prep_NOP == 1'b1)) begin
-                leds_s[1] <= !leds_s[1];
-            end 
-            
-            if((prev_nop == 1'b0) && (detect_NOP == 1'b1)) begin 
-                leds_s[2] <= !leds_s[2];                
-            end*/ 
-            
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_ss_det) ) begin 
-                leds_s[0] <= !leds_s[0];  
-            end else 
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_nop_det) ) begin 
-                leds_s[1] <= !leds_s[1];  
-            end else 
-            if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_full_det) ) begin 
-                leds_s[2] <= !leds_s[2];  
-            end
-            
-            if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
-                leds_s[5] <= !leds_s[5];  
-            end 
-            if((prev_prep_ss == 1'b0) && (detect_prep_SS == 1'b1)) begin 
-                leds_s[6] <= !leds_s[6];  
-            end 
-            if((prev_good_ret == 1'b0) && (detect_GOOD_RET == 1'b1)) begin 
-                leds_s[7] <= !leds_s[7];  
-            end 
-         end
-    end
-    
     
     
 ///////////////////////////////////////////////////////////////////////

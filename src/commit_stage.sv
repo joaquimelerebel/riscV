@@ -53,7 +53,6 @@ module commit_stage import ariane_pkg::*; #(
     output logic                                    flush_commit_o,     // request a pipeline flush
     output logic                                    sfence_vma_o,        // flush TLBs and pipeline
     // nop thingy activation bit
-    output logic[9:0]                               leds,                // debug leds
     output logic                                    cfi_signal,          // stop cpu signal
     input  logic                                    csr_nop_thingy_en_i, // enables the nop parser
     output logic                                    rst_nop_id_csr_o,    // rst the cst from its args nb 
@@ -272,7 +271,6 @@ fw_cfi_shadow_stack
    .csr_en_i(csr_nop_thingy_en_i),
    .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
-   .leds(leds),
    .cfi_signal(cfi_signal),
    .csr_indi_nb_args_i(csr_indi_nb_args_i),
    .rst_nop_id_csr_o(rst_nop_id_csr_o),
