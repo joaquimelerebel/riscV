@@ -51,7 +51,7 @@ torture-logs   :=
 elf-bin        ?= sw/app/benchmarks/coremark.riscv
 
 # Application to simulate
-APP            ?= helloworld_printf
+APP            ?= coremark
 
 # root path
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
