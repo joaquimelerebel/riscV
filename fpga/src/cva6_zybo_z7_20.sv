@@ -63,6 +63,8 @@ module cva6_zybo_z7_20 (
   output logic     tx
 
 );
+
+
 // 24 MByte in 8 byte words
 localparam NumWords = (24 * 1024 * 1024) / 8;
 localparam NBSlave = 2; // debug, ariane
