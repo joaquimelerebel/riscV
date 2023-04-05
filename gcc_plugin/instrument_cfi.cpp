@@ -28,7 +28,7 @@ char generic_asm[ASM_BUFFER_SIZE];
 
 char *create_byte(uint32_t imm)
 {
-    snprintf(generic_asm, ASM_BUFFER_SIZE, ".insn 0x%x", imm);
+    snprintf(generic_asm, ASM_BUFFER_SIZE, ".word 0x%x", imm); //, ".byte 0x%02x, 0x%02x, 0x%02x, 0x%02x", imm & 0xff, (imm >> 8) & 0xff, (imm >> 16) & 0xff, (imm >> 24) & 0xff);
     return generic_asm;
 }
 
@@ -393,8 +393,9 @@ int plugin_init(struct plugin_name_args *info, struct plugin_gcc_version *ver)
     register_callback(PLUGIN_NAME, PLUGIN_INFO, NULL, &inst_plugin_info);
 
     // warn the user about the presence of this plugin
+#if DEBUG == 2
     printf("> Instrumentation plugin '%s @ %s' was loaded onto GCC\n", PLUGIN_NAME, PLUGIN_VERSION);
-
+#endif
     // insert inst pass into the struct used to register the pass
     pass.pass = &inst_pass;
 
