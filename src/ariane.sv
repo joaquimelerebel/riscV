@@ -518,7 +518,6 @@ module ariane import ariane_pkg::*; #(
     .cfi_signal             ( commit_cfi_signal             ),
     .rst_nop_id_csr_o       ( rst_nop_id                    ),
     .csr_indi_nb_args_i     ( nop_indi_nb_args              ),
-    .leds(leds),
     .*
   );
 
