@@ -393,8 +393,9 @@ int plugin_init(struct plugin_name_args *info, struct plugin_gcc_version *ver)
     register_callback(PLUGIN_NAME, PLUGIN_INFO, NULL, &inst_plugin_info);
 
     // warn the user about the presence of this plugin
+#if DEBUG == 2
     printf("> Instrumentation plugin '%s @ %s' was loaded onto GCC\n", PLUGIN_NAME, PLUGIN_VERSION);
-
+#endif
     // insert inst pass into the struct used to register the pass
     pass.pass = &inst_pass;
 
