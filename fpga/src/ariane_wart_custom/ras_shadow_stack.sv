@@ -12,7 +12,8 @@
 
 module ras_shadow_stack #(
                     parameter DATA_W     = 4           ,        // Data width
-                    parameter DEPTH      = 8                    // Depth of Stack                             
+                    parameter DEPTH      = 8           ,         // Depth of Stack 
+                    parameter SP_WIDTH   = 32                    // Depth of Stack                             
                  )
 
                 (
@@ -25,7 +26,8 @@ module ras_shadow_stack #(
 
                    input                   i_pop       ,        // Pop
                    output [DATA_W - 1 : 0] o_data      ,        // Read-data                   
-                   output                  o_empty              // Empty signal
+                   output                  o_empty     ,        // Empty signal
+                   output                  o_valid              // valid output 
                 );
 
 
@@ -33,8 +35,8 @@ module ras_shadow_stack #(
    Internal Registers/Signals
 -------------------------------------------------------------------------------------------------------------------------------*/
 logic [DATA_W - 1 : 0]        stack [DEPTH]           ;
-logic [$clog2(DEPTH+1)-1 : 0] stack_ptr_rg            ;
-logic                         push, pop, full, empty  ;
+logic [SP_WIDTH-1 : 0]        stack_ptr_rg            ;
+logic                         push, pop, full, empty, valid  ;
 
 
 /*-------------------------------------------------------------------------------------------------------------------------------
@@ -54,7 +56,7 @@ always @ (posedge clk) begin
    else begin      
       
       // Push to Stack    
-      if (push) begin
+      if (push & !full) begin
          stack [stack_ptr_rg] <= i_data    ;               
       end
       
@@ -76,14 +78,16 @@ end
 -------------------------------------------------------------------------------------------------------------------------------*/
 assign full    = (stack_ptr_rg == DEPTH)               ;
 assign empty   = (stack_ptr_rg == 0    )               ;
+assign valid   = (stack_ptr_rg <= DEPTH)               ;
 
 assign push    = i_push & !full                        ;
 assign pop     = i_pop  & !empty                       ;
 
 assign o_full  = full                                  ;
 assign o_empty = empty                                 ;  
+assign o_valid = valid                                 ;
 
-assign o_data  = empty ? '0 : stack [stack_ptr_rg - 1] ;   
+assign o_data  = (empty | !valid) ? '0 : stack [stack_ptr_rg - 1] ;   
 
 
 /*---------------------------

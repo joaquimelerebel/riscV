@@ -1,15 +1,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Team: "Les Vieux Briscards" for 3rd national RISC-V student contest 2022-2023  
 
-// This module will check whether calls are followed by nop with immediate #2
-// in the case of an indirect call, the number of arguments of the called function 
-// is put in a CSR, we get it in csr_indi_nb_args_i and we compare it with 
-// nop.imm[10:2] which are the arguments taken by the function.
-// If a function is called and not followed by the right nop, an exception and cfi_signal
-// is issued.
+// This module embeds 2 technics : shadow stack and forward edge control flow 
+// enforcement. 
+
+// The FW-CFI : checks if the current commited instruction is a call, if 
+// indeed it is, checks if the following instruction is the custom nop.
+// in the case of an indirect call, a CSR would have been modified to indicate 
+// the number of arguments used in the call. We can compare thoses with the 
+// informations in the nop : is the function variadic, how many args does it take.
+// we check that the call verifies theses rules, if not we issue an exception and cfi_signal.
+
+// The Shadow Stack : we put every call address's on a stack and when their is a return we pop 
+// the stack and check if the next instruction address is equal to the address poped. 
+// In the case of a filled ss, we have a counter for the number of calls and return, 
+// "the stack pointer". if the stack pointer becomes greater than the depth of the ss, 
+// the ss is desactivated until the sp can point to a valid address.
+
 // cfi_signal will have the effect of setting pc to 0 and therefore crashing the core. 
 
-// This module works hands in hands with the nop ret detector
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -208,7 +217,7 @@ endfunction
    
 logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack;
 logic                           push_s_s, pop_s_s;
-logic                           full_ss;
+logic                           full_ss, valid_ss;
 
 logic                           detect_RET, detect_GOOD_RET, detect_prep_SS;
 
@@ -229,7 +238,8 @@ ras_shadow_stack
 
    .i_pop(pop_s_s),
    .o_data(data_o_stack),                   
-   .o_empty() //check the flag
+   .o_empty(), //check the flag
+   .o_valid(valid_ss)
 );   
 
 // add elements to the stack
@@ -293,6 +303,9 @@ always_comb begin
            
                     next_state_shadow_stack = IDLE_SS;
                     
+                    if ( !valid_ss ) begin 
+                        detect_GOOD_RET = 1'b1;
+                    end else
                     if ( data_o_stack == commit_instr_i[1].pc )    begin
                          detect_GOOD_RET = 1'b1;
                     end
@@ -318,8 +331,10 @@ always_comb begin
                 detect_prep_SS = 1'b1;
                 next_state_shadow_stack = IDLE_SS;
            
+                if (!valid_ss) begin 
+                    detect_GOOD_RET = 1'b1;
+                end else 
                 if ( data_o_stack == commit_instr_i[0].pc )    begin
-                
                         detect_GOOD_RET = 1'b1;
                 end
                 
