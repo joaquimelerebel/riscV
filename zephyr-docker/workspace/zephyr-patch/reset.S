@@ -29,7 +29,6 @@ SECTION_FUNC(reset, __reset)
 	 * This will be dependent on linker.ld configuration.
 	 */
 	call __initialize
-/*	li zero, 1 */
 #endif /* CONFIG_INCLUDE_RESET_VECTOR */
 
 /* use ABI name of registers for the sake of simplicity */
@@ -89,7 +88,6 @@ aa_loop:
 
 #ifdef CONFIG_WDOG_INIT
 	call _WdogInit
-/*	li zero, 1 */
 #endif
 
 	/*
@@ -97,7 +95,6 @@ aa_loop:
 	 * and then enters kernel z_cstart
 	 */
 	call _PrepC
-/*	li zero, 1 */
 
 boot_secondary_core:
 	la t0, riscv_cpu_wake_flag

@@ -48,6 +48,9 @@ ZEPHYR_FILES_TREE = {
   ],
   'kernel': [
     './init.c', './Kconfig'
+  ],
+  'lib/libc/newlib': [
+    'libc-hooks.c'
   ]
 }
 
@@ -58,15 +61,14 @@ for path, files in ZEPHYR_FILES_TREE.items():
 
 print('Done ✅')
 
+# !TODO!: Make newlib without nano as well
 print(action, "libc files", end=" ")
 
 LIBC_FILES = ['./libc.a', './libg.a', './libm.a', './libc_nano.a', './libg_nano.a', './libm_nano.a']
 
 for libc_file in LIBC_FILES:
-  files = glob.glob(os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/**/**/', libc_file))
-  files.append(os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/', libc_file)) 
-  for file in files:
-    fn(libc_file, file)
+  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/', libc_file)
+  fn(libc_file, dst)
 
 print('Done ✅')
 
@@ -75,9 +77,7 @@ print(action, "libgcc files", end=" ")
 LIBGCC_FILES = ['./libgcc.a']
 
 for libgcc_file in LIBGCC_FILES:
-  files = glob.glob(os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/**/**/**/', libgcc_file))
-  files.append(os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/12.1.0', libgcc_file)) # TODO: remove Hardcoding
-  for file in files:
-    fn(libgcc_file, file)
+  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/12.1.0', libgcc_file)
+  fn(libgcc_file, dst)
 
 print('Done ✅')

@@ -392,6 +392,7 @@ do {                                                                    \
 	\symbol :
 .endm
 
+// !TODO!: Take into account the number of arguments passed to the function
 .macro section_func section, symbol
 	.section .\section\().\symbol, "ax"
 	FUNC_CODE()
