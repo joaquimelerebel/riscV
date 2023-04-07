@@ -1,0 +1,51 @@
+From 7f28595ee8d2c32cb598adc03fe28678302bc509 Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Fri, 7 Apr 2023 13:20:21 +0200
+Subject: [PATCH] check src & dest of memcpy
+
+---
+ newlib/libc/machine/riscv/memcpy-asm.S | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/newlib/libc/machine/riscv/memcpy-asm.S b/newlib/libc/machine/riscv/memcpy-asm.S
+index 0594ca760..d55d232d6 100644
+--- a/newlib/libc/machine/riscv/memcpy-asm.S
++++ b/newlib/libc/machine/riscv/memcpy-asm.S
+@@ -15,6 +15,22 @@
+ .type	memcpy, @function
+ memcpy:
+   li zero, 2
++  addi sp, sp, -16
++  sw ra, 12(sp)
++  sw a0, 8(sp)
++  sw a1, 4(sp)
++  sw a2, 0(sp)
++  mv a0, a1
++  mv a1, a2
++  call __ptr_overflow_check__
++  bnez a0, __abort
++  lw a0, 0(sp) // lw a0, a2
++  call __ptr_overflow_check__
++  bnez a0, __abort
++  lw ra, 12(sp)
++  lw a0, 8(sp)
++  lw a1, 4(sp)
++  lw a2, 0(sp)
+   mv t1, a0
+   beqz a2, 2f
+ 
+@@ -27,7 +43,11 @@ memcpy:
+   bnez a2, 1b
+ 
+ 2:
++  addi sp, sp, 16
+   ret
+ 
++__abort:
++  call __ptr_overflow_abort__
++
+   .size	memcpy, .-memcpy
+ #endif
+-- 
+2.39.2
+

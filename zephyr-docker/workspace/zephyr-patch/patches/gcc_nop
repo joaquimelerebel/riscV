@@ -1,0 +1,31 @@
+From a0c941a8762468e4348fa05b6e0a014fec0951d4 Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Fri, 7 Apr 2023 11:54:27 +0200
+Subject: [PATCH] add NOPs to functions defined in assembly
+
+---
+ libgcc/config/riscv/riscv-asm.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libgcc/config/riscv/riscv-asm.h b/libgcc/config/riscv/riscv-asm.h
+index b70930ee54d..b492c0cc18e 100644
+--- a/libgcc/config/riscv/riscv-asm.h
++++ b/libgcc/config/riscv/riscv-asm.h
+@@ -22,10 +22,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #define FUNC_TYPE(X)	.type X,@function
+ #define FUNC_SIZE(X)	.size X,.-X
+ 
++// !TODO!: Take account the number of arguments: put 0 or more
+ #define FUNC_BEGIN(X)		\
+ 	.globl X;		\
+ 	FUNC_TYPE (X);		\
+-X:
++X: \
++	li zero, 2 \
++	
+ 
+ #define FUNC_END(X)		\
+ 	FUNC_SIZE(X)
+-- 
+2.39.2
+
