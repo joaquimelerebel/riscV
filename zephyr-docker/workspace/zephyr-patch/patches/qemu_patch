@@ -197,259 +197,6 @@ diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
 index 48f918b71b..f94a48ff3c 100644
 --- a/target/riscv/op_helper.c
 +++ b/target/riscv/op_helper.c
-@@ -44,14 +44,16 @@ target_ulong helper_csrr(CPURISCVState *env, int csr)
-      * read-only instruction such as CSRRS/CSRRC with rs1=x0 or CSRRSI/
-      * CSRRCI with uimm=0 will raise an illegal instruction exception.
-      */
--    if (csr == CSR_SEED) {
-+    if (csr == CSR_SEED)
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
-     target_ulong val = 0;
-     RISCVException ret = riscv_csrrw(env, csr, &val, 0, 0);
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
-     return val;
-@@ -62,7 +64,8 @@ void helper_csrw(CPURISCVState *env, int csr, target_ulong src)
-     target_ulong mask = env->xl == MXL_RV32 ? UINT32_MAX : (target_ulong)-1;
-     RISCVException ret = riscv_csrrw(env, csr, NULL, src, mask);
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
- }
-@@ -73,7 +76,8 @@ target_ulong helper_csrrw(CPURISCVState *env, int csr,
-     target_ulong val = 0;
-     RISCVException ret = riscv_csrrw(env, csr, &val, src, write_mask);
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
-     return val;
-@@ -86,7 +90,8 @@ target_ulong helper_csrr_i128(CPURISCVState *env, int csr)
-                                           int128_zero(),
-                                           int128_zero());
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
- 
-@@ -101,21 +106,23 @@ void helper_csrw_i128(CPURISCVState *env, int csr,
-                                           int128_make128(srcl, srch),
-                                           UINT128_MAX);
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
- }
- 
- target_ulong helper_csrrw_i128(CPURISCVState *env, int csr,
--                       target_ulong srcl, target_ulong srch,
--                       target_ulong maskl, target_ulong maskh)
-+                               target_ulong srcl, target_ulong srch,
-+                               target_ulong maskl, target_ulong maskh)
- {
-     Int128 rv = int128_zero();
-     RISCVException ret = riscv_csrrw_i128(env, csr, &rv,
-                                           int128_make128(srcl, srch),
-                                           int128_make128(maskl, maskh));
- 
--    if (ret != RISCV_EXCP_NONE) {
-+    if (ret != RISCV_EXCP_NONE)
-+    {
-         riscv_raise_exception(env, ret, GETPC());
-     }
- 
-@@ -130,21 +137,25 @@ target_ulong helper_sret(CPURISCVState *env)
-     uint64_t mstatus;
-     target_ulong prev_priv, prev_virt;
- 
--    if (!(env->priv >= PRV_S)) {
-+    if (!(env->priv >= PRV_S))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
-     target_ulong retpc = env->sepc;
--    if (!riscv_has_ext(env, RVC) && (retpc & 0x3)) {
-+    if (!riscv_has_ext(env, RVC) && (retpc & 0x3))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
-     }
- 
--    if (get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
-+    if (get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
-     if (riscv_has_ext(env, RVH) && riscv_cpu_virt_enabled(env) &&
--        get_field(env->hstatus, HSTATUS_VTSR)) {
-+        get_field(env->hstatus, HSTATUS_VTSR))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
-     }
- 
-@@ -154,12 +165,14 @@ target_ulong helper_sret(CPURISCVState *env)
-                         get_field(mstatus, MSTATUS_SPIE));
-     mstatus = set_field(mstatus, MSTATUS_SPIE, 1);
-     mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
--    if (env->priv_ver >= PRIV_VERSION_1_12_0) {
-+    if (env->priv_ver >= PRIV_VERSION_1_12_0)
-+    {
-         mstatus = set_field(mstatus, MSTATUS_MPRV, 0);
-     }
-     env->mstatus = mstatus;
- 
--    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
-+    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env))
-+    {
-         /* We support Hypervisor extensions and virtulisation is disabled */
-         target_ulong hstatus = env->hstatus;
- 
-@@ -169,7 +182,8 @@ target_ulong helper_sret(CPURISCVState *env)
- 
-         env->hstatus = hstatus;
- 
--        if (prev_virt) {
-+        if (prev_virt)
-+        {
-             riscv_cpu_swap_hypervisor_regs(env);
-         }
- 
-@@ -183,12 +197,14 @@ target_ulong helper_sret(CPURISCVState *env)
- 
- target_ulong helper_mret(CPURISCVState *env)
- {
--    if (!(env->priv >= PRV_M)) {
-+    if (!(env->priv >= PRV_M))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
-     target_ulong retpc = env->mepc;
--    if (!riscv_has_ext(env, RVC) && (retpc & 0x3)) {
-+    if (!riscv_has_ext(env, RVC) && (retpc & 0x3))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
-     }
- 
-@@ -196,7 +212,8 @@ target_ulong helper_mret(CPURISCVState *env)
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
- 
-     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
--        !pmp_get_num_rules(env) && (prev_priv != PRV_M)) {
-+        !pmp_get_num_rules(env) && (prev_priv != PRV_M))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_INST_ACCESS_FAULT, GETPC());
-     }
- 
-@@ -206,14 +223,17 @@ target_ulong helper_mret(CPURISCVState *env)
-     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
-     mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
-     mstatus = set_field(mstatus, MSTATUS_MPV, 0);
--    if ((env->priv_ver >= PRIV_VERSION_1_12_0) && (prev_priv != PRV_M)) {
-+    if ((env->priv_ver >= PRIV_VERSION_1_12_0) && (prev_priv != PRV_M))
-+    {
-         mstatus = set_field(mstatus, MSTATUS_MPRV, 0);
-     }
-     env->mstatus = mstatus;
-     riscv_cpu_set_mode(env, prev_priv);
- 
--    if (riscv_has_ext(env, RVH)) {
--        if (prev_virt) {
-+    if (riscv_has_ext(env, RVH))
-+    {
-+        if (prev_virt)
-+        {
-             riscv_cpu_swap_hypervisor_regs(env);
-         }
- 
-@@ -231,12 +251,17 @@ void helper_wfi(CPURISCVState *env)
-     bool prv_s = env->priv == PRV_S;
- 
-     if (((prv_s || (!rvs && prv_u)) && get_field(env->mstatus, MSTATUS_TW)) ||
--        (rvs && prv_u && !riscv_cpu_virt_enabled(env))) {
-+        (rvs && prv_u && !riscv_cpu_virt_enabled(env)))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
--    } else if (riscv_cpu_virt_enabled(env) && (prv_u ||
--        (prv_s && get_field(env->hstatus, HSTATUS_VTW)))) {
-+    }
-+    else if (riscv_cpu_virt_enabled(env) && (prv_u ||
-+                                             (prv_s && get_field(env->hstatus, HSTATUS_VTW))))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
--    } else {
-+    }
-+    else
-+    {
-         cs->halted = 1;
-         cs->exception_index = EXCP_HLT;
-         cpu_loop_exit(cs);
-@@ -248,12 +273,17 @@ void helper_tlb_flush(CPURISCVState *env)
-     CPUState *cs = env_cpu(env);
-     if (!(env->priv >= PRV_S) ||
-         (env->priv == PRV_S &&
--         get_field(env->mstatus, MSTATUS_TVM))) {
-+         get_field(env->mstatus, MSTATUS_TVM)))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
--    } else if (riscv_has_ext(env, RVH) && riscv_cpu_virt_enabled(env) &&
--               get_field(env->hstatus, HSTATUS_VTVM)) {
-+    }
-+    else if (riscv_has_ext(env, RVH) && riscv_cpu_virt_enabled(env) &&
-+             get_field(env->hstatus, HSTATUS_VTVM))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
--    } else {
-+    }
-+    else
-+    {
-         tlb_flush(cs);
-     }
- }
-@@ -268,12 +298,14 @@ void helper_hyp_tlb_flush(CPURISCVState *env)
- {
-     CPUState *cs = env_cpu(env);
- 
--    if (env->priv == PRV_S && riscv_cpu_virt_enabled(env)) {
-+    if (env->priv == PRV_S && riscv_cpu_virt_enabled(env))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
-     }
- 
-     if (env->priv == PRV_M ||
--        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env))) {
-+        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)))
-+    {
-         tlb_flush(cs);
-         return;
-     }
-@@ -284,7 +316,8 @@ void helper_hyp_tlb_flush(CPURISCVState *env)
- void helper_hyp_gvma_tlb_flush(CPURISCVState *env)
- {
-     if (env->priv == PRV_S && !riscv_cpu_virt_enabled(env) &&
--        get_field(env->mstatus, MSTATUS_TVM)) {
-+        get_field(env->mstatus, MSTATUS_TVM))
-+    {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
 @@ -306,3 +339,139 @@ target_ulong helper_hyp_hlvx_wu(CPURISCVState *env, target_ulong address)
  }
  
@@ -478,7 +225,7 @@ index 48f918b71b..f94a48ff3c 100644
 +#endif
 +        return 0;
 +    }
-+    
++
 +    return return_stack[offset++] = pc + 4;
 +}
 +
@@ -488,8 +235,8 @@ index 48f918b71b..f94a48ff3c 100644
 +        fprintf(stdout, "return stack underflow, cause: %x\n", pc);
 +#endif
 +        return 0;
-+    } 
-+    
++    }
++
 +    return return_stack[--offset];
 +}
 +
@@ -511,7 +258,7 @@ index 48f918b71b..f94a48ff3c 100644
 +        }
 +
 +
-+        // call 
++        // call
 +        if (LI_TYPE(next_isns) != LI_TYPE_CALL)
 +        {
 +#if LOG_CFI_VIOLATIONS >= 1
@@ -545,7 +292,7 @@ index 48f918b71b..f94a48ff3c 100644
 +        // if ( LI_TYPE(next_isns) == LI_TYPE_RET )
 +        //     fprintf(stdout, "Deprecated ret nop at %x\n", next_pc);
 +
-+        
++
 +        int saved_return_address = pop_return_stack(pc);
 +        // fprintf(stdout, "pop return address %x, but going to: %x\n", saved_return_address, next_pc);
 +        if ( saved_return_address != 0 ) {
@@ -554,14 +301,14 @@ index 48f918b71b..f94a48ff3c 100644
 +                fprintf(stdout, "Unexpected return address %x, expected: %x\n", next_pc, saved_return_address);
 +#endif
 +            }
-+        } 
++        }
 +
 +    }
 +
 +    if (env->custom_prot && rd != 0)
 +    {
 +        //call
-+        
++
 +        if ( rd == 1 || rd == 5 ) {
 +            // fprintf(stdout, "push address %x - pc = %x\n", pc + 4, pc);
 +            if ( push_return_stack(pc) == 0) {
