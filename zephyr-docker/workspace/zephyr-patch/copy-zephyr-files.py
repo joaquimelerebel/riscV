@@ -51,6 +51,9 @@ ZEPHYR_FILES_TREE = {
   ],
   'lib/libc/newlib': [
     'libc-hooks.c'
+  ],
+  'soc/riscv/riscv-privilege/virt': [
+    'Kconfig.soc'
   ]
 }
 
