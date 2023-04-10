@@ -237,6 +237,5 @@
 
 #if defined(CONFIG_CUSTOM_PROT)
 #define CSR_CUSTOM_PROT 0x3FF
-#define CSR_HEAP_START  0x3FE
-#define CSR_HEAP_END    0x3FD
+#define CSR_ARGS_CHECK  0x3FE
 #endif

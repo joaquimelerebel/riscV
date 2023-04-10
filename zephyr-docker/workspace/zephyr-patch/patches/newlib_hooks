@@ -1,0 +1,128 @@
+From 78bc3870d71971f264e4737a02c105ec45c5747c Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Fri, 7 Apr 2023 11:12:28 +0200
+Subject: [PATCH] add Hooks for check for heap overflow
+
+---
+ newlib/libc/stdlib/Makefile.in     |  7 ++++++
+ newlib/libc/stdlib/mallocr.c       |  5 +++++
+ newlib/libc/stdlib/nano-mallocr.c  | 35 ++++++++++++++++++++++++++++++
+ newlib/libc/stdlib/overflow_hook.c | 20 +++++++++++++++++
+ 4 files changed, 67 insertions(+)
+ create mode 100644 newlib/libc/stdlib/overflow_hook.c
+
+diff --git a/newlib/libc/stdlib/Makefile.in b/newlib/libc/stdlib/Makefile.in
+index 699831f13..cdd1c14a8 100644
+--- a/newlib/libc/stdlib/Makefile.in
++++ b/newlib/libc/stdlib/Makefile.in
+@@ -89,6 +89,7 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
+        lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
+        lib_a-__ten_mu.$(OBJEXT) lib_a-_Exit.$(OBJEXT) \
+        lib_a-abort.$(OBJEXT) lib_a-abs.$(OBJEXT) \
++       lib_a-overflow_hook.$(OBJEXT) \
+        lib_a-aligned_alloc.$(OBJEXT) lib_a-assert.$(OBJEXT) \
+        lib_a-atexit.$(OBJEXT) lib_a-atof.$(OBJEXT) \
+        lib_a-atoff.$(OBJEXT) lib_a-atoi.$(OBJEXT) \
+@@ -1138,6 +1139,12 @@ lib_a-mtrim.o: mtrim.c
+ lib_a-mtrim.obj: mtrim.c
+        $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mtrim.obj `if test -f 'mtrim.c'; then $(CYGPATH_W) 'mtrim.c'; else $(CYGPATH_W) '$(srcdir)/mtrim.c'; fi`
+ 
++lib_a-overflow_hook.o: overflow_hook.c
++       $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.o `test -f 'overflow_hook.c' || echo '$(srcdir)/'`overflow_hook.c
++
++lib_a-overflow_hook.obj: overflow_hook.c
++       $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.obj `if test -f 'overflow_hook.c'; then $(CYGPATH_W) 'overflow_hook.c'; else $(CYGPATH_W) '$(srcdir)/overflow_hook.c'; fi`
++
+ lib_a-nrand48.o: nrand48.c
+        $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nrand48.o `test -f 'nrand48.c' || echo '$(srcdir)/'`nrand48.c
+ 
+diff --git a/newlib/libc/stdlib/mallocr.c b/newlib/libc/stdlib/mallocr.c
+index 26d1c89cc..0a3068ae3 100644
+--- a/newlib/libc/stdlib/mallocr.c
++++ b/newlib/libc/stdlib/mallocr.c
+@@ -2266,6 +2266,11 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
+ 
+ #ifdef DEFINE_MALLOC
+ 
++// !TODO! Implement
++int __attribute__((weak)) __heap_overflow_check__(void* ptr, size_t size) {
++  return 0;
++}
++
+ /*
+   Malloc Algorthim:
+ 
+diff --git a/newlib/libc/stdlib/nano-mallocr.c b/newlib/libc/stdlib/nano-mallocr.c
+index 13b72c99f..3c68375ba 100644
+--- a/newlib/libc/stdlib/nano-mallocr.c
++++ b/newlib/libc/stdlib/nano-mallocr.c
+@@ -329,6 +329,41 @@ void * nano_malloc(RARG malloc_size_t s)
+     assert(align_ptr + size <= (char *)r + alloc_size);
+     return align_ptr;
+ }
++
++/* !TODO!: Can optimize search with an some algorithm */
++chunk* find_ptr_chunk(void* ptr) {
++    chunk *p = sbrk_start;
++    void* heap_end = sbrk(0);
++    while (p < heap_end) {
++        if ( p->size < 0 ) return NULL; // corrupted header - shouldn't go any further
++        chunk* next = (chunk *)((char *)p + p->size);
++        // !TODO: maybe make sure the pointer doesn't start at the header
++        // printf("checking if ptr = %x is in range [%x, %x]\n", ptr, p, next);
++        if ( ptr > p && ptr < next)
++            return p;
++
++        p = next;
++    }
++}
++/*
++    !TODO!: maybe
++    If chunk of start and chunk of end,
++    if they are not the same, error
++*/
++int __attribute__((weak)) __heap_overflow_check__(void* ptr, size_t size) {
++//    printf("check overflow %x, %d\n", ptr, size);
++   chunk* c = find_ptr_chunk(ptr);
++   if ( !c ) return -2;
++
++//    printf("found chunk %x of size: %d\n", c, c->size);
++
++   void* start = c + CHUNK_OFFSET;
++   void* end = start + c->size;
++   void* access_end = start + size;
++
++   if ( access_end >= end ) return -1;
++   return 0;
++}
+ #endif /* DEFINE_MALLOC */
+ 
+ #ifdef DEFINE_FREE
+diff --git a/newlib/libc/stdlib/overflow_hook.c b/newlib/libc/stdlib/overflow_hook.c
+new file mode 100644
+index 000000000..8a094bf82
+--- /dev/null
++++ b/newlib/libc/stdlib/overflow_hook.c
+@@ -0,0 +1,20 @@
++#ifndef _INCLUDE_OVERFLOW_HOOK_H_
++#define _INCLUDE_OVERFLOW_HOOK_H_
++
++#include <stdlib.h>
++#include <unistd.h>
++#include <signal.h>
++
++int __attribute__((weak)) __ptr_overflow_check__(void* ptr, size_t offset) {
++  return 0;
++}
++
++void __attribute__((__noreturn__)) __ptr_overflow_abort__() {
++  printf("abort!");
++  char msg[] = "*** buffer overflow detected ***: terminated\n";
++  write(2, msg, strlen(msg));
++  raise (SIGABRT);
++  _exit (1);
++}
++
++#endif // _INCLUDE_OVERFLOW_HOOK_H_
+-- 
+2.39.2

@@ -1,0 +1,343 @@
+From ac6f15e45fabad478053b165833a12468435b3df Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Fri, 7 Apr 2023 12:32:36 +0200
+Subject: [PATCH] add helper to jal and jalr for CFI and RAS
+
+---
+ target/riscv/cpu.c                      |   5 +
+ target/riscv/cpu.h                      |   5 +
+ target/riscv/cpu_bits.h                 |   8 +
+ target/riscv/csr.c                      |  39 ++++
+ target/riscv/helper.h                   |   7 +
+ target/riscv/insn_trans/trans_rvi.c.inc |  24 ++-
+ target/riscv/op_helper.c                | 235 ++++++++++++++++++++----
+ 7 files changed, 289 insertions(+), 34 deletions(-)
+
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 93b52b826c..e9d97f5aa4 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -249,6 +249,11 @@ static void riscv_any_cpu_init(Object *obj)
+ #elif defined(TARGET_RISCV64)
+     set_misa(env, MXL_RV64, RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+ #endif
++
++#if defined(CONFIG_CUSTOM_PROT)
++    env->check_args = -1;
++#endif
++
+     set_priv_version(env, PRIV_VERSION_1_12_0);
+     register_cpu_props(DEVICE(obj));
+ }
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 31537fc05f..ffc3e4e210 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -395,6 +395,11 @@ struct CPUArchState {
+     uint64_t kvm_timer_compare;
+     uint64_t kvm_timer_state;
+     uint64_t kvm_timer_frequency;
++
++#if defined(CONFIG_CUSTOM_PROT)
++    bool custom_prot;
++    int32_t check_args;
++#endif
+ };
+ 
+ OBJECT_DECLARE_CPU_TYPE(RISCVCPU, RISCVCPUClass, RISCV_CPU)
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 8b0d7e20ea..787b39b373 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -3,6 +3,8 @@
+ #ifndef TARGET_RISCV_CPU_BITS_H
+ #define TARGET_RISCV_CPU_BITS_H
+ 
++#define CONFIG_CUSTOM_PROT
++
+ #define get_field(reg, mask) (((reg) & \
+                  (uint64_t)(mask)) / ((mask) & ~((mask) << 1)))
+ #define set_field(reg, mask, val) (((reg) & ~(uint64_t)(mask)) | \
+@@ -173,6 +175,12 @@
+ #define CSR_MISELECT        0x350
+ #define CSR_MIREG           0x351
+ 
++#if defined(CONFIG_CUSTOM_PROT)
++/* CSR to enable disable custom protection */
++#define CSR_CUSTOM_PROT     0x3FF
++#define CSR_CHECK_ARGS      0x3FE
++#endif
++
+ /* Machine-Level Interrupts (AIA) */
+ #define CSR_MTOPEI          0x35c
+ #define CSR_MTOPI           0xfb0
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 1b0a0c1693..5851ff62db 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -3973,6 +3973,40 @@ RISCVException riscv_csrrw_debug(CPURISCVState *env, int csrno,
+     return ret;
+ }
+ 
++#if defined(CONFIG_CUSTOM_PROT)
++
++static RISCVException read_custom_prot_csr(CPURISCVState *env, int csrno,
++                              target_ulong *val)
++{
++    *val = env->custom_prot;
++    return RISCV_EXCP_NONE;
++}
++
++static RISCVException write_custom_prot_csr(CPURISCVState *env, int csrno,
++                              target_ulong val)
++{
++    fprintf(stdout, "write custom_prot csr\n");
++    env->custom_prot = !!val;
++    return RISCV_EXCP_NONE;
++}
++
++static RISCVException read_check_args_csr(CPURISCVState *env, int csrno,
++                              target_ulong *val)
++{
++    *val = (target_ulong)env->check_args;
++    return RISCV_EXCP_NONE;
++}
++
++static RISCVException write_check_args_csr(CPURISCVState *env, int csrno,
++                              target_ulong val)
++{
++    env->check_args = (target_ulong)val;
++    //fprintf(stdout, "write check arg csr %x\n", env->check_args);
++    return RISCV_EXCP_NONE;
++}
++
++#endif
++
+ /* Control and Status Register function table */
+ riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     /* User Floating-Point CSRs */
+@@ -4649,5 +4683,10 @@ riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_SCOUNTOVF]      = { "scountovf", sscofpmf,  read_scountovf,
+                              .min_priv_ver = PRIV_VERSION_1_12_0 },
+ 
++#if defined(CONFIG_CUSTOM_PROT)
++    [CSR_CUSTOM_PROT]    = { "cprot", any, read_custom_prot_csr, write_custom_prot_csr },
++    [CSR_CHECK_ARGS]     = { "check_args", any, read_check_args_csr, write_check_args_csr },
++#endif
++
+ #endif /* !CONFIG_USER_ONLY */
+ };
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 0497370afd..be379541a6 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -104,6 +104,13 @@ DEF_HELPER_4(csrrw, tl, env, int, tl, tl)
+ DEF_HELPER_2(csrr_i128, tl, env, int)
+ DEF_HELPER_4(csrw_i128, void, env, int, tl, tl)
+ DEF_HELPER_6(csrrw_i128, tl, env, int, tl, tl, tl, tl)
++
++/* jal, jalr */
++#if defined(CONFIG_CUSTOM_PROT)
++DEF_HELPER_4(jal, void, env, int, int, int)
++DEF_HELPER_5(jalr, void, env, int, int, int, int)
++#endif
++
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_1(sret, tl, env)
+ DEF_HELPER_1(mret, tl, env)
+diff --git a/target/riscv/insn_trans/trans_rvi.c.inc b/target/riscv/insn_trans/trans_rvi.c.inc
+index 4496f21266..0c66b1fd68 100644
+--- a/target/riscv/insn_trans/trans_rvi.c.inc
++++ b/target/riscv/insn_trans/trans_rvi.c.inc
+@@ -44,12 +44,35 @@ static bool trans_auipc(DisasContext *ctx, arg_auipc *a)
+ 
+ static bool trans_jal(DisasContext *ctx, arg_jal *a)
+ {
++#if defined(CONFIG_CUSTOM_PROT)
++    TCGv_i32 pc = tcg_constant_i32(ctx->base.pc_next);
++    TCGv_i32 imm = tcg_constant_i32(a->imm);
++    TCGv_i32 rd = tcg_constant_i32(a->rd);
++
++    gen_helper_jal(cpu_env, pc, rd, imm);
++    tcg_temp_free_i32(pc);
++    tcg_temp_free_i32(imm);
++    tcg_temp_free_i32(rd);
++#endif
++    // expect a zero next, if not a zero
+     gen_jal(ctx, a->rd, a->imm);
+     return true;
+ }
+ 
+ static bool trans_jalr(DisasContext *ctx, arg_jalr *a)
+ {
++#if defined(CONFIG_CUSTOM_PROT)
++    TCGv_i32 pc = tcg_constant_i32(ctx->base.pc_next);
++    TCGv_i32 imm = tcg_constant_i32(a->imm);
++    TCGv_i32 rd = tcg_constant_i32(a->rd);
++    TCGv_i32 rs1 = tcg_constant_i32(a->rs1);
++
++    gen_helper_jalr(cpu_env, pc, rd, rs1, imm);
++    tcg_temp_free_i32(pc);
++    tcg_temp_free_i32(imm);
++    tcg_temp_free_i32(rs1);
++    tcg_temp_free_i32(rd);
++#endif
+     TCGLabel *misaligned = NULL;
+ 
+     tcg_gen_addi_tl(cpu_pc, get_gpr(ctx, a->rs1, EXT_NONE), a->imm);
+@@ -73,7 +96,6 @@ static bool trans_jalr(DisasContext *ctx, arg_jalr *a)
+         gen_exception_inst_addr_mis(ctx);
+     }
+     ctx->base.is_jmp = DISAS_NORETURN;
+-
+     return true;
+ }
+ 
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 48f918b71b..f94a48ff3c 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -306,3 +339,139 @@ target_ulong helper_hyp_hlvx_wu(CPURISCVState *env, target_ulong address)
+ }
+ 
+ #endif /* !CONFIG_USER_ONLY */
++
++#if defined(CONFIG_CUSTOM_PROT)
++
++#define LI_MASK 0xFFF00000
++#define IS_LI(OPCODE) (((OPCODE) & ~LI_MASK) == 0x00013)
++#define LI_IMM(OPCODE) (((OPCODE) & LI_MASK) >> 20)
++#define LI_TYPE(OPCODE) (IS_LI(OPCODE) ? LI_IMM(OPCODE) & 3 : -1)
++#define LI_TYPE_RET 1
++#define LI_TYPE_CALL 2
++#define LI_CALL_ARGS(OPCODE) (LI_IMM(OPCODE) >> 2)
++#define LI_CALL_ARGS_VAR(OPCODE) (LI_IMM(OPCODE) & (1 << 10))
++#define LOG_CFI_VIOLATIONS 1
++#define LOG_RAS_VIOLATIONS 1
++
++static int return_stack[100];
++static int offset = 0;
++
++static int push_return_stack(int pc) {
++    if ( offset >= 100 ) {
++#if LOG_RAS_VIOLATIONS >=2
++        fprintf(stdout, "return stack overflow, cause: %x\n", pc);
++#endif
++        return 0;
++    }
++
++    return return_stack[offset++] = pc + 4;
++}
++
++static int pop_return_stack(int pc) {
++    if ( offset == 0 ) {
++#if LOG_RAS_VIOLATIONS >= 2
++        fprintf(stdout, "return stack underflow, cause: %x\n", pc);
++#endif
++        return 0;
++    }
++
++    return return_stack[--offset];
++}
++
++void helper_jal(CPURISCVState *env, int pc, int rd, int imm)
++{
++    target_ulong next_pc = pc + imm;
++    // fprintf(stdout, "helper jal %x | pc = %x | next = %x | ext = %x.\n", imm, env->pc, next_pc, riscv_has_ext(env, RVC));
++
++    uint32_t next_isns = cpu_ldl_code(env, next_pc);
++
++    if (env->custom_prot && rd != 0)
++    {
++
++        if ( rd == 1 || rd == 5 ) {
++            // fprintf(stdout, "push address %x - pc = %x\n", pc + 4, pc);
++            if ( push_return_stack(pc) == 0) {
++                //exit(0);
++            }
++        }
++
++
++        // call
++        if (LI_TYPE(next_isns) != LI_TYPE_CALL)
++        {
++#if LOG_CFI_VIOLATIONS >= 1
++            fprintf(stdout, "Possible Call: JAL %d %d at %x from %x | NOP Issue %x vs %x\n", rd, imm, next_pc, pc, next_isns, 0x00200013);
++#endif
++        }
++
++        if (env->check_args >= 0)
++        {
++            bool safe = LI_CALL_ARGS(next_isns) == env->check_args || (LI_CALL_ARGS_VAR(next_isns) && LI_CALL_ARGS(next_isns) <= env->check_args);
++            if (!safe) {
++#if LOG_CFI_VIOLATIONS >= 1
++                fprintf(stdout, "JAL call with unexpected number of arguments: variadic: %d, expected: %d, got: %d at pc = %x\n", LI_CALL_ARGS_VAR(next_isns), env->check_args, LI_CALL_ARGS(next_isns), next_pc);
++#endif
++            }
++        }
++    }
++
++    env->check_args = -1;
++}
++
++void helper_jalr(CPURISCVState *env, int pc, int rd, int rs1, int imm)
++{
++    target_ulong next_pc = env->gpr[rs1] + imm;
++    // fprintf(stdout, "helper jalr %x (%x) %x | pc = %x | next = %x | ext = %x.\n", rs1, env->gpr[rs1], imm, env->pc, next_pc, riscv_has_ext(env, RVC));
++
++    uint32_t next_isns = cpu_ldl_code(env, next_pc);
++    if (env->custom_prot && rd == 0 && (rs1 == 1 || rs1 == 5))
++    {
++        // return
++        // if ( LI_TYPE(next_isns) == LI_TYPE_RET )
++        //     fprintf(stdout, "Deprecated ret nop at %x\n", next_pc);
++
++
++        int saved_return_address = pop_return_stack(pc);
++        // fprintf(stdout, "pop return address %x, but going to: %x\n", saved_return_address, next_pc);
++        if ( saved_return_address != 0 ) {
++            if ( saved_return_address != next_pc ) {
++#if LOG_RAS_VIOLATIONS >= 1
++                fprintf(stdout, "Unexpected return address %x, expected: %x\n", next_pc, saved_return_address);
++#endif
++            }
++        }
++
++    }
++
++    if (env->custom_prot && rd != 0)
++    {
++        //call
++
++        if ( rd == 1 || rd == 5 ) {
++            // fprintf(stdout, "push address %x - pc = %x\n", pc + 4, pc);
++            if ( push_return_stack(pc) == 0) {
++                //exit(0);
++            }
++        }
++
++        if (LI_TYPE(next_isns) != LI_TYPE_CALL) {
++#if LOG_CFI_VIOLATIONS >= 1
++            fprintf(stdout, "Possible Call: JALR %d %d %d at %x from %x | NOP Issue %x vs %x\n", rd, rs1, imm, next_pc, pc, next_isns, 0x00200013);
++#endif
++        }
++
++        if (env->check_args >= 0)
++        {
++            bool safe = LI_CALL_ARGS(next_isns) == env->check_args || (LI_CALL_ARGS_VAR(next_isns) && LI_CALL_ARGS(next_isns) <= env->check_args);
++            if (!safe) {
++#if LOG_CFI_VIOLATIONS >= 1
++                fprintf(stdout, "JALR call with unexpected number of arguments: variadic: %d, expected: %d, got: %d at pc = %x\n ", LI_CALL_ARGS_VAR(next_isns), LI_CALL_ARGS(next_isns), env->check_args, next_pc);
++#endif
++            }
++        }
++    }
++
++    env->check_args = -1;
++}
++
++#endif
+\ No newline at end of file
+-- 
+2.39.2
+
