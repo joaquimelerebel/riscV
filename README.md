@@ -115,7 +115,7 @@ Thales modifications add CV32A6 support on Zybo board.
 Follow the steps below to build and run a sample application:
 
 ```
-sudo ./gcc_creation_script.sh
+sudo ./install.sh
 west build -p -b qemu_riscv32 /workdir/zephyr/samples/hello_world
 west build -t run
 ```
@@ -133,7 +133,7 @@ By default its value is 1 but you should try to protect against as many scenario
 Now that we have a working environment, we can build the RIPE attack.
 
 ```
-sudo ./gcc_creation_script.sh
+sudo ./install.sh
 west build -p -b cv32a6_zybo /workdir/ripe
 ```
 
@@ -248,7 +248,7 @@ This result shows that the penetration test has succeeded.
 The perf_baseline test application is measuring performance of the HW and SW on the FPGA by performing multiple compute, stack access and heap manipulations. This application is generated similarly than RIPE:
 
 ```
-sudo ./gcc_creation_script.sh
+sudo ./install.sh
 west build -p -b cv32a6_zybo /workdir/perf_baseline/
 ```
 This step should give you the memory size of the application as follow :
