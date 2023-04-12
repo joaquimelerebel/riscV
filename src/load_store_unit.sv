@@ -224,7 +224,7 @@ module load_store_unit import ariane_pkg::*; #(
         .translation_req_o     ( st_translation_req   ),
         .vaddr_o               ( st_vaddr             ),
         .paddr_i               ( mmu_paddr            ),
-        .ex_d                  ( mmu_exception        ),
+        .ex_i                  ( mmu_exception        ),
         .dtlb_hit_i            ( dtlb_hit             ),
         // Load Unit
         .page_offset_i         ( page_offset          ),
@@ -255,7 +255,7 @@ module load_store_unit import ariane_pkg::*; #(
         .translation_req_o     ( ld_translation_req   ),
         .vaddr_o               ( ld_vaddr             ),
         .paddr_i               ( mmu_paddr            ),
-        .ex_d                  ( mmu_exception        ),
+        .ex_i                  ( mmu_exception        ),
         .dtlb_hit_i            ( dtlb_hit             ),
         .dtlb_ppn_i            ( dtlb_ppn             ),
         // to store unit

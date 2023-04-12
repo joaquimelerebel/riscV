@@ -75,7 +75,7 @@ module id_stage (
         .instruction_i           ( instruction                     ),
         .compressed_instr_i      ( fetch_entry_i.instruction[15:0] ),
         .branch_predict_i        ( fetch_entry_i.branch_predict    ),
-        .ex_d                    ( fetch_entry_i.ex                ),
+        .ex_i                    ( fetch_entry_i.ex                ),
         .priv_lvl_i              ( priv_lvl_i                      ),
         .debug_mode_i            ( debug_mode_i                    ),
         .fs_i,
