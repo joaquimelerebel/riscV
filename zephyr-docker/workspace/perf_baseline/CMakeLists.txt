@@ -14,9 +14,9 @@ project(perf_baseline)
 # No shared library in Zephyr
 add_library(funclib STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/funclib.c )
 target_include_directories(funclib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
-target_compile_options(funclib PRIVATE "-o0" )
+target_compile_options(funclib PRIVATE "-O0" )
 
 target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/testapp.c )
 target_link_libraries(app PRIVATE funclib)
 target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
-target_compile_options(app PRIVATE "-o0" )
+target_compile_options(app PRIVATE "-O0" )
