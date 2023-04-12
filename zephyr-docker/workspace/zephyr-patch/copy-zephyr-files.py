@@ -54,6 +54,9 @@ ZEPHYR_FILES_TREE = {
   ],
   'soc/riscv/riscv-privilege/virt': [
     'Kconfig.soc'
+  ],
+  'boards/riscv/cv32a6_zybo' : [
+    './cv32a6_zybo_defconfig'
   ]
 }
 
