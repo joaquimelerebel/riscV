@@ -1,0 +1,55 @@
+@inproceedings{intel_cet,
+author = {Shanbhogue, Vedvyas and Gupta, Deepak and Sahita, Ravi},
+title = {Security Analysis of Processor Instruction Set Architecture for Enforcing Control-Flow Integrity},
+year = {2019},
+isbn = {9781450372268},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3337167.3337175},
+doi = {10.1145/3337167.3337175},
+abstract = {Intel has developed Control-flow Enforcement Technology (CET) [27] that provides CPU instruction set architecture (ISA) capabilities to defend against Return-oriented Programming (ROP) and call/jmp-oriented programming (COP/JOP) style control-flow subversion attacks. This attack methodology uses code sequences in authorized modules with at least one instruction in the sequence being a control transfer instruction that depends on attacker-controlled data either in the return stack or in a register/memory for the target address. Attackers stitch these sequences together by diverting the control flow instruction (e.g. RET, CALL, JMP) from its original target address to a new target (via modification in the data stack or in the register or memory used by these instructions). This paper describes CET security objectives, threat model and various architectural design choices to ensure that the design meets the security objectives. We conclude the paper with performance data and related work in this domain.},
+booktitle = {Proceedings of the 8th International Workshop on Hardware and Architectural Support for Security and Privacy},
+articleno = {8},
+numpages = {11},
+keywords = {control flow subversion attacks, ROP, JOP, Control-flow integrity, shadow stack, COP},
+location = {Phoenix, AZ, USA},
+series = {HASP '19}
+}
+
+@misc{cva6_doc,
+  author       = "OPENHW GROUP",
+  title        = "CVA6 Design Document",
+  howpublished = {\url{https://cva6.readthedocs.io/en/latest/03_cva6_design/}},
+  year         = "2023",
+  note         = "",
+  annote       = ""
+}
+
+@techreport{riscv_isa,
+     title = {The RISC-V Instruction Set Manual, Volume I: User-Level ISA},
+     author = {Andrew Waterman1, Krste Asanovi ́c1,2},
+     group = {SiFive Inc},
+     year = {2017},
+     institution = {CS Division, EECS Department, University of California, Berkeley},
+     Date-Added = {2017-05-7}
+}
+
+@misc{thales_cva6_repo,
+  author = {ThalesGroup},
+  title = {National RISC-V student contest CV32A6},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/ThalesGroup/cva6-softcore-contest}},
+  commit = {628caca}
+}
+
+@inproceedings{ripe_attack,
+author = {Wilander, John and Nikiforakis, Nick and Younan, Yves and Kamkar, Mariam and Joosen, Wouter},
+year = {2011},
+month = {12},
+pages = {41-50},
+title = {RIPE: Runtime Intrusion Prevention Evaluator},
+journal = {ACM International Conference Proceeding Series},
+doi = {10.1145/2076732.2076739}
+}

@@ -1,0 +1,119 @@
+%l'espace interligne
+\usepackage{setspace}
+%les images
+\usepackage{graphicx}
+	\graphicspath{ {../} }
+ %tableaux multipages
+\usepackage{longtable}
+%pour gerer les flotant -> images
+\usepackage{float}
+%séparer la page en 2
+\usepackage{blindtext}
+%tableaux pour les bytefields
+\usepackage{bytefield}
+%tableaux à pleins de colones
+\usepackage{multicol}
+% avoir des tableaux et des images propres en multicols
+\usepackage{wrapfig}
+%theorical computer science symbols
+\usepackage{stmaryrd}
+%little lines on the tables
+\usepackage{booktabs}
+%ajoute les slash dans les tables
+\usepackage{diagbox}
+%indent after a section title
+\usepackage{indentfirst}
+%use of boxes ... encadrer du text
+\usepackage{awesomebox}
+%ajout des emojis
+\usepackage{emoji}
+%maths symbols
+\usepackage{amssymb}
+\usepackage{amsmath}
+	\newcommand{\Lapl}{\mathop{\mathcal{L}}}
+\usepackage{mathtools}
+    \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+%avoir du UTF8
+\usepackage[utf8]{inputenc}
+	\pagenumbering{arabic}
+%police francais
+\usepackage[T1]{fontenc}
+%Avoir Tables de matiere en fr
+\usepackage[french,english]{babel}
+%insertion pdf
+\usepackage{pdfpages}
+%add the refs
+\usepackage[style=ieee]{biblatex}
+\addbibresource{ref.bib}
+%\addbibresource{res.bib}
+%couleurs
+\usepackage{xcolor}
+	\definecolor{codegreen}{rgb}{0,0.6,0}
+	\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+	\definecolor{codepurple}{rgb}{0.58,0,0.82}
+	\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+
+    \definecolor{mGreen}{rgb}{0,0.6,0}
+    \definecolor{mGray}{rgb}{0.5,0.5,0.5}
+    \definecolor{mPurple}{rgb}{0.58,0,0.82}
+    \definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+%avoir des listes
+\usepackage{listings}
+\input{riscv.tex}
+\input{console_style.tex}
+    
+%liens/references	
+\usepackage{hyperref}
+	\hypersetup{
+    		colorlinks=true,
+    		linkcolor=blue,
+    		filecolor=magenta,
+    		urlcolor=cyan,
+	}
+%captions -> descriptions d'elements
+\usepackage{caption}
+\usepackage{subcaption}
+%tableaux
+\usepackage{array,multirow,makecell}
+	\setcellgapes{1pt}
+	\makegapedcells
+	\newcolumntype{R}[1]{>{\centering\arraybackslash }b{#1}}
+	\newcolumntype{L}[1]{>{\centering\arraybackslash }b{#1}}
+	\newcolumntype{C}[1]{>{\centering\arraybackslash }b{#1}}
+%lipsum pour faire du template
+\usepackage{lipsum}
+%les marges et formats de pages
+\usepackage{geometry}
+ 	\geometry{a4paper,
+ 			total={170mm,257mm},
+ 			left=20mm,
+ 			top=20mm,}
+%s'assurer qu'on a bien les section en roman
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+%fonction pour faire une division de la page en 3 horizontales
+\newcommand\textline[4][t]{%
+  \par\smallskip\noindent\parbox[#1]{.5\textwidth}{\raggedright#2}%
+  \parbox[#1]{.5\textwidth}{\raggedleft{#3}}\par\smallskip%
+}
+
+\makeatletter
+  \renewcommand\l@section{\@dottedtocline{2}{1.5em}{3em}}
+  \renewcommand\l@subsection{\@dottedtocline{2}{3em}{5em}}
+  \renewcommand\l@subsubsection{\@dottedtocline{2}{6em}{7em}}
+\makeatother
+
+\usepackage[newfloat]{minted}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Source Code}
+%schémas 
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes,shadows,arrows,intersections}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{pgfplots}
+\usepackage{circuitikz}
+%\tikzstyle{arduidev}=[draw, text width=6em, minimum height=8em]

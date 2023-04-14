@@ -1,0 +1,35 @@
+\tikzstyle{inst} = [rectangle, draw, fill=white, text centered, draw=black, minimum width=2.5cm, minimum height=.4cm]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[node distance=.4cm]
+
+
+\node (inst3) [inst] {\tiny ...};
+\node (inst4) [inst, below of=inst3] {\tiny csrwi CSTM\_CSR, 1 };
+\node (inst5) [inst, below of=inst4] {\tiny jalr  a5};
+
+\node (inst6) [inst, below of=inst5, xshift=5cm] {\tiny li zero, 6};
+\node (inst7) [inst, below of=inst6] {\tiny ...};
+\node (inst8) [inst, below of=inst7] {\tiny ret};
+
+\node (inst9) [inst, below of=inst8, xshift=-5cm] {\tiny ...};
+
+
+
+% ---------------
+
+\draw [arrow] (inst5.south east) -- (inst6.north west);
+
+\draw [decoration={text along path,
+        text={|\tiny|ss.push(PC + 4)},text align={center}, raise=1mm}, decorate] (inst5.south east) -- (inst6.north west);
+
+
+\draw [arrow] (inst8.south west) -- (inst9.north east);
+\draw [decoration={text along path,
+        text={|\tiny|ss.pop()},text align={center}, raise=1mm}, decorate] (inst9.north east) -- (inst8.south west);
+
+\end{circuitikz}
+\caption{Control Flow Diagram : indirect call with shadow stack}
+\end{figure}

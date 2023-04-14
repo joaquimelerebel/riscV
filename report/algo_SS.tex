@@ -1,0 +1,98 @@
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=2cm, minimum height=.5cm, text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=2cm, minimum height=.5cm, text centered, draw=black]
+\tikzstyle{decision} = [diamond, draw, text badly centered, inner sep=3pt, aspect=3]
+\tikzstyle{line_meeting} = [circle, draw, fill=black]
+
+ \tikzstyle{every node}=[font=\small]
+
+\tikzstyle{line} = [thick]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black]
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[node distance=1cm]
+
+\node (start) [startstop] {Start};
+\node (in1) [io, below of=start] {new inst};
+
+\node (dec1) [decision, below of=in1] {is CALL ?};
+\node (pro1) [process, below of=dec1] {set NEXT\_INST\_LP};
+\node (pro2) [process, below of=pro1] {SS.push(PC + 4)};
+
+\node (start2) [startstop,right of=start, xshift=2.5cm] {Start};
+\node (in2) [io, below of=start2] {new inst};
+\node (dec2) [decision, below of=in2] {is RET ?};
+\node (dec4) [decision, below of=dec2, yshift=-.5cm] {PC!=SS.pop()};
+
+\node (start3) [startstop,right of=start2, xshift=4.5cm] {Start};
+\node (in3) [io, below of=start3] {new inst};
+
+\node (dec5) [decision, below of=in3, yshift=-0.5cm] {is NEXT\_INST\_LP set ?};
+\node (dec3) [decision, below of=dec5, yshift=-0.5cm] {is LP ?};
+\node (dec7) [decision, below of=dec3, xshift=-2cm, yshift=-0.5cm] {LP.VARIADIC ?};
+\node (dec6) [decision, below of=dec7,yshift=-1cm] {\tiny LP.ARGS\_NB <= CSR.ARGS\_NB};
+\node (dec8) [decision, right of=dec7, yshift=-1cm, xshift=3cm] {\tiny LP.ARGS\_NB == CSR.ARGS\_NB};
+\node (pro3) [process, below of=dec3, yshift=-4.5cm] {unset NEXT\_INST\_LP};
+
+
+\node (stop) [startstop, below of=dec4, yshift=-5cm] {Exception};
+% \node (pro2b) [process, right of=dec1, xshift=2cm] {Process 2b};
+
+
+% ''''''''''''''''
+\draw [arrow] (start) -- (in1);
+\draw [arrow] (in1) -- (dec1);
+
+\draw [arrow] (dec1.south) -- (pro1.north);
+\draw [arrow] (pro1.south) -- (pro2.north);
+
+\draw [arrow] (dec1.west) -- (-2.5, -2) -- (-2.5, 0) -- (start);
+\draw [line](pro2.south) -- (0, -5) -- (-2.5, -5) -- (-2.5, -2) node[line_meeting]{};
+
+% ----------------
+\draw [arrow] (start2) -- (in2);
+\draw [arrow] (in2) -- (dec2);
+
+
+\draw [arrow] (dec2.east) -- (5.7,-2) -- (5.7,0) -- (start2);
+\draw [line](dec4.east) -- (5.7,-3.5) --(5.7,-2) node[line_meeting]{};
+
+\draw [arrow] (dec2.south) -- (dec4.north);
+
+\draw [arrow] (dec4) -- (stop);
+
+% ---------------
+\draw [arrow] (start3) -- (in3);
+\draw [arrow] (in3) -- (dec5);
+
+\draw [arrow] (dec5.south) -- (dec3.north);
+
+\draw [arrow] (dec3.south) -- (9,-4.5) -- (7,-4.5) -- (dec7.north);
+
+\draw [line](dec6.south) -- (7, -8.5) -- (9, -8.5) node[line_meeting]{};
+
+\draw [arrow] (dec7.east) -- (11,-5.5) -- (dec8.north);
+\draw [arrow] (dec8.south) -- (11, -8.5) -- (9, -8.5) -- (pro3.north);
+
+\draw [line, name path=ab, arrow] (dec7.south) -- (dec6.north);
+\draw[line, name path=cd] (dec8.west) --  (3.5, -6.5) node[line_meeting]{};
+
+%\path[name intersections={of=ab and cd,by=e}];
+%\fill[color=white] (e) circle[radius=0.1];
+%\draw (e) node[jump crossing]{};
+
+
+\draw  [line] (dec3.west) --  (5, -4) --  (5, -5) -- (3.5, -5) node[line_meeting]{};
+
+\draw [line](dec6.west) -- (3.5, -7.5) node[line_meeting]{};
+
+\draw [line](dec5.east) -- (14,-2.5) node[line_meeting]{};
+
+\draw [arrow] (pro3.south) --  (9, -10) --  (14, -10) --  (14, 0) -- (start3);
+
+
+
+\end{circuitikz}
+\caption{Simplified hardware algorithm implemented in the commit stage}
+\end{figure}

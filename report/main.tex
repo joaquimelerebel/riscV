@@ -1,0 +1,297 @@
+\documentclass[9pt]{article}
+
+\input{libs}
+
+\singlespacing
+
+\begin{document}
+\input{title}
+
+\clearpage 
+
+
+
+\paragraph{Abstract :}
+
+The 5\textsuperscript{rd} national RISC-V student contest is a hackaton sponsored by Thales, the GDR SOC\textsuperscript{2} and the CNFM whose goal is to improve the security of the CV32A6 RISC-V soft-core. The task is to defeat ten memory-corruption attacks taken from the RIPE benchmark with minimal performance overhead. The soft-core is geared with Zephyr RTOS, and the contest allows us to modify the CV32A6 core, the OS and/or the compiler. Our solution consists of a forward edge control-flow integrity (FW-CFI) enforcement technique, a shadow stack and a hardened version of memset that protects against heap pointer read or write overflow. Our implementation modifies the CV32A6 core in order to add support for hardware CFI checks and the shadow stack. We also modify the compiler for automatic generation of CFI annotations, as well as the OS and the linked libraries.
+
+The objective of this challenge is to counter a maximum number of attacks in a batch of 10 attacks from the RIPE benchmark ported to RISC-V CVA6-32. 
+Numerous of theses attacks are ways to take control of the control flow. 
+With the control of the flow, the attacker can realise \textbf{arbitrary code execution}. It is therefore, of the greatest importance to keep the control of the flow.
+Multiple countermeasure exist for theses attacks and we based our solution on one of them : \textit{Intel Control-flow Enforcement}\cite{intel_cet} (CFE).
+
+Our solution, is a forward edge control-flow integrity (FW-CFI) enforcement technic, a shadow stack(SS) and a memset heap protection. We have tested multiple solution before going for this one. With this implementation we are able to \textbf{counter all the attacks given} with no apparent timing overhead.
+
+\vspace{1cm}
+
+\begin{multicols}{2}
+
+\section{Introduction}
+The national RISC-V student contest is open to all Master 2 students of a French engineering school or University. 
+Each team can count up to 4 members and can be coached by teachers or PhD students. 
+For the last 3 years, this contest has proposed hardware challenges to the students, the first year was focused on the FPGA optimisation of the core, the second year on the power efficiency and finally this year pays attention to the security of the core. 
+A benchmark of 10 attacks is given to the participants, the goal is to prevent the attacks on a Zephyr running upon the CV32A6. 
+The chosen board is a Zybo-z7 20 which embeds an Artix-7 FPGA. 
+The implementation should not increase the size of the FPGA design or the execution time by more than 100\%. 
+The teams are judged on the number of attacks they are able to counter and in the case of a tie, on the execution time of a performance benchmark.
+
+
+
+
+\paragraph{The core} CV32A6 is an open source 6 stage RISC-V 32 bit processor. It implements I, M and C extensions from the RISC-V instruction set \cite{riscv_isa}. The goal of this core is to run an OS at reasonable speed. The chosen core does not have a MMU or PMP but theses features are available on more recent version of the core. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{img/core_diagram.png}
+    \caption{CVA6 core diagram \cite{cva6_doc}}
+    \label{fig:core_diag}
+\end{figure}
+
+\paragraph{Zephyr} is an embedded real-time OS which supports a wide variety of microprocessor/microcontrollers architectures.
+Zephyr embeds multiple services and features like PMP support, single address space and stack canaries. 
+The OS uses Kconfig and device tree for its configuration and is compiled through cmake with gcc-12.   
+
+\paragraph{Runtime Intrusion Prevention Evaluator (Ripe) \cite{ripe_attack}} is a security benchark which contains 850 executable simulated attacks. The goal of this bench is to evaluate solutions against buffer overflows attacks. The benchmark was recently ported to RISC-V and a selection of 10 of theses attacks makes our evaluation benchmark.
+% ret2libc simulation is not done to libc but with a defined function in the ripe program and the rop simulation is done without gadgets and no offset is used in the indirect call for the rop attack.
+
+
+\begin{wraptable}{l}{0.7\linewidth}
+\centering
+    \centering
+    \tiny
+    \begin{tabular}{c||c|c|c|c|c}
+         i & approaches & inject param & code ptr & location & function \\ \hline \hline
+         1 & direct & no nop & ret  & stack & memcpy\\\hline
+         2 & direct & no nop & functptrstackvar & stack & memcpy\\\hline
+         3 & indirect & no nop & functptrstackvar & stack & memcpy\\\hline
+         4 & direct & data & var leak & heap & sprintf\\\hline
+         5 & direct & ret2libc& ret & stack & memcpy\\\hline
+         6 & indirect & ret2libc & funcptrheapvar & heap & memcpy\\\hline
+         7 & indirect & ret2libc & structfunctptrheap & heap & homebrew\\\hline
+         8 & indirect & ret2libc & longjumpbugheap&heap&memcpy\\\hline
+         9 & direct & rop & ret&stack&memcpy\\\hline
+         10& direct & rop & structfuncptrheap&heap&memcpy\\
+    \end{tabular}
+     \makeatletter\def\@captype{table}\makeatother
+    \caption{Table presenting the different supposedly simulated attacks on the benchmark}
+\end{wraptable}
+
+\subsection{Related work}
+Multiple methods exist for the control flow enforcement. 
+% faire une partie sur le papier de RIPE
+% faire partie sur le Intel CFE
+
+The RIPE (Runtime Intrusion Prevention Evaluator) is a testbed which cover 850 forms of buffer overflows. To do so it 
+
+Some of the first ideas that could come to mind would be ASLR. However, this solution is sub optimal because the chosen core is 32 bits. As a side note, the RIPE benchmark takes the form of a single binary that attacks itself and thus defeat any countermeasures that relies on the secrecy of memory locations. 
+
+
+% partie sur le fait qu'en réalité les attaques sont assez mal simulé.
+
+
+\section{Implementation}
+
+\subsection{Stack canaries}
+The stack canaries are a simple tool to implement with Zephyr because it only demands to add 2 lines in the configuration file of the board. Stack canaries are secret pseudo random value placed on the stack to check the integrity of this memory space. If stack smashing occurs, the canary might be overwritten and the smashing detected.
+
+\begin{lstlisting}
+    CONFIG_TEST_RANDOM_GENERATOR=y
+    CONFIG_STACK_CANARIES=y
+\end{lstlisting}
+The first line is here to add a pseudo random source and the second one is to add the stack canary. 
+
+\subsection{Simple FW \& BW control flow}
+
+The development of forward edge and backward edge control flow enforcement has been thought of with 2 custom instructions : the first one as a landing pad (LP) after a call : "\textit{li zero, 2}", this is the forward edge control flow. The second instruction is the LP which would be placed after a call so that when the call returns, the first instruction executed is this instruction : "\textit{li zero, 1}". 
+
+The result in assembly is : 
+
+\lstinputlisting[caption={Example of "z\_bss\_zero" function compiled with the pads}, style={riscv}]{listings/z_bss_zero_1.asm}
+
+The instruction "nop" is in reality : "\textit{add zero, 0}", that is why we chose the solution of the index 1 and 2.
+This technique has been quite efficient. Added to the stack canaries we were able to break :
+
+% place attacks counterfeited through the simple landing pad technique
+
+\input{diag_double_CFI}
+
+
+In a second time, we thought about identifying the function where indirect calls could go. This was achieved by adding some information in the first LP. 
+The first 2 bits of the immediate was kept as it was.  The last bit was taken by isVariadic information and the rest of the immediate became the number of arguments. 
+
+
+
+\vspace{1em}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=1.1em]{32}
+    \bitheader{0-31} \\
+    \bitbox{1}{V} & \bitbox{8}{number args} & \bitbox{1}{1}& \bitbox{1}{0}
+    & \bitbox{21}{nop} \\
+\end{bytefield}
+\caption{Landing Pad for the FW-CFI}
+\end{figure}
+
+\begin{itemize}
+    \item V : the variadic bit. 
+\end{itemize}
+
+But, to check whether or not the call is made with the right number of arguments, the hardware must be aware of this information, this is done by writing this information to a custom CSR.
+
+\input{diag_double_CFI_indirect}
+
+
+\subsection{Forward CFI + Shadow Stack}
+
+\input{diag_contol_flow}
+
+The shadow stack allows to remove the second LP. A shadow stack is a hardware or software security feature which stores the return addresses of a call in a LIFO secured space. During a return, the return address is checked against the shadow stack return address. If the return address in the shadow stack and the return address in the current flow are not the same, their might be an attack occurring.
+
+\input{algo_SS}
+This scheme was simplified by supposing that their is only one commit per clock cycle done. In reality, we can have up to 2 commits done in one clock cycle, which complexify things. 
+
+The hardware modifications were done with a atypical debug method. For the first half of the competition we did not have access to the simulator. The ILA components did not seem to want to work, therefore, we developed the first elements with the outputs linked to the 9 controllable LEDs of the board. Once the simulator was up and running we did already have a working solution which only needed a verification by the simulator.
+
+To get better results in the FPGA placement, the SS has a depth of only 100. When the count of calls is greater than 100, the SS is deactivated but the previous return addresses are stored. 
+The SS starts to compare addresses again when counter goes under 100. 
+
+The previously shown algorithm is implemented through 2 Finite State Machines (FSM) and 2 modules, the first for the detection and FSM, the second for the LIFO logic.
+
+\subsection{Heap "memset" Protection}
+%faire des schéma ptetre et des explications des bails 
+
+\subsection{Optimisation}
+The first version of the compiled library showed a great lack of optimisation, multiples solutions were applicable to solve that : 
+\begin{enumerate}
+    \item add an FPU to the core because the performance benchmark is doing floating point operations.
+    \item reduce the time consumed by the core on nop execution through prematured nop execution. The custom nop could bypass the pipeline from the fetch phase. Which would remove the timing overhead of the solution.
+    \item increase the frequency of the core.
+    \item temper the cycle count CSR.
+\end{enumerate}
+
+\section{Results}
+\subsection{Performances}
+
+\begin{lstlisting}[style=consoleLarge, caption={Results of the benchmark on the non-modified hardware, OS and compiler}]
+*** Booting Zephyr OS build zephyr-v3.2.0-327-g869365ab012b  ***
+Begining of execution with depth 12, call number 50, seed value 63728127.000000
+SUCCESS: computed value 868200.000000 - duration: 25.317176 sec 632929412 cycles
+\end{lstlisting}
+
+\begin{lstlisting}[style=consoleLarge, caption={Results of the benchmark on the FW CFI + shadow stack + secure memset HW, OS and compiler}]
+*** Booting Zephyr OS build zephyr-v3.2.0-327-g869365ab012b  ***
+Begining of execution with depth 12, call number 50, seed value 63728127.000000
+SUCCESS: computed value 868200.000000 - duration: 25.135623 sec 628390584 cycles
+\end{lstlisting}
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c}
+         & number of cycles & time of execution \\ \hline \hline
+         before modifications & 632929412 & 25.317176 sec \\\hline
+         stack canaries & 633811376 & 25.352455 sec \\ \hline
+         FW \& BW CFI & 628152061 &  25.126082 sec\\ \hline
+         FW CFI + shadow stack  & 628152061 &  25.126082 sec \\ \hline
+         FW CFI + shadow stack + secure memset & 628390584 &  25.135623  sec
+    \end{tabular}
+    \caption{Results from the benchmark perf\_baseline before and after the modifications}
+\end{table}
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c||c|c}
+    resources & utilisation after modification & utilisation before modification \\ \hline\hline
+    LUT	& 27161 (51.054512\%) & 25765 (48.43045\%)\\
+    FF & 26056 (24.488722\%) & 22328 (20.98\%)\\
+    BRAM & 71 (50.714283\%) & 71 (50.714283\%) \\
+    clock speed & 25MHz & 25MHz\\
+    perf\_baseline size & 86828 B & 61936 B\\
+    \end{tabular}
+    \caption{Table of modification's impact}
+\end{table}
+
+\subsection{Attacks prevented}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|P{3cm}|P{2.5cm}|P{2.5cm}}
+         index & stack canaries & FW\&BW CFI & FW CFI + shadow stack & FW CFI + shadow stack + secure memset\\ \hline \hline
+         1 &    \emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         2 &    \emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         3 &    \emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         4 &    \emoji{cross-mark}        &\emoji{cross-mark}       & \emoji{cross-mark}       & \emoji{check-mark-button}\\\hline
+         5 &    \emoji{check-mark-button} &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         6 &     \emoji{cross-mark}       &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         7 &     \emoji{cross-mark}       &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         8 &    \emoji{cross-mark}        &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         9 &    \emoji{check-mark-button} &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+         10&    \emoji{cross-mark}        &\emoji{check-mark-button} &\emoji{check-mark-button}& \emoji{check-mark-button}\\\hline
+    \end{tabular}
+    \caption{Table presenting the different prevented attacks with different approaches}
+\end{table}
+
+
+\section{Conclusion}
+
+
+
+
+\section{Annexe}
+\begin{centering}
+    \begin{longtable}{c c c c}
+\begin{minipage}[\baselineskip]{4cm}
+ \lstinputlisting[style={console}]{listings/csl_out_1}
+\end{minipage}
+& 
+\begin{minipage}[\baselineskip]{4cm}
+  \lstinputlisting[style={console}]{listings/csl_out_2}
+\end{minipage}  
+& 
+\begin{minipage}[\baselineskip]{4cm}
+  \lstinputlisting[style={console}]{listings/csl_out_3}
+\end{minipage}
+&
+\begin{minipage}[\baselineskip]{4cm}
+  \lstinputlisting[style={console}]{listings/csl_out_4}
+\end{minipage}
+\\ 1 & 2 & 3 & 4\\ 
+\begin{minipage}[\baselineskip]{4cm}
+  \lstinputlisting[style={console}]{listings/csl_out_5}
+\end{minipage}
+ &  
+ \begin{minipage}[\baselineskip]{4cm}
+\lstinputlisting[style={console}]{listings/csl_out_6}
+\end{minipage}
+&
+  
+\begin{minipage}[\baselineskip]{4cm}
+\lstinputlisting[style={console}]{listings/csl_out_7}
+\end{minipage}
+&  
+
+\begin{minipage}[\baselineskip]{4cm}
+\lstinputlisting[style={console}]{listings/csl_out_8}
+\end{minipage}
+
+\\ 5 & 6 & 7 & 8 \\
+&
+\begin{minipage}[\baselineskip]{4cm}
+\lstinputlisting[style={console}]{listings/csl_out_9}
+\end{minipage}
+ &
+\begin{minipage}[\baselineskip]{4cm}
+\lstinputlisting[style={console}]{listings/csl_out_10}
+\end{minipage} \\ &  9 & 10 &\\
+\caption{Table presenting the different outputs of our solution (suppressing all unprintable characters) }
+    \end{longtable}
+\end{centering}
+
+
+\printbibliography
+
+\end{multicols}
+
+\end{document}
