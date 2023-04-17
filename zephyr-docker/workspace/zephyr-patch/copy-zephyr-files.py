@@ -55,9 +55,9 @@ ZEPHYR_FILES_TREE = {
   'soc/riscv/riscv-privilege/virt': [
     'Kconfig.soc'
   ],
-  'boards/riscv/cv32a6_zybo' : [
-    './cv32a6_zybo_defconfig'
-  ]
+#  'boards/riscv/cv32a6_zybo' : [
+#    './cv32a6_zybo_defconfig'
+#  ]
 }
 
 print(action, "zephyr files", end=" ")
@@ -80,7 +80,7 @@ print('Done ✅')
 
 print(action, "libgcc files", end=" ")
 
-LIBGCC_FILES = ['./libgcc.a']
+LIBGCC_FILES = ['./libgcc.a', './libgcov.a']
 
 for libgcc_file in LIBGCC_FILES:
   dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/12.1.0', libgcc_file)
