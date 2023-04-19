@@ -252,7 +252,7 @@ static void bg_thread_main(void *unused1, void *unused2, void *unused3)
 	extern void main(void);
 
 #if defined(CONFIG_CUSTOM_PROT)
-	csr_write(CSR_CUSTOM_PROT, 1);
+	csr_write(CSR_CUSTOM_PROT, 0);
 #endif
 	main();
 
