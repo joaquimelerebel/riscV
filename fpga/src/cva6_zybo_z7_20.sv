@@ -60,11 +60,10 @@ module cva6_zybo_z7_20 (
   input  logic     tdi       ,
   output wire      tdo       ,
   input  logic     rx        ,
+  output logic[9:0] leds,
   output logic     tx
 
 );
-
-
 // 24 MByte in 8 byte words
 localparam NumWords = (24 * 1024 * 1024) / 8;
 localparam NBSlave = 2; // debug, ariane
@@ -544,6 +543,7 @@ ariane #(
     .time_irq_i   ( timer_irq           ),
     .debug_req_i  ( debug_req_irq       ),
     .axi_req_o    ( axi_ariane_req      ),
+    .leds(leds),
     .axi_resp_i   ( axi_ariane_resp     )
 );
 

@@ -38,6 +38,7 @@ module ariane import ariane_pkg::*; #(
   // Timer facilities
   input  logic                         time_irq_i,   // timer interrupt in (async)
   input  logic                         debug_req_i,  // debug request (async)
+  output logic[9:0]                     leds,
 `ifdef FIRESIM_TRACE
   // firesim trace port
   output traced_instr_pkg::trace_port_t trace_o,
@@ -278,7 +279,7 @@ module ariane import ariane_pkg::*; #(
     .set_debug_pc_i      ( set_debug_pc                  ),
     .epc_i               ( epc_commit_pcgen              ),
     .eret_i              ( eret                          ),
-    .commit_cfi_signal_i ( commit_cfi_signal             ),
+    .commit_cfi_signal_i ( /*commit_cfi_signal*/ 1'b0             ),
     .trap_vector_base_i  ( trap_vector_base_commit_pcgen ),
     .ex_valid_i          ( ex_commit.valid               ),
     .fetch_entry_o       ( fetch_entry_if_id             ),
@@ -518,6 +519,7 @@ module ariane import ariane_pkg::*; #(
     .cfi_signal             ( commit_cfi_signal             ),
     .rst_nop_id_csr_o       ( rst_nop_id                    ),
     .csr_indi_nb_args_i     ( nop_indi_nb_args              ),
+    .leds(leds),
     .*
   );
 

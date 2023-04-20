@@ -41,6 +41,7 @@ module fw_cfi_shadow_stack #(
     input  ariane_pkg::scoreboard_entry_t [NR_COMMIT_PORTS-1:0]     commit_instr_i,
     // signal that their is an error -> put pc to 0 (needs to change for a proposer exception)
     output logic                                                    cfi_signal,
+    output logic[9:0]                                               leds,
     // number of arguments from the csr (assigned when indirect call will come)
     input  logic[8:0]                                               csr_indi_nb_args_i,
     // reset the csr to all 1's so that we can identify reset from no args 
@@ -361,16 +362,16 @@ end
 ///////////////////////////////////////////////////////////////////////
    
    
-    ariane_pkg::exception_t  ex_d, ex_q; 
+    ariane_pkg::exception_t  ex_i, ex_q; 
     
     logic is_ss_det, is_nop_det, is_full_det;
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
         
-            ex_d.valid <= 1'b0;
-            ex_d.cause <= '0;
-            ex_d.tval  <= '0;
+            ex_i.valid <= 1'b0;
+            ex_i.cause <= '0;
+            ex_i.tval  <= '0;
             is_nop_det <= '0;
             is_ss_det <= '0;
             is_full_det <= '0;
@@ -379,29 +380,29 @@ end
             is_nop_det <= '0;
             is_ss_det <= '0;
             is_full_det <= '0;
-            ex_d.valid <= 1'b0;
-            ex_d.cause <= '0;
-            ex_d.tval  <= '0;
+            ex_i.valid <= 1'b0;
+            ex_i.cause <= '0;
+            ex_i.tval  <= '0;
             
             if( detect_prep_SS && !detect_GOOD_RET  && csr_en_i ) begin
                 
-                ex_d.cause <= riscv::ILLEGAL_INSTR;
-                ex_d.valid <= 1'b1;
-                ex_d.tval <= prev_entry.pc;
+                ex_i.cause <= riscv::ILLEGAL_INSTR;
+                ex_i.valid <= 1'b1;
+                ex_i.tval <= prev_entry.pc;
                 is_ss_det <= '1;
             end else 
             if( full_ss && csr_en_i) begin
                 
-                ex_d.cause <= riscv::ILLEGAL_INSTR;
-                ex_d.valid <= 1'b1;
-                ex_d.tval <= prev_entry.pc;
+                ex_i.cause <= riscv::ILLEGAL_INSTR;
+                ex_i.valid <= 1'b1;
+                ex_i.tval <= prev_entry.pc;
                 is_full_det <= '1;
             end else 
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
-                ex_d.cause <= riscv::ILLEGAL_INSTR;
-                ex_d.valid <= 1'b1;
-                ex_d.tval <= prev_entry.pc;
+                ex_i.cause <= riscv::ILLEGAL_INSTR;
+                ex_i.valid <= 1'b1;
+                ex_i.tval <= prev_entry.pc;
                 is_nop_det <= '1;
             end
          end
@@ -421,9 +422,9 @@ end
          
             cfi_signal <= '0;
         
-            if( ex_d.valid ) begin
+            if( ex_i.valid ) begin
             
-                ex_q <= ex_d;
+                ex_q <= ex_i;
                 counter <= counter + 1;
             end else 
             if( counter > 0 ) begin
@@ -431,7 +432,7 @@ end
                 cfi_signal <= '1; 
                 ex_q <= ex_q;
                 counter <= counter + 1;
-                if(counter > 3) begin
+                if(counter > 1) begin
                     counter <= 0; 
                 end
             end else 
@@ -456,6 +457,67 @@ always @ (posedge clk_i) begin
     end
     
 end 
-    
+
+logic[9:0] leds_s;
+assign leds = leds_s;
+         
+always_ff @(posedge clk_i) begin
+    if(rst_ni == 1'b0) begin 
+        prev_nop <= 1'b0;
+        prev_ret <= 1'b0;
+        prev_call <= 1'b0;
+        prev_prep_ss <= 1'b0;
+        prev_prep_nop <= 1'b0;
+        prev_good_ret <= 1'b0;
+        prev_ex <= '0;
+        leds_s <= '0;
+     end else begin
+     
+        prev_call <= detect_CALL;
+        prev_nop <= detect_NOP;
+        prev_prep_nop <= detect_prep_NOP;
+        
+        prev_ret <= detect_RET;
+        prev_prep_ss <= detect_prep_SS;
+        prev_good_ret <= detect_GOOD_RET;
+        
+        prev_ex <= exception_o.valid;
+        
+        leds_s[9] <= csr_en_i;
+        
+        /*if((prev_call == 1'b0) && (detect_CALL == 1'b1)) begin
+            leds_s[0] <= !leds_s[0]; 
+        end 
+        
+        if((prev_prep_nop == 1'b0) && (detect_prep_NOP == 1'b1)) begin
+            leds_s[1] <= !leds_s[1];
+        end 
+        
+        if((prev_nop == 1'b0) && (detect_NOP == 1'b1)) begin 
+            leds_s[2] <= !leds_s[2];                
+        end*/ 
+        
+        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_ss_det) ) begin 
+            leds_s[0] <= !leds_s[0];  
+        end else 
+        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_nop_det) ) begin 
+            leds_s[1] <= !leds_s[1];  
+        end else 
+        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_full_det) ) begin 
+            leds_s[2] <= !leds_s[2];  
+        end
+        
+        if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
+            leds_s[5] <= !leds_s[5];  
+        end 
+        if((prev_prep_ss == 1'b0) && (detect_prep_SS == 1'b1)) begin 
+            leds_s[6] <= !leds_s[6];  
+        end 
+        if((prev_good_ret == 1'b0) && (detect_GOOD_RET == 1'b1)) begin 
+            leds_s[7] <= !leds_s[7];  
+        end 
+     end
+end
+   
     
 endmodule
