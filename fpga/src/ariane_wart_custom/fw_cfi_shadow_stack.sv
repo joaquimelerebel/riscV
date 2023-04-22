@@ -390,14 +390,7 @@ end
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
                 is_ss_det <= '1;
-            end else 
-            if( full_ss && csr_en_i) begin
-                
-                ex_i.cause <= riscv::ILLEGAL_INSTR;
-                ex_i.valid <= 1'b1;
-                ex_i.tval <= prev_entry.pc;
-                is_full_det <= '1;
-            end else 
+            end else
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
                 ex_i.cause <= riscv::ILLEGAL_INSTR;
