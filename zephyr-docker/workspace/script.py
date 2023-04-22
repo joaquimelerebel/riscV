@@ -103,10 +103,10 @@ class Attack() :
 	def build(self) :
 		if GCC_MOD :	
 			if VERBOSE :
-				print(f"\n--------------\nsudo sh gcc_creation_script.sh\n-------------------------\n")
-				p=sub.Popen(f"sudo sh gcc_creation_script.sh", shell=True)
+				print(f"\n--------------\nsudo sh install.sh\n-------------------------\n")
+				p=sub.Popen(f"sudo sh install.sh", shell=True)
 			else :	
-				p=sub.Popen(f"sudo sh gcc_creation_script.sh", shell=True, stdout=sub.DEVNULL)
+				p=sub.Popen(f"sudo sh install.sh", shell=True, stdout=sub.DEVNULL)
 			p.communicate()
 
 		if VERBOSE :
