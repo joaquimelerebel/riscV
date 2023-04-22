@@ -67,7 +67,7 @@ print('Done ✅')
 # !TODO!: Make newlib without nano as well
 print(action, "libc files", end=" ")
 
-LIBC_FILES = ['./libc.a', './libg.a', './libm.a', './libc_nano.a', './libg_nano.a', './libm_nano.a', 'libgloss.a', 'libnosys_nano.a', 'libsim.a', 'crt0.o']
+LIBC_FILES = ['./libc.a', './libg.a', './libm.a', './libc_nano.a', './libg_nano.a', './libm_nano.a', 'libgloss.a', 'libnosys_nano.a', 'libsim.a']
 
 for libc_file in LIBC_FILES:
   dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/', libc_file)
