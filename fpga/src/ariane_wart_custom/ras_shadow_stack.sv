@@ -76,9 +76,9 @@ end
 /*-------------------------------------------------------------------------------------------------------------------------------
    Continuous Assignments
 -------------------------------------------------------------------------------------------------------------------------------*/
-assign full    = (stack_ptr_rg == DEPTH)               ;
+assign full    = (stack_ptr_rg >= DEPTH)               ;
 assign empty   = (stack_ptr_rg == 0    )               ;
-assign valid   = (stack_ptr_rg <= DEPTH)               ;
+assign valid   = (stack_ptr_rg < DEPTH)               ;
 
 assign push    = i_push & !full                        ;
 assign pop     = i_pop  & !empty                       ;
@@ -87,7 +87,7 @@ assign o_full  = full                                  ;
 assign o_empty = empty                                 ;  
 assign o_valid = valid                                 ;
 
-assign o_data  = (empty | !valid) ? '0 : stack [stack_ptr_rg - 1] ;   
+assign o_data  = (empty || !valid) ? '0 : stack [stack_ptr_rg - 1] ;   
 
 
 /*---------------------------
