@@ -65,7 +65,7 @@ def attack_classique():
 
 		# run 
 		print(f"\n-----------------------\nsudo docker run -ti --privileged -v /dev:/dev -v `realpath workspace`:/workdir zephyr-build:v1 /bin/bash -c 'cd /workdir; sudo python script.py {att} {SERIAL_PATH} {GCC_MOD}\n-------------------\n")
-		p=sub.Popen(f"sudo docker run -ti --privileged -v /dev:/dev -v `realpath workspace`:/workdir zephyr-build:v1 /bin/bash -c 'cd /workdir; sudo python script.py {att} {SERIAL_PATH} {GCC_MOD}'", shell=True)
+		p=sub.Popen(f"sudo docker run -ti --privileged -v /dev:/dev -v `realpath workspace`:/workdir zephyr-build:v1 /bin/bash -c 'cd /workdir; sudo python script.py {att} {SERIAL_PATH} {GCC_MOD}'", shell=True, stdout=sub.DEVNULL)
 
 		# p.stdin.write(b"cd workdir\nsudo ./script.py\n")
 
