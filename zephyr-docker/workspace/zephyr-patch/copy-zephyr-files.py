@@ -44,7 +44,7 @@ ZEPHYR_FILES_TREE = {
     './mwdt.h', './gcc.h'
   ],
   'arch/riscv/core': [
-    './isr.S', './reset.S', './switch.S', 'fatal.c'
+    './isr.S', './reset.S', './switch.S', 'fatal.c', 'thread.c'
   ],
   'kernel': [
     './init.c', './Kconfig'

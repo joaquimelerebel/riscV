@@ -108,6 +108,12 @@ not_user_task:
 	mv a0, s0
 #endif
 
+#if defined(CONFIG_CUSTOM_PROT)
+	mv s0, a0
+	call z_riscv_nx_thread_stack
+	mv a0, s0
+#endif
+
 	/* Restore the new thread's callee-saved registers */
 	DO_CALLEE_SAVED(lr, a0)
 
