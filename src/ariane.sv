@@ -300,7 +300,7 @@ module ariane import ariane_pkg::*; #(
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
-    .fetch_entry_i              ( fetch_entry_if_id      ),
+    .fetch_entry_i              ( fetch_entry_if_id          ),
     .fetch_entry_valid_i        ( fetch_valid_if_id          ),
     .fetch_entry_ready_o        ( fetch_ready_id_if          ),
 
@@ -516,6 +516,7 @@ module ariane import ariane_pkg::*; #(
     .fence_o                ( fence_commit_controller       ),
     .sfence_vma_o           ( sfence_vma_commit_controller  ),
     .flush_commit_o         ( flush_commit                  ),
+    // CFI module
     .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
     .cfi_signal             ( commit_cfi_signal             ),
     .cfi_ex_o               ( cfi_ex                        ),

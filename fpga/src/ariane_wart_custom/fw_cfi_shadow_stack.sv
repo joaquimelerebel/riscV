@@ -200,11 +200,11 @@ endfunction
          end else begin 
             state_fw_cfi <= next_state_fw_cfi;
 
-            if(commit_ack_i[0]) begin
+           //if(commit_ack_i[0]) begin
                 prev_entry <= commit_instr_i[0];
-            end else begin
-                prev_entry <= prev_entry;
-            end
+            //end else begin
+             //   prev_entry <= prev_entry;
+            //end
             
             rst_csr_q <= rst_csr_d;
          end
@@ -214,11 +214,12 @@ endfunction
 ////////                     shadow stack                    //////////             
 ///////////////////////////////////////////////////////////////////////   
    
-logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack;
+logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack, data_o_cached;
 logic                           push_s_s, pop_s_s;
-logic                           full_ss, valid_ss;
+logic                           valid_ss;
 
 logic                           detect_RET, detect_GOOD_RET, detect_prep_SS;
+
 
 enum int unsigned { IDLE_SS, WAITS_PC } state_shadow_stack, next_state_shadow_stack;
 
@@ -233,7 +234,7 @@ ras_shadow_stack
    
    .i_push(push_s_s),
    .i_data(data_i_stack),                   
-   .o_full(full_ss), // check the flag in input
+   .o_full(), // check the flag in input
 
    .i_pop(pop_s_s),
    .o_data(data_o_stack),                   
@@ -254,27 +255,30 @@ always_ff @(posedge clk_i) begin
         data_i_stack <= '0;
         state_shadow_stack <= next_state_shadow_stack;
         
-        // add the return address to the stack
-        if(     (commit_ack_i[0] == 1'b1)                   && 
-                (commit_instr_i[0].ex.valid == 1'b0)        && 
-                is_call( commit_instr_i[0]) )               begin
-                
-                data_i_stack <= commit_instr_i[0].pc + 4;
-                push_s_s <= '1;
-        end else 
-        // cannot do 0 and 1 at the same time otherwise their is a problem in fw edge
-        if(     (commit_ack_i[1] == 1'b1)                   && 
-                (commit_instr_i[1].ex.valid == 1'b0)        && 
-                is_call(commit_instr_i[1]) )                begin
-                
-                data_i_stack <= commit_instr_i[1].pc + 4;
-                push_s_s <= '1;
-        end            
-        
-        // detect that SS was used 
-        if(detect_GOOD_RET) begin
-            pop_s_s <= '1;
+        if(csr_en_i) begin 
+            // add the return address to the stack
+            if(     (commit_ack_i[0] == 1'b1)                   && 
+                    (commit_instr_i[0].ex.valid == 1'b0)        && 
+                    is_call( commit_instr_i[0]) )               begin
+                    
+                    data_i_stack <= commit_instr_i[0].pc + 4;
+                    push_s_s <= '1;
+            end else 
+            // cannot do 0 and 1 at the same time otherwise their is a problem in fw edge
+            if(     (commit_ack_i[1] == 1'b1)                   && 
+                    (commit_instr_i[1].ex.valid == 1'b0)        && 
+                    is_call(commit_instr_i[1]) )                begin
+                    
+                    data_i_stack <= commit_instr_i[1].pc + 4;
+                    push_s_s <= '1;
+            end            
+            
+            // detect that SS was used 
+            if(detect_RET) begin
+                pop_s_s <= '1;
+            end
         end
+        
     end
 end   
 
@@ -295,8 +299,9 @@ always_comb begin
                 is_ret(commit_instr_i[0]) )                begin
                     next_state_shadow_stack = WAITS_PC;
                     detect_RET = 1'b1;
+                    data_o_cached = data_o_stack;
                 
-                // check if the return is in the second that might be ACK at the same time 
+                // check if the return add is the next inst 
                 if( commit_ack_i[1] && !commit_instr_i[1].ex.valid ) begin
                     detect_prep_SS = 1'b1;
            
@@ -305,7 +310,7 @@ always_comb begin
                     if ( !valid_ss ) begin 
                         detect_GOOD_RET = 1'b1;
                     end else
-                    if ( data_o_stack == commit_instr_i[1].pc )    begin
+                    if ( data_o_cached == commit_instr_i[1].pc )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -316,6 +321,7 @@ always_comb begin
                 is_ret(commit_instr_i[1]) )                begin
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
+                        data_o_cached = data_o_stack;
             end
         end
         WAITS_PC : begin
@@ -333,7 +339,7 @@ always_comb begin
                 if (!valid_ss) begin 
                     detect_GOOD_RET = 1'b1;
                 end else 
-                if ( data_o_stack == commit_instr_i[0].pc )    begin
+                if ( data_o_cached == commit_instr_i[0].pc )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
@@ -343,6 +349,7 @@ always_comb begin
                     
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
+                        data_o_cached = data_o_stack;
                 end
                      
            end
