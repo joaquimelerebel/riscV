@@ -52,13 +52,13 @@ module commit_stage import ariane_pkg::*; #(
     output logic                                    fence_o,            // flush D$ and pipeline
     output logic                                    flush_commit_o,     // request a pipeline flush
     output logic                                    sfence_vma_o,        // flush TLBs and pipeline
-    // nop thingy activation bit
-    output logic[9:0]                               leds,                // debug leds
-    output logic                                    cfi_signal,          // stop cpu signal
+    // CFI stuff
+    output logic[9:0]                               leds,                   // debug leds
+    output logic                                    cfi_signal,             // stop cpu signal
     output ariane_pkg::exception_t                  cfi_ex_o,
-    input  logic                                    csr_nop_thingy_en_i, // enables the nop parser
-    output logic                                    rst_nop_id_csr_o,    // rst the cst from its args nb 
-    input  logic[8:0]                               csr_indi_nb_args_i   // number of arguments in the csr     
+    input  logic                                    cfi_en_i,               // enables the csr check
+    output logic                                    cfi_nb_args_rst_o,      // rst the csr from its args nb 
+    input  logic[8:0]                               cfi_nb_args_i           // number of arguments in the csr     
 );
 
 // ila_0 i_ila_commit (
@@ -272,13 +272,13 @@ fw_cfi_shadow_stack
    .clk_i,
    .rst_ni,
    .flush_i(flush_dcache_i),
-   .csr_en_i(csr_nop_thingy_en_i),
+   .csr_en_i(cfi_en_i),
    .commit_ack_i(commit_ack_o),
    .commit_instr_i(commit_instr_i),
    .leds(leds),
    .cfi_signal(cfi_signal),
-   .csr_indi_nb_args_i(csr_indi_nb_args_i),
-   .rst_nop_id_csr_o(rst_nop_id_csr_o),
+   .csr_indi_nb_args_i(cfi_nb_args_i),
+   .rst_nop_id_csr_o(cfi_nb_args_rst_o),
    .exception_o(ex_cntr_flow_s)
 );
 

@@ -87,10 +87,10 @@ module csr_regfile import ariane_pkg::*; #(
     output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
     output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
     //NOP THINGY ACTIV
-    output logic                  nop_thingy_en_o,             // enable signal for the nop thingy in commit block
-    output logic[8:0]             nop_indi_nb_args_o,
+    output logic                  cfi_en_o,             // enable signal for the nop thingy in commit block
+    output logic[8:0]             cfi_nb_args_o,
     input exception_t             cfi_ex_i,
-    input logic                   rst_nop_id_i  
+    input logic                   cfi_nb_args_rst_i  
     
 );
     // internal signal to keep track of access exceptions
@@ -166,7 +166,7 @@ module csr_regfile import ariane_pkg::*; #(
     
     // nop thingy assignement
     assign nop_thingy_en_o = nop_en_q;
-    assign nop_indi_nb_args_o = nop_id_q[8:0];
+    assign cfi_nb_args_o = nop_id_q[8:0];
     
     // ----------------
     // CSR Read logic
@@ -424,7 +424,7 @@ module csr_regfile import ariane_pkg::*; #(
         // check if we want to reset the value in the CSR nop args
         // reset to all ones so that we can differentiate writting 
         // nb args 0 and csr reseted 
-        if( rst_nop_id_i ) begin
+        if( cfi_nb_args_rst_i ) begin
             nop_id_d = '1;
         end
         
