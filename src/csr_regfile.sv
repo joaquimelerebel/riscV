@@ -84,13 +84,16 @@ module csr_regfile import ariane_pkg::*; #(
     input  logic[riscv::XLEN-1:0] perf_data_i,                // read data from performance counter module
     output logic                  perf_we_o,
     // PMPs
-    output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
-    output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
+    output riscv::pmpcfg_t [15:0] pmpcfg_o,             // PMP configuration containing pmpcfg for max 16 PMPs
+    output logic [15:0][53:0]     pmpaddr_o,            // PMP addresses
     //NOP THINGY ACTIV
     output logic                  cfi_en_o,             // enable signal for the nop thingy in commit block
     output logic[8:0]             cfi_nb_args_o,
     input exception_t             cfi_ex_i,
-    input logic                   cfi_nb_args_rst_i  
+    input logic                   cfi_nb_args_rst_i,
+    
+    output logic[riscv::XLEN-1:0] pseudo_pmp_start_o,  // pseudo pmp "les vieux briscards modifications"
+    output logic[riscv::XLEN-1:0] pseudo_pmp_end_o  
     
 );
     // internal signal to keep track of access exceptions
@@ -152,6 +155,8 @@ module csr_regfile import ariane_pkg::*; #(
     // NOP THINGY activation register creation
     riscv::xlen_t nop_en_q,     nop_en_d;
     riscv::xlen_t nop_id_q,     nop_id_d;
+    riscv::xlen_t pseudo_pmp_end_q, pseudo_pmp_end_d;
+    riscv::xlen_t pseudo_pmp_start_q, pseudo_pmp_start_d;
 
 
     assign pmpcfg_o = pmpcfg_q[15:0];
@@ -164,9 +169,11 @@ module csr_regfile import ariane_pkg::*; #(
     assign csr_addr = riscv::csr_t'(csr_addr_i);
     assign fs_o = mstatus_q.fs;
     
-    // nop thingy assignement
+    // cfi/NX assignement
     assign nop_thingy_en_o = nop_en_q;
     assign cfi_nb_args_o = nop_id_q[8:0];
+    assign pseudo_pmp_start_o = pseudo_pmp_start_q;
+    assign pseudo_pmp_end_o = pseudo_pmp_end_q;
     
     // ----------------
     // CSR Read logic
@@ -329,7 +336,8 @@ module csr_regfile import ariane_pkg::*; #(
                 //NOP CSR                
                 riscv::CSR_EN_NOPTHINGY:      csr_rdata = nop_en_q; 
                 riscv::CSR_ID_INDI_CALL:      csr_rdata = nop_id_q;
-                
+                riscv::CSR_PMP_START:         csr_rdata = pseudo_pmp_start_q;
+                riscv::CSR_PMP_END:           csr_rdata = pseudo_pmp_end_q;  
                 default: read_access_exception = 1'b1;
             endcase
         end
@@ -421,6 +429,8 @@ module csr_regfile import ariane_pkg::*; #(
         
         nop_en_d                = nop_en_q;
         nop_id_d                = nop_id_q;
+        pseudo_pmp_end_d        = pseudo_pmp_end_q;
+        pseudo_pmp_start_d      = pseudo_pmp_start_q;   
         // check if we want to reset the value in the CSR nop args
         // reset to all ones so that we can differentiate writting 
         // nb args 0 and csr reseted 
@@ -682,6 +692,8 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_EN_NOPTHINGY : nop_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
                 
                 riscv::CSR_ID_INDI_CALL : nop_id_d    = csr_wdata;  
+                riscv::CSR_PMP_START    : pseudo_pmp_start_d  = csr_wdata;
+                riscv::CSR_PMP_END      : pseudo_pmp_end_d    = csr_wdata;
                 
                 default: update_access_exception = 1'b1;
             endcase
@@ -1172,6 +1184,8 @@ module csr_regfile import ariane_pkg::*; #(
             //nop register
             nop_en_q               <= {riscv::XLEN{1'b0}};
             nop_id_q               <= {riscv::XLEN{1'b1}};
+            pseudo_pmp_start_q     <= {riscv::XLEN{1'b1}};
+            pseudo_pmp_end_q       <= {riscv::XLEN{1'b1}};
             
         end else begin
             priv_lvl_q             <= priv_lvl_d;
@@ -1227,6 +1241,8 @@ module csr_regfile import ariane_pkg::*; #(
             // nop thingy 
             nop_en_q               <= nop_en_d;
             nop_id_q               <= nop_id_d;
+            pseudo_pmp_start_q     <= pseudo_pmp_start_d;
+            pseudo_pmp_end_q       <= pseudo_pmp_end_d;
         end
     end
 

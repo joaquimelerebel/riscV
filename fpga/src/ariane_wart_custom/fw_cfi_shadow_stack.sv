@@ -46,7 +46,9 @@ module fw_cfi_shadow_stack #(
     input  logic[8:0]                                               csr_indi_nb_args_i,
     // reset the csr to all 1's so that we can identify reset from no args 
     output logic                                                    rst_nop_id_csr_o,
-    output ariane_pkg::exception_t                                  exception_o
+    output ariane_pkg::exception_t                                  exception_o,
+    input logic[riscv::xlen_t-1:0]                                  ppmp_start_i, // NX stuff -> maybe should have its own module ?
+    input logic[riscv::xlen_t-1:0]                                  ppmp_end_i
 );
     
     enum int unsigned { IDLE, WAITS_NOP } state_fw_cfi, next_state_fw_cfi;
@@ -361,6 +363,38 @@ always_comb begin
     endcase
 end 
 
+
+///////////////////////////////////////////////////////////////////////
+///////                      PSEUDO PMP                      //////////             
+///////////////////////////////////////////////////////////////////////
+
+logic PMP_NX_fault1, PMP_NX_fault2;
+
+always_ff @(posedge clk_i) begin
+    if(rst_ni == 1'b0) begin 
+        PMP_NX_fault1 <= 1'b0;
+        PMP_NX_fault2 <= 1'b0;
+     end else begin
+        PMP_NX_fault1 <= 1'b0;
+        PMP_NX_fault2 <= 1'b0;
+        // check the first inst
+        if( commit_ack_i[0] ) begin
+            PMP_NX_fault1 <= 1'b1;
+            if(( commit_instr_i[0].pc >= ppmp_start_i ) && 
+               ( commit_instr_i[0].pc < ppmp_end_i    ) ) begin
+              PMP_NX_fault1 <= 1'b0;
+            end
+        end
+        if( commit_ack_i[1] ) begin
+            PMP_NX_fault2 <= 1'b1;
+            if(( commit_instr_i[1].pc >= ppmp_start_i ) && 
+               ( commit_instr_i[1].pc < ppmp_end_i    ) ) begin
+              PMP_NX_fault2 <= 1'b0;
+            end
+        end
+    end 
+end  
+
    
 ///////////////////////////////////////////////////////////////////////
 ///////                      EXCEPTION                       //////////             
@@ -397,6 +431,13 @@ end
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
                 ex_i.cause <= riscv::LD_ACCESS_FAULT;
+                ex_i.valid <= 1'b1;
+                ex_i.tval <= prev_entry.pc;
+                is_nop_det <= '1;
+            end
+            if( PMP_NX_fault2 || PMP_NX_fault1) begin 
+                
+                ex_i.cause <= riscv::ST_ACCESS_FAULT;
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
                 is_nop_det <= '1;

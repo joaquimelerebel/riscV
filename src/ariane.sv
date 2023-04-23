@@ -203,6 +203,8 @@ module ariane import ariane_pkg::*; #(
   logic                     cfi_en_o;
   logic[8:0]                cfi_nb_args_o;
   logic                     cfi_nb_args_rst;
+  //NX signals
+  logic[riscv::xlen_t-1:0]  ppmp_start, ppmp_end;
   
   // ----------------------------
   // Performance Counters <-> *
@@ -521,6 +523,8 @@ module ariane import ariane_pkg::*; #(
     .cfi_ex_o               ( cfi_ex                        ),
     .cfi_nb_args_rst_o      ( cfi_nb_args_rst               ),
     .cfi_nb_args_i          ( cfi_nb_args_o                 ),
+    .ppmp_start_i           ( ppmp_start                    ),
+    .ppmp_end_i             ( ppmp_end                      ),
     .leds(leds),
     .*
   );
@@ -583,6 +587,8 @@ module ariane import ariane_pkg::*; #(
     .cfi_ex_i               ( cfi_ex                        ),
     .cfi_nb_args_o          ( cfi_nb_args_o                 ),
     .cfi_nb_args_rst_i      ( cfi_nb_args_rst               ),
+    .pseudo_pmp_start_o     ( ppmp_start                    ),
+    .pseudo_pmp_end_o       ( ppmp_end                      ),
     .debug_req_i,
     .ipi_i,
     .irq_i,

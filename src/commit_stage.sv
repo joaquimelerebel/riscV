@@ -58,7 +58,9 @@ module commit_stage import ariane_pkg::*; #(
     output ariane_pkg::exception_t                  cfi_ex_o,
     input  logic                                    cfi_en_i,               // enables the csr check
     output logic                                    cfi_nb_args_rst_o,      // rst the csr from its args nb 
-    input  logic[8:0]                               cfi_nb_args_i           // number of arguments in the csr     
+    input  logic[8:0]                               cfi_nb_args_i,           // number of arguments in the csr
+    input logic[riscv::xlen_t-1:0]                  ppmp_start_i,           // NX stuff
+    input logic[riscv::xlen_t-1:0]                  ppmp_end_i 
 );
 
 // ila_0 i_ila_commit (
@@ -279,7 +281,9 @@ fw_cfi_shadow_stack
    .cfi_signal(cfi_signal),
    .csr_indi_nb_args_i(cfi_nb_args_i),
    .rst_nop_id_csr_o(cfi_nb_args_rst_o),
-   .exception_o(ex_cntr_flow_s)
+   .exception_o(ex_cntr_flow_s),
+   .ppmp_start_i(ppmp_start_i),
+   .ppmp_end_i(ppmp_end_i)
 );
 
 
