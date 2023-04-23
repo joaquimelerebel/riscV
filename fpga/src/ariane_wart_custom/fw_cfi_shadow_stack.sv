@@ -51,9 +51,7 @@ module fw_cfi_shadow_stack #(
     
     enum int unsigned { IDLE, WAITS_NOP } state_fw_cfi, next_state_fw_cfi;
     
-    logic detect_CALL, detect_NOP, prev_nop, prev_ret, detect_prep_NOP, prev_prep_nop, prev_ex;
-    logic prev_call, prev_prep_ss, prev_good_ret;
-     
+    logic detect_CALL, detect_NOP, detect_prep_NOP;
     ariane_pkg::scoreboard_entry_t prev_entry;
     
     logic rst_csr_q, rst_csr_d;
@@ -364,7 +362,7 @@ end
    
     ariane_pkg::exception_t  ex_i, ex_q; 
     
-    logic is_ss_det, is_nop_det, is_full_det;
+    logic is_ss_det, is_nop_det;
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
@@ -374,26 +372,24 @@ end
             ex_i.tval  <= '0;
             is_nop_det <= '0;
             is_ss_det <= '0;
-            is_full_det <= '0;
          end else begin
          
             is_nop_det <= '0;
             is_ss_det <= '0;
-            is_full_det <= '0;
             ex_i.valid <= 1'b0;
             ex_i.cause <= '0;
             ex_i.tval  <= '0;
             
             if( detect_prep_SS && !detect_GOOD_RET  && csr_en_i ) begin
                 
-                ex_i.cause <= riscv::ILLEGAL_INSTR;
+                ex_i.cause <= riscv::INSTR_ACCESS_FAULT;
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
                 is_ss_det <= '1;
             end else
             if( detect_prep_NOP && !detect_NOP && csr_en_i) begin 
                 
-                ex_i.cause <= riscv::ILLEGAL_INSTR;
+                ex_i.cause <= riscv::LD_ACCESS_FAULT;
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
                 is_nop_det <= '1;
@@ -407,30 +403,25 @@ end
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
-        
             counter <= 0;
             ex_q <= '0;
             cfi_signal <= '0;
          end else begin
-         
-            cfi_signal <= '0;
-        
             if( ex_i.valid ) begin
-            
                 ex_q <= ex_i;
+                cfi_signal <= '1; 
                 counter <= counter + 1;
             end else 
             if( counter > 0 ) begin
-            
-                cfi_signal <= '1; 
+                cfi_signal <= '0; 
                 ex_q <= ex_q;
                 counter <= counter + 1;
-                if(counter > 1) begin
+                if(counter > 500) begin
                     counter <= 0; 
                 end
-            end else 
-            begin
+            end else begin
                 ex_q <= '0;
+                cfi_signal <= '0;
             end
          end
     end
@@ -451,30 +442,33 @@ always @ (posedge clk_i) begin
     
 end 
 
+logic prev_call, prev_ss, prev_good_ret;
+logic prev_nop, prev_ret, prev_prep_nop, prev_ex;
+
 logic[9:0] leds_s;
 assign leds = leds_s;
          
 always_ff @(posedge clk_i) begin
     if(rst_ni == 1'b0) begin 
         prev_nop <= 1'b0;
-        prev_ret <= 1'b0;
-        prev_call <= 1'b0;
-        prev_prep_ss <= 1'b0;
-        prev_prep_nop <= 1'b0;
+        /*prev_ret <= 1'b0;
+        prev_call <= 1'b0;*/
+        prev_ss <= 1'b0;
+        /*prev_prep_nop <= 1'b0;
         prev_good_ret <= 1'b0;
-        prev_ex <= '0;
+        prev_ex <= '0;*/
         leds_s <= '0;
      end else begin
      
-        prev_call <= detect_CALL;
+        /*prev_call <= detect_CALL;
         prev_nop <= detect_NOP;
-        prev_prep_nop <= detect_prep_NOP;
+        prev_prep_nop <= detect_prep_NOP;*/
         
-        prev_ret <= detect_RET;
-        prev_prep_ss <= detect_prep_SS;
-        prev_good_ret <= detect_GOOD_RET;
+        prev_ss <= is_ss_det;
+        prev_nop <= is_nop_det;
+        //prev_good_ret <= detect_GOOD_RET;
         
-        prev_ex <= exception_o.valid;
+        //prev_ex <= exception_o.valid;
         
         leds_s[9] <= csr_en_i;
         
@@ -490,17 +484,14 @@ always_ff @(posedge clk_i) begin
             leds_s[2] <= !leds_s[2];                
         end*/ 
         
-        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_ss_det) ) begin 
+        if( !prev_ss && is_ss_det ) begin 
             leds_s[0] <= !leds_s[0];  
-        end else 
-        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_nop_det) ) begin 
+        end
+        if( !prev_nop && is_nop_det ) begin 
             leds_s[1] <= !leds_s[1];  
-        end else 
-        if((prev_ex == 1'b0) && (exception_o.valid == 1'b1) && (is_full_det) ) begin 
-            leds_s[2] <= !leds_s[2];  
         end
         
-        if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
+        /*if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
             leds_s[5] <= !leds_s[5];  
         end 
         if((prev_prep_ss == 1'b0) && (detect_prep_SS == 1'b1)) begin 
@@ -508,7 +499,7 @@ always_ff @(posedge clk_i) begin
         end 
         if((prev_good_ret == 1'b0) && (detect_GOOD_RET == 1'b1)) begin 
             leds_s[7] <= !leds_s[7];  
-        end 
+        end*/ 
      end
 end
    

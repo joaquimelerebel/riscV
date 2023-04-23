@@ -166,6 +166,7 @@ module ariane import ariane_pkg::*; #(
   // COMMIT <-> CTRL
   // --------------
   logic                     commit_cfi_signal;
+  exception_t               cfi_ex;
   
   // --------------
   // CSR <-> *
@@ -279,7 +280,7 @@ module ariane import ariane_pkg::*; #(
     .set_debug_pc_i      ( set_debug_pc                  ),
     .epc_i               ( epc_commit_pcgen              ),
     .eret_i              ( eret                          ),
-    .commit_cfi_signal_i ( /*commit_cfi_signal*/ 1'b0             ),
+    .commit_cfi_signal_i ( commit_cfi_signal /*1'b0*/    ),
     .trap_vector_base_i  ( trap_vector_base_commit_pcgen ),
     .ex_valid_i          ( ex_commit.valid               ),
     .fetch_entry_o       ( fetch_entry_if_id             ),
@@ -517,6 +518,7 @@ module ariane import ariane_pkg::*; #(
     .flush_commit_o         ( flush_commit                  ),
     .csr_nop_thingy_en_i    ( nop_thingy_en                 ),
     .cfi_signal             ( commit_cfi_signal             ),
+    .cfi_ex_o               ( cfi_ex                        ),
     .rst_nop_id_csr_o       ( rst_nop_id                    ),
     .csr_indi_nb_args_i     ( nop_indi_nb_args              ),
     .leds(leds),
@@ -578,6 +580,7 @@ module ariane import ariane_pkg::*; #(
     .pmpcfg_o               ( pmpcfg                        ),
     .pmpaddr_o              ( pmpaddr                       ),
     .nop_thingy_en_o        ( nop_thingy_en                 ),
+    .cfi_ex_i               ( cfi_ex                        ),
     .nop_indi_nb_args_o     ( nop_indi_nb_args              ),
     .rst_nop_id_i           ( rst_nop_id                    ),
     .debug_req_i,

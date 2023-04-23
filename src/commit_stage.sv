@@ -55,6 +55,7 @@ module commit_stage import ariane_pkg::*; #(
     // nop thingy activation bit
     output logic[9:0]                               leds,                // debug leds
     output logic                                    cfi_signal,          // stop cpu signal
+    output ariane_pkg::exception_t                  cfi_ex_o,
     input  logic                                    csr_nop_thingy_en_i, // enables the nop parser
     output logic                                    rst_nop_id_csr_o,    // rst the cst from its args nb 
     input  logic[8:0]                               csr_indi_nb_args_i   // number of arguments in the csr     
@@ -260,6 +261,8 @@ ariane_pkg::exception_t ex_cntr_flow_s;
 
 //assign cfi_signal = '0; 
 //assign ex_cntr_flow_s = '0;
+
+assign cfi_ex_o = ex_cntr_flow_s;
 
 fw_cfi_shadow_stack
 #(

@@ -89,6 +89,7 @@ module csr_regfile import ariane_pkg::*; #(
     //NOP THINGY ACTIV
     output logic                  nop_thingy_en_o,             // enable signal for the nop thingy in commit block
     output logic[8:0]             nop_indi_nb_args_o,
+    input exception_t             cfi_ex_i,
     input logic                   rst_nop_id_i  
     
 );
@@ -250,8 +251,14 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_MCOUNTEREN:         csr_rdata = mcounteren_q;
                 riscv::CSR_MSCRATCH:           csr_rdata = mscratch_q;
                 riscv::CSR_MEPC:               csr_rdata = mepc_q;
-                riscv::CSR_MCAUSE:             csr_rdata = mcause_q;
-                riscv::CSR_MTVAL:              csr_rdata = mtval_q;
+                riscv::CSR_MCAUSE:             csr_rdata = mcause_q; 
+                riscv::CSR_MTVAL: begin             
+                    if( cfi_ex_i.valid ) begin
+                        csr_rdata = cfi_ex_i.tval; 
+                    end else begin
+                        csr_rdata = mtval_q;
+                    end
+                end 
                 riscv::CSR_MIP:                csr_rdata = mip_q;
                 riscv::CSR_MVENDORID:          csr_rdata = '0; // not implemented
                 riscv::CSR_MARCHID:            csr_rdata = ARIANE_MARCHID;
