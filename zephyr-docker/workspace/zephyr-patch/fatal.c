@@ -77,7 +77,7 @@ static char *cause_str(unsigned long cause)
 	case 6:
 		return "Store/AMO address misaligned";
 	case 7:
-		return "Store/AMO access fault";
+		return "Stack execution fault";
 	case 8:
 		return "Environment call from U-mode";
 	case 9:
