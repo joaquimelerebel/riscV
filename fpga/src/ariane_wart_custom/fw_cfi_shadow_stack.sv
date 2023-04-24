@@ -216,7 +216,8 @@ endfunction
 ////////                     shadow stack                    //////////             
 ///////////////////////////////////////////////////////////////////////   
    
-logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack, data_o_cached;
+logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack;
+logic [riscv::XLEN-1:0]         data_o_cached_d, data_o_cached_q;
 logic                           push_s_s, pop_s_s;
 logic                           valid_ss;
 
@@ -251,11 +252,13 @@ always_ff @(posedge clk_i) begin
         pop_s_s <= '0;
         data_i_stack <= '0;
         state_shadow_stack <= IDLE_SS;
+        data_o_cached_q <= '0;
     end else begin
         push_s_s <= '0;
         pop_s_s <= '0;
         data_i_stack <= '0;
         state_shadow_stack <= next_state_shadow_stack;
+        data_o_cached_q <= data_o_cached_d;
         
         if(csr_en_i) begin 
             // add the return address to the stack
@@ -289,6 +292,7 @@ always_comb begin
     detect_RET = 1'b0;
     detect_prep_SS = 1'b0;
     detect_GOOD_RET = 1'b0;
+    data_o_cached_d = '0;
     
     // FSM
     case( state_shadow_stack ) 
@@ -301,7 +305,7 @@ always_comb begin
                 is_ret(commit_instr_i[0]) )                begin
                     next_state_shadow_stack = WAITS_PC;
                     detect_RET = 1'b1;
-                    data_o_cached = data_o_stack;
+                    data_o_cached_d = data_o_stack;
                 
                 // check if the return add is the next inst 
                 if( commit_ack_i[1] && !commit_instr_i[1].ex.valid ) begin
@@ -312,7 +316,7 @@ always_comb begin
                     if ( !valid_ss ) begin 
                         detect_GOOD_RET = 1'b1;
                     end else
-                    if ( data_o_cached == commit_instr_i[1].pc )    begin
+                    if ( data_o_stack == commit_instr_i[1].pc )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -323,7 +327,7 @@ always_comb begin
                 is_ret(commit_instr_i[1]) )                begin
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
-                        data_o_cached = data_o_stack;
+                        data_o_cached_d = data_o_stack;
             end
         end
         WAITS_PC : begin
@@ -341,7 +345,7 @@ always_comb begin
                 if (!valid_ss) begin 
                     detect_GOOD_RET = 1'b1;
                 end else 
-                if ( data_o_cached == commit_instr_i[0].pc )    begin
+                if ( data_o_cached_q == commit_instr_i[0].pc )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
@@ -351,7 +355,7 @@ always_comb begin
                     
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
-                        data_o_cached = data_o_stack;
+                        data_o_cached_d = data_o_stack;
                 end
                      
            end
@@ -494,7 +498,7 @@ always @ (posedge clk_i) begin
     
 end 
 
-logic prev_call, prev_ss, prev_good_ret;
+logic prev_call, prev_ss, prev_good_ret, prev_NX_det;
 logic prev_nop, prev_ret, prev_prep_nop, prev_ex;
 
 logic[9:0] leds_s;
@@ -506,6 +510,7 @@ always_ff @(posedge clk_i) begin
         /*prev_ret <= 1'b0;
         prev_call <= 1'b0;*/
         prev_ss <= 1'b0;
+        prev_NX_det <= 1'b0;
         /*prev_prep_nop <= 1'b0;
         prev_good_ret <= 1'b0;
         prev_ex <= '0;*/
@@ -518,6 +523,7 @@ always_ff @(posedge clk_i) begin
         
         prev_ss <= is_ss_det;
         prev_nop <= is_nop_det;
+        prev_NX_det <= PMP_NX_fault2 | PMP_NX_fault1;
         //prev_good_ret <= detect_GOOD_RET;
         
         //prev_ex <= exception_o.valid;
@@ -542,7 +548,9 @@ always_ff @(posedge clk_i) begin
         if( !prev_nop && is_nop_det ) begin 
             leds_s[1] <= !leds_s[1];  
         end
-        
+        if( !prev_NX_det && (PMP_NX_fault2 || PMP_NX_fault1) ) begin
+            leds_s[2] <= !leds_s[2];
+        end
         /*if((prev_ret == 1'b0) && (detect_RET == 1'b1)) begin 
             leds_s[5] <= !leds_s[5];  
         end 
