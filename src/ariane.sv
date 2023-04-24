@@ -204,7 +204,7 @@ module ariane import ariane_pkg::*; #(
   logic[8:0]                cfi_nb_args_o;
   logic                     cfi_nb_args_rst;
   //NX signals
-  logic[riscv::XLEN-1:0]  ppmp_start, ppmp_end;
+  logic[riscv::XLEN-1:0]    ppmp_start, ppmp_end;
   
   // ----------------------------
   // Performance Counters <-> *

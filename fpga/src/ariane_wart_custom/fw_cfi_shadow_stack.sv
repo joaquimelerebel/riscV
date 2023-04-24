@@ -47,8 +47,8 @@ module fw_cfi_shadow_stack #(
     // reset the csr to all 1's so that we can identify reset from no args 
     output logic                                                    rst_nop_id_csr_o,
     output ariane_pkg::exception_t                                  exception_o,
-    input logic[riscv::xlen_t-1:0]                                  ppmp_start_i, // NX stuff -> maybe should have its own module ?
-    input logic[riscv::xlen_t-1:0]                                  ppmp_end_i
+    input logic[riscv::XLEN-1:0]                                    ppmp_start_i, // NX stuff -> maybe should have its own module ?
+    input logic[riscv::XLEN-1:0]                                    ppmp_end_i
 );
     
     enum int unsigned { IDLE, WAITS_NOP } state_fw_cfi, next_state_fw_cfi;
