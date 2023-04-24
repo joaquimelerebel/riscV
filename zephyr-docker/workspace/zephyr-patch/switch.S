@@ -110,7 +110,7 @@ not_user_task:
 
 #if defined(CONFIG_CUSTOM_PROT)
 	mv s0, a0
-	call z_riscv_nx_thread_stack
+	call z_riscv_switch_nx_thread_stack
 	mv a0, s0
 #endif
 
