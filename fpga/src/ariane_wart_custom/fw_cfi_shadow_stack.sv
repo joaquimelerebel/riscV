@@ -378,18 +378,20 @@ always_ff @(posedge clk_i) begin
         PMP_NX_fault1 <= 1'b0;
         PMP_NX_fault2 <= 1'b0;
         // check the first inst
-        if( commit_ack_i[0] ) begin
-            PMP_NX_fault1 <= 1'b1;
-            if(( commit_instr_i[0].pc >= ppmp_start_i ) && 
-               ( commit_instr_i[0].pc < ppmp_end_i    ) ) begin
-              PMP_NX_fault1 <= 1'b0;
+        if(csr_en_i) begin
+            if( commit_ack_i[0] ) begin
+                PMP_NX_fault1 <= 1'b1;
+                if(( commit_instr_i[0].pc >= ppmp_start_i ) && 
+                   ( commit_instr_i[0].pc < ppmp_end_i    ) ) begin
+                  PMP_NX_fault1 <= 1'b0;
+                end
             end
-        end
-        if( commit_ack_i[1] ) begin
-            PMP_NX_fault2 <= 1'b1;
-            if(( commit_instr_i[1].pc >= ppmp_start_i ) && 
-               ( commit_instr_i[1].pc < ppmp_end_i    ) ) begin
-              PMP_NX_fault2 <= 1'b0;
+            if( commit_ack_i[1] ) begin
+                PMP_NX_fault2 <= 1'b1;
+                if(( commit_instr_i[1].pc >= ppmp_start_i ) && 
+                   ( commit_instr_i[1].pc < ppmp_end_i    ) ) begin
+                  PMP_NX_fault2 <= 1'b0;
+                end
             end
         end
     end 
@@ -403,7 +405,7 @@ end
    
     ariane_pkg::exception_t  ex_i, ex_q; 
     
-    logic is_ss_det, is_nop_det;
+    logic is_ss_det, is_nop_det, is_NX_det;
     
     always_ff @(posedge clk_i) begin
         if(rst_ni == 1'b0) begin 
@@ -413,9 +415,11 @@ end
             ex_i.tval  <= '0;
             is_nop_det <= '0;
             is_ss_det <= '0;
+            is_NX_det <= '0;
          end else begin
          
             is_nop_det <= '0;
+            is_NX_det <= '0;
             is_ss_det <= '0;
             ex_i.valid <= 1'b0;
             ex_i.cause <= '0;
@@ -434,13 +438,13 @@ end
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
                 is_nop_det <= '1;
-            end
+            end else 
             if( PMP_NX_fault2 || PMP_NX_fault1) begin 
                 
                 ex_i.cause <= riscv::ST_ACCESS_FAULT;
                 ex_i.valid <= 1'b1;
                 ex_i.tval <= prev_entry.pc;
-                is_nop_det <= '1;
+                is_NX_det <= '1;
             end
          end
     end
