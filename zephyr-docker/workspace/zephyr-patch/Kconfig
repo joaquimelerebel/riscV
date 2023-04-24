@@ -725,6 +725,7 @@ menu "Security Options"
 
 config CUSTOM_PROT
 	bool "Enable custom protection"
+	select THREAD_STACK_INFO
 	default y	
 	help
 		"Enable custom protection with annotations"
