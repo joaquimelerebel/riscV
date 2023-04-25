@@ -379,9 +379,9 @@ package riscv;
         CSR_PMP_END        = 12'h3FC,
         CSR_PMP_START      = 12'h3FD,
         // csr that contains the number of args in next function
-        CSR_ID_INDI_CALL   = 12'h3FE,
-        // csr enables CSR
-        CSR_EN_NOPTHINGY   = 12'h3FF,
+        CSR_IDICALLNARG_CFI= 12'h3FE,
+        // CFI enable CSR
+        CSR_EN_CFI         = 12'h3FF,
         
         CSR_MVENDORID      = 12'hF11,
         CSR_MARCHID        = 12'hF12,
