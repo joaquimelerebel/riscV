@@ -522,7 +522,7 @@ module ariane import ariane_pkg::*; #(
     .cfi_signal             ( commit_cfi_signal             ),
     .cfi_ex_o               ( cfi_ex                        ),
     .cfi_nb_args_rst_o      ( cfi_nb_args_rst               ),
-    .cfi_nb_args_i          ( cfi_nb_args_o                 ),
+    .cfi_nb_args_i          ( cfi_nb_args                   ),
     .ppmp_start_i           ( ppmp_start                    ),
     .ppmp_end_i             ( ppmp_end                      ),
     .leds(leds),

@@ -88,7 +88,7 @@ module csr_regfile import ariane_pkg::*; #(
     output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
     output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
     //CFI
-    output logic                  cfi_en_o,             // enable signal for the nop thingy in commit block
+    output logic                  cfi_en_o,             // enable signal for the cfi in commit block
     output logic[8:0]             cfi_nb_args_o,
     input exception_t             cfi_ex_i,
     input logic                   cfi_nb_args_rst_i,
