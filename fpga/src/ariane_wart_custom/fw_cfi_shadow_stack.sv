@@ -383,17 +383,15 @@ always_ff @(posedge clk_i) begin
         // check the first inst
         if(csr_en_i) begin
             if( commit_ack_i[0] ) begin
-                PMP_NX_fault1 <= 1'b1;
                 if(( commit_instr_i[0].pc >= ppmp_start_i ) && 
                    ( commit_instr_i[0].pc < ppmp_end_i    ) ) begin
-                  PMP_NX_fault1 <= 1'b0;
+                  PMP_NX_fault1 <= 1'b1;
                 end
             end
             if( commit_ack_i[1] ) begin
-                PMP_NX_fault2 <= 1'b1;
                 if(( commit_instr_i[1].pc >= ppmp_start_i ) && 
                    ( commit_instr_i[1].pc < ppmp_end_i    ) ) begin
-                  PMP_NX_fault2 <= 1'b0;
+                  PMP_NX_fault2 <= 1'b1;
                 end
             end
         end
