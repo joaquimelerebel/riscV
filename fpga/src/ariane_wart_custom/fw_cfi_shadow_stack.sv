@@ -252,7 +252,7 @@ always_ff @(posedge clk_i) begin
         pop_s_s <= '0;
         data_i_stack <= '0;
         state_shadow_stack <= IDLE_SS;
-        data_o_cached_q <= '0;
+        data_o_cached_q <= '0; 
     end else begin
         push_s_s <= '0;
         pop_s_s <= '0;
@@ -292,8 +292,7 @@ always_comb begin
     detect_RET = 1'b0;
     detect_prep_SS = 1'b0;
     detect_GOOD_RET = 1'b0;
-    data_o_cached_d = '0;
-    
+    data_o_cached_d = data_o_cached_q;
     // FSM
     case( state_shadow_stack ) 
         IDLE_SS : begin
@@ -316,7 +315,7 @@ always_comb begin
                     if ( !valid_ss ) begin 
                         detect_GOOD_RET = 1'b1;
                     end else
-                    if ( data_o_stack == commit_instr_i[1].pc )    begin
+                    if ( data_o_cached_d == commit_instr_i[1].pc )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -345,7 +344,7 @@ always_comb begin
                 if (!valid_ss) begin 
                     detect_GOOD_RET = 1'b1;
                 end else 
-                if ( data_o_cached_q == commit_instr_i[0].pc )    begin
+                if ( data_o_cached_d == commit_instr_i[0].pc )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
@@ -469,9 +468,12 @@ end
                 counter <= counter + 1;
             end else 
             if( counter > 0 ) begin
-                cfi_signal <= '0; 
+                cfi_signal <= '0;
                 ex_q <= ex_q;
                 counter <= counter + 1;
+                /*if(counter < 5) begin
+                    cfi_signal <= '1; 
+                end*/
                 if(counter > 500) begin
                     counter <= 0; 
                 end
