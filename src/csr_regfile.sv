@@ -86,7 +86,7 @@ module csr_regfile import ariane_pkg::*; #(
     // PMPs
     output riscv::pmpcfg_t [15:0] pmpcfg_o,   // PMP configuration containing pmpcfg for max 16 PMPs
     output logic [15:0][53:0]     pmpaddr_o,   // PMP addresses
-    //NOP THINGY ACTIV
+    //CFI
     output logic                  cfi_en_o,             // enable signal for the nop thingy in commit block
     output logic[8:0]             cfi_nb_args_o,
     input exception_t             cfi_ex_i,
@@ -150,8 +150,8 @@ module csr_regfile import ariane_pkg::*; #(
 
 
     // NOP THINGY activation register creation
-    riscv::xlen_t nop_en_q,     nop_en_d;
-    riscv::xlen_t nop_id_q,     nop_id_d;
+    riscv::xlen_t cfi_en_q,     cfi_en_d;
+    riscv::xlen_t cfi_id_q,     cfi_id_d;
 
 
     assign pmpcfg_o = pmpcfg_q[15:0];
@@ -165,8 +165,8 @@ module csr_regfile import ariane_pkg::*; #(
     assign fs_o = mstatus_q.fs;
     
     // nop thingy assignement
-    assign nop_thingy_en_o = nop_en_q;
-    assign cfi_nb_args_o = nop_id_q[8:0];
+    assign cfi_en_o = cfi_en_q;
+    assign cfi_nb_args_o = cfi_id_q[8:0];
     
     // ----------------
     // CSR Read logic
@@ -327,8 +327,8 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR15:        csr_rdata = {10'b0, pmpaddr_q[15][riscv::PLEN-3:1], (pmpcfg_q[15].addr_mode[1] == 1'b1 ? 1'b1 : 1'b0)};
                 
                 //NOP CSR                
-                riscv::CSR_EN_NOPTHINGY:      csr_rdata = nop_en_q; 
-                riscv::CSR_ID_INDI_CALL:      csr_rdata = nop_id_q;
+                riscv::CSR_EN_CFI:           csr_rdata = cfi_en_q; 
+                riscv::CSR_IDICALLNARG_CFI:  csr_rdata = cfi_id_q;
                 
                 default: read_access_exception = 1'b1;
             endcase
@@ -419,13 +419,13 @@ module csr_regfile import ariane_pkg::*; #(
         pmpcfg_d                = pmpcfg_q;
         pmpaddr_d               = pmpaddr_q;
         
-        nop_en_d                = nop_en_q;
-        nop_id_d                = nop_id_q;
+        cfi_en_d                = cfi_en_q;
+        cfi_id_d                = cfi_id_q;
         // check if we want to reset the value in the CSR nop args
         // reset to all ones so that we can differentiate writting 
         // nb args 0 and csr reseted 
         if( cfi_nb_args_rst_i ) begin
-            nop_id_d = '1;
+            cfi_id_d = '1;
         end
         
         // check for correct access rights and that we are writing
@@ -678,10 +678,10 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_PMPADDR14:  if (!pmpcfg_q[14].locked && !(pmpcfg_q[15].locked && pmpcfg_q[15].addr_mode == riscv::TOR))  pmpaddr_d[14]  = csr_wdata[riscv::PLEN-3:0];
                 riscv::CSR_PMPADDR15:  if (!pmpcfg_q[15].locked)  pmpaddr_d[15]  = csr_wdata[riscv::PLEN-3:0];
                 
-                // nop thingy enabling/disabling 
-                riscv::CSR_EN_NOPTHINGY : nop_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
+                // cfi enabling/disabling 
+                riscv::CSR_EN_CFI          : cfi_en_d    = {{riscv::XLEN-1{1'b0}}, csr_wdata[0]}; // enable bit
                 
-                riscv::CSR_ID_INDI_CALL : nop_id_d    = csr_wdata;  
+                riscv::CSR_IDICALLNARG_CFI : cfi_id_d    = csr_wdata;  
                 
                 default: update_access_exception = 1'b1;
             endcase
@@ -1170,8 +1170,8 @@ module csr_regfile import ariane_pkg::*; #(
             pmpaddr_q              <= '0;
             
             //nop register
-            nop_en_q               <= {riscv::XLEN{1'b0}};
-            nop_id_q               <= {riscv::XLEN{1'b1}};
+            cfi_en_q               <= {riscv::XLEN{1'b0}};
+            cfi_id_q               <= {riscv::XLEN{1'b1}};
             
         end else begin
             priv_lvl_q             <= priv_lvl_d;
@@ -1224,9 +1224,9 @@ module csr_regfile import ariane_pkg::*; #(
                 end
             end
             
-            // nop thingy 
-            nop_en_q               <= nop_en_d;
-            nop_id_q               <= nop_id_d;
+            // cfi
+            cfi_en_q               <= cfi_en_d;
+            cfi_id_q               <= cfi_id_d;
         end
     end
 

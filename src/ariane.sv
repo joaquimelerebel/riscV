@@ -200,8 +200,8 @@ module ariane import ariane_pkg::*; #(
   logic [15:0][53:0]        pmpaddr;
   
   // CFI signals
-  logic                     cfi_en_o;
-  logic[8:0]                cfi_nb_args_o;
+  logic                     cfi_en;
+  logic[8:0]                cfi_nb_args;
   logic                     cfi_nb_args_rst;
   
   // ----------------------------
@@ -579,9 +579,9 @@ module ariane import ariane_pkg::*; #(
     .perf_we_o              ( we_csr_perf                   ),
     .pmpcfg_o               ( pmpcfg                        ),
     .pmpaddr_o              ( pmpaddr                       ),
-    .cfi_en_o               ( cfi_en_o                      ),
+    .cfi_en_o               ( cfi_en                        ),
     .cfi_ex_i               ( cfi_ex                        ),
-    .cfi_nb_args_o          ( cfi_nb_args_o                 ),
+    .cfi_nb_args_o          ( cfi_nb_args                   ),
     .cfi_nb_args_rst_i      ( cfi_nb_args_rst               ),
     .debug_req_i,
     .ipi_i,
