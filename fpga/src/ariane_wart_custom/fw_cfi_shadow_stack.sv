@@ -214,7 +214,8 @@ endfunction
 ////////                     shadow stack                    //////////             
 ///////////////////////////////////////////////////////////////////////   
    
-logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack, data_o_cached;
+logic [riscv::XLEN-1:0]         data_i_stack, data_o_stack;
+logic [riscv::XLEN-1:0]         data_o_cached_d, data_o_cached_q;
 logic                           push_s_s, pop_s_s;
 logic                           valid_ss;
 
@@ -249,11 +250,13 @@ always_ff @(posedge clk_i) begin
         pop_s_s <= '0;
         data_i_stack <= '0;
         state_shadow_stack <= IDLE_SS;
+        data_o_cached_q <= '0; 
     end else begin
         push_s_s <= '0;
         pop_s_s <= '0;
         data_i_stack <= '0;
         state_shadow_stack <= next_state_shadow_stack;
+        data_o_cached_q <= data_o_cached_d;
         
         if(csr_en_i) begin 
             // add the return address to the stack
@@ -287,7 +290,7 @@ always_comb begin
     detect_RET = 1'b0;
     detect_prep_SS = 1'b0;
     detect_GOOD_RET = 1'b0;
-    
+    data_o_cached_d = data_o_cached_q;
     // FSM
     case( state_shadow_stack ) 
         IDLE_SS : begin
@@ -299,7 +302,7 @@ always_comb begin
                 is_ret(commit_instr_i[0]) )                begin
                     next_state_shadow_stack = WAITS_PC;
                     detect_RET = 1'b1;
-                    data_o_cached = data_o_stack;
+                    data_o_cached_d = data_o_stack;
                 
                 // check if the return add is the next inst 
                 if( commit_ack_i[1] && !commit_instr_i[1].ex.valid ) begin
@@ -310,7 +313,7 @@ always_comb begin
                     if ( !valid_ss ) begin 
                         detect_GOOD_RET = 1'b1;
                     end else
-                    if ( data_o_cached == commit_instr_i[1].pc )    begin
+                    if ( data_o_cached_d == commit_instr_i[1].pc )    begin
                          detect_GOOD_RET = 1'b1;
                     end
                 end
@@ -321,7 +324,7 @@ always_comb begin
                 is_ret(commit_instr_i[1]) )                begin
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
-                        data_o_cached = data_o_stack;
+                        data_o_cached_d = data_o_stack;
             end
         end
         WAITS_PC : begin
@@ -339,7 +342,7 @@ always_comb begin
                 if (!valid_ss) begin 
                     detect_GOOD_RET = 1'b1;
                 end else 
-                if ( data_o_cached == commit_instr_i[0].pc )    begin
+                if ( data_o_cached_d == commit_instr_i[0].pc )    begin
                         detect_GOOD_RET = 1'b1;
                 end
                 
@@ -349,7 +352,7 @@ always_comb begin
                     
                         next_state_shadow_stack = WAITS_PC;
                         detect_RET = 1'b1;
-                        data_o_cached = data_o_stack;
+                        data_o_cached_d = data_o_stack;
                 end
                      
            end
@@ -420,9 +423,12 @@ end
                 counter <= counter + 1;
             end else 
             if( counter > 0 ) begin
-                cfi_signal <= '0; 
+                cfi_signal <= '0;
                 ex_q <= ex_q;
                 counter <= counter + 1;
+                /*if(counter < 5) begin
+                    cfi_signal <= '1; 
+                end*/
                 if(counter > 500) begin
                     counter <= 0; 
                 end
