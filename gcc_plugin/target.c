@@ -4,7 +4,7 @@
 void printk(const char*, ...);
 void f1(int);
 
-int f(int x) {
+int f(double x) {
     return -x;
 }
 

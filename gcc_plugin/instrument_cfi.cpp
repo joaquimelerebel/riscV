@@ -20,16 +20,19 @@
 #define LI_MASK 0x00000013
 #define CSRWI_3FE_MASK 0x3fe05073
 
-#define LI_ZERO(imm) create_byte(((imm << 20) | LI_MASK))
-#define CSRWI_3FE(imm) create_byte(((imm << 15) | CSRWI_3FE_MASK))
-#define ASM_BUFFER_SIZE 100
+#define ASM_BUFFER_SIZE 256
 
-char generic_asm[ASM_BUFFER_SIZE];
+char generic_asm_buffer[ASM_BUFFER_SIZE];
 
-char *create_byte(uint32_t imm)
+char* LI_ZERO(int imm)
 {
-    snprintf(generic_asm, ASM_BUFFER_SIZE, ".insn 0x%x", imm);
-    return generic_asm;
+    snprintf(generic_asm_buffer, ASM_BUFFER_SIZE, "li zero, %d", imm);
+    return generic_asm_buffer;
+}
+
+char* CSRWI_3FE(int imm) {
+    snprintf(generic_asm_buffer, ASM_BUFFER_SIZE, "csrwi 0x3fe, %d", imm);
+    return generic_asm_buffer;
 }
 
 /**
@@ -38,19 +41,28 @@ char *create_byte(uint32_t imm)
 #define DEBUG 1
 
 /**
- * Generate code for runtime verification of number of arguments
-*/
-#define RUNTIME_ARG_CHECK 1 // 0
-
-/**
  * Generate code for return verification
+ * Depreciated and replaced by the shadow stack
 */
-#define RUNTIME_RET_ANNOTATION 0 // 1
+#define RUNTIME_RET_ANNOTATION 0
 
 /**
  * Generate code for call verification
+ * Always needed
 */
-#define RUNTIME_CALL_ANNOTATION 1 // 0
+#define RUNTIME_CALL_ANNOTATION 1
+
+/**
+ * Encode number of arguments in the call annotations
+ * Needed if any component uses RUNTIME_ARG_CHECK
+*/
+#define RUNTIME_ARG_CHECK_ANNOTATION 1
+
+/**
+ * Generate code for runtime verification of number of arguments
+ * Unneeded for libraries (trust them to be safe, questionable), but needed for user programs
+*/
+#define RUNTIME_ARG_CHECK 1
 
 /**
  * Name of this plugin
@@ -239,33 +251,28 @@ static unsigned int instrument_assignments_plugin_exec(void)
 {
     // get the FUNCTION_DECL of the function whose body we are reading
     tree fndef = current_function_decl;
-#if DEBUG >= 1
-    // print the function name
-    fprintf(stderr, "\n> Inspecting function '%s' | RUNTIME_ARG_CHECK = %d\n", FN_NAME(fndef), RUNTIME_ARG_CHECK);
-#endif 
-    /* Traverse the parameter list and count the number of non-variadic parameters */
 
     // get function entry block
     basic_block entry = ENTRY_BLOCK_PTR_FOR_FN(cfun)->next_bb;
 
+#if DEBUG == 2
+    print_rtl_single(stderr, BB_HEAD(entry));
+#endif
 
-#if RUNTIME_ARG_CHECK == 1
+#if RUNTIME_ARG_CHECK_ANNOTATION == 1
+    /* Traverse the parameter list and count the number of non-variadic parameters */
     struct argument_count c;
     get_argument_count(fndef, &c);
     uint32_t call_nop_imm = (1 << 1) | (c.count << 2) | (c.is_variadic << 10);
 #if DEBUG >= 1
-    fprintf(stderr, "Function %s uses %d arguments it is%s variadic\n", IDENTIFIER_POINTER(DECL_NAME(fndef)), c.count, c.is_variadic ? "" : " not");
+    fprintf(stderr, "> Function '%s' uses %d arguments it is%s variadic\n", IDENTIFIER_POINTER(DECL_NAME(fndef)), c.count, c.is_variadic ? "" : " not");
 #endif
-#else
-    uint32_t call_nop_imm = (1 << 1);
-#endif
+#else 
+    uint32_t call_nop_imm = 2;
+#endif 
 
 #if DEBUG >= 1
-    fprintf(stderr, "[function start] adding nop %s\n", LI_ZERO(call_nop_imm));
-#endif
-
-#if DEBUG == 2
-    print_rtl_single(stderr, BB_HEAD(entry));
+    fprintf(stderr, "  [landing pad]: prefix %s\n", LI_ZERO(call_nop_imm));
 #endif
 
     // insert nop at the beginning of the function
@@ -287,7 +294,7 @@ static unsigned int instrument_assignments_plugin_exec(void)
             if (is_indirect)
             {
 #if DEBUG >= 1
-                fprintf(stderr, "Indirect call: prefixing with %s\n", CSRWI_3FE(count_call_ins_arguments(ins)));
+                fprintf(stderr, "  [indirect call]: prefix %s\n", CSRWI_3FE(count_call_ins_arguments(ins)));
 #endif
                 insert_asm(ins, CSRWI_3FE(count_call_ins_arguments(ins)), true);
             }
@@ -296,13 +303,8 @@ static unsigned int instrument_assignments_plugin_exec(void)
 #if RUNTIME_RET_ANNOTATION == 1
 
 #if DEBUG >= 1
-            fprintf(stderr, "[call instruction] adding nop %s: \n", LI_ZERO(1));
+            fprintf(stderr, "  [return pad]: suffix %s: \n", LI_ZERO(1));
 #endif
-
-#if DEBUG == 2
-            print_rtl_single(stderr, ins);
-#endif
-
             insert_asm(ins, LI_ZERO(1));
 #endif
         }
@@ -393,8 +395,11 @@ int plugin_init(struct plugin_name_args *info, struct plugin_gcc_version *ver)
     register_callback(PLUGIN_NAME, PLUGIN_INFO, NULL, &inst_plugin_info);
 
     // warn the user about the presence of this plugin
-#if DEBUG == 2
+#if DEBUG == 1
     printf("> Instrumentation plugin '%s @ %s' was loaded onto GCC\n", PLUGIN_NAME, PLUGIN_VERSION);
+    printf("RUNTIME_CALL_ANNOTATION = %d | RUNTIME_ARG_CHECK_ANNOTATION = %d\n", RUNTIME_CALL_ANNOTATION, RUNTIME_ARG_CHECK_ANNOTATION);
+    printf("RUNTIME_ARG_CHECK = %d\n", RUNTIME_ARG_CHECK);
+    printf("RUNTIME_RET_ANNOTATION = %d\n", RUNTIME_RET_ANNOTATION);
 #endif
     // insert inst pass into the struct used to register the pass
     pass.pass = &inst_pass;
