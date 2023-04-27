@@ -1,0 +1,59 @@
+From 95c1bcec95fcaecd3ac80ed01e73be38c8c0f2f1 Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Tue, 18 Apr 2023 00:49:38 +0200
+Subject: [PATCH 4/5] fix assembly errors
+
+---
+ newlib/libc/machine/riscv/memcpy-asm.S | 4 ++--
+ newlib/libc/machine/riscv/memcpy.c     | 3 +++
+ newlib/libc/machine/riscv/memset.S     | 2 +-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/newlib/libc/machine/riscv/memcpy-asm.S b/newlib/libc/machine/riscv/memcpy-asm.S
+index d55d232d6..7db18c5bb 100644
+--- a/newlib/libc/machine/riscv/memcpy-asm.S
++++ b/newlib/libc/machine/riscv/memcpy-asm.S
+@@ -20,11 +20,11 @@ memcpy:
+   sw a0, 8(sp)
+   sw a1, 4(sp)
+   sw a2, 0(sp)
+-  mv a0, a1
+   mv a1, a2
+   call __ptr_overflow_check__
+   bnez a0, __abort
+-  lw a0, 0(sp) // lw a0, a2
++  lw a0, 4(sp) // lw a0, a1
++  lw a1, 0(sp) // lw a1, a2
+   call __ptr_overflow_check__
+   bnez a0, __abort
+   lw ra, 12(sp)
+diff --git a/newlib/libc/machine/riscv/memcpy.c b/newlib/libc/machine/riscv/memcpy.c
+index 07e8e0076..035ce1b54 100644
+--- a/newlib/libc/machine/riscv/memcpy.c
++++ b/newlib/libc/machine/riscv/memcpy.c
+@@ -23,6 +23,9 @@ void *
+ __inhibit_loop_to_libcall
+ memcpy(void *__restrict aa, const void *__restrict bb, size_t n)
+ {
++  if ( __ptr_overflow_check__(aa, n) < 0 || __ptr_overflow_check__(bb, n) < 0 )
++    __ptr_overflow_abort__();
++
+   #define BODY(a, b, t) { \
+     t tt = *b; \
+     a++, b++; \
+diff --git a/newlib/libc/machine/riscv/memset.S b/newlib/libc/machine/riscv/memset.S
+index 205a66598..74463f007 100644
+--- a/newlib/libc/machine/riscv/memset.S
++++ b/newlib/libc/machine/riscv/memset.S
+@@ -61,7 +61,7 @@ memset:
+ 
+ .Ltiny:
+   sub a3, t1, a2
+-  sll a3, a3, 2
++  sll a3, a3, 3
+ 1:auipc t0, %pcrel_hi(.Ltable)
+   add a3, a3, t0
+ .option push
+-- 
+2.39.2
+

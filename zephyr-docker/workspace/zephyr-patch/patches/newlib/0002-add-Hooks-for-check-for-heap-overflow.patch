@@ -1,7 +1,7 @@
 From 78bc3870d71971f264e4737a02c105ec45c5747c Mon Sep 17 00:00:00 2001
 From: noctisdark <diseven@outlook.fr>
 Date: Fri, 7 Apr 2023 11:12:28 +0200
-Subject: [PATCH] add Hooks for check for heap overflow
+Subject: [PATCH 2/5] add Hooks for check for heap overflow
 
 ---
  newlib/libc/stdlib/Makefile.in     |  7 ++++++
@@ -16,25 +16,25 @@ index 699831f13..cdd1c14a8 100644
 --- a/newlib/libc/stdlib/Makefile.in
 +++ b/newlib/libc/stdlib/Makefile.in
 @@ -89,6 +89,7 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
-        lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
-        lib_a-__ten_mu.$(OBJEXT) lib_a-_Exit.$(OBJEXT) \
-        lib_a-abort.$(OBJEXT) lib_a-abs.$(OBJEXT) \
-+       lib_a-overflow_hook.$(OBJEXT) \
-        lib_a-aligned_alloc.$(OBJEXT) lib_a-assert.$(OBJEXT) \
-        lib_a-atexit.$(OBJEXT) lib_a-atof.$(OBJEXT) \
-        lib_a-atoff.$(OBJEXT) lib_a-atoi.$(OBJEXT) \
+ 	lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
+ 	lib_a-__ten_mu.$(OBJEXT) lib_a-_Exit.$(OBJEXT) \
+ 	lib_a-abort.$(OBJEXT) lib_a-abs.$(OBJEXT) \
++	lib_a-overflow_hook.$(OBJEXT) \
+ 	lib_a-aligned_alloc.$(OBJEXT) lib_a-assert.$(OBJEXT) \
+ 	lib_a-atexit.$(OBJEXT) lib_a-atof.$(OBJEXT) \
+ 	lib_a-atoff.$(OBJEXT) lib_a-atoi.$(OBJEXT) \
 @@ -1138,6 +1139,12 @@ lib_a-mtrim.o: mtrim.c
  lib_a-mtrim.obj: mtrim.c
-        $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mtrim.obj `if test -f 'mtrim.c'; then $(CYGPATH_W) 'mtrim.c'; else $(CYGPATH_W) '$(srcdir)/mtrim.c'; fi`
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mtrim.obj `if test -f 'mtrim.c'; then $(CYGPATH_W) 'mtrim.c'; else $(CYGPATH_W) '$(srcdir)/mtrim.c'; fi`
  
 +lib_a-overflow_hook.o: overflow_hook.c
-+       $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.o `test -f 'overflow_hook.c' || echo '$(srcdir)/'`overflow_hook.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.o `test -f 'overflow_hook.c' || echo '$(srcdir)/'`overflow_hook.c
 +
 +lib_a-overflow_hook.obj: overflow_hook.c
-+       $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.obj `if test -f 'overflow_hook.c'; then $(CYGPATH_W) 'overflow_hook.c'; else $(CYGPATH_W) '$(srcdir)/overflow_hook.c'; fi`
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-overflow_hook.obj `if test -f 'overflow_hook.c'; then $(CYGPATH_W) 'overflow_hook.c'; else $(CYGPATH_W) '$(srcdir)/overflow_hook.c'; fi`
 +
  lib_a-nrand48.o: nrand48.c
-        $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nrand48.o `test -f 'nrand48.c' || echo '$(srcdir)/'`nrand48.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nrand48.o `test -f 'nrand48.c' || echo '$(srcdir)/'`nrand48.c
  
 diff --git a/newlib/libc/stdlib/mallocr.c b/newlib/libc/stdlib/mallocr.c
 index 26d1c89cc..0a3068ae3 100644
@@ -126,3 +126,4 @@ index 000000000..8a094bf82
 +#endif // _INCLUDE_OVERFLOW_HOOK_H_
 -- 
 2.39.2
+

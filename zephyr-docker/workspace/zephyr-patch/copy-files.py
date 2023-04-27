@@ -9,12 +9,17 @@ from termcolors import fg, style
 
 WORKDIR_PATH = environ.get('WORKDIR_PATH')
 ZEPHYR_SDK_PATH = environ.get('ZEPHYR_SK_PATH')
+NEWLIB_NANO_O = environ.get('NEWLIB_NANO_O')
 
 if WORKDIR_PATH is None:
-  WORKDIR_PATH = input('Workdir Path (/workdir): ') or "/workdir"
+  WORKDIR_PATH = input('Workdir Path (/workdir):') or "/workdir"
 
 if ZEPHYR_SDK_PATH is None:
   ZEPHYR_SDK_PATH = input('Zephyr SDK Path (/opt/toolchains/zephyr-sdk-0.15.1): ') or "/opt/toolchains/zephyr-sdk-0.15.1"
+
+if NEWLIB_NANO_O is None:
+  NEWLIB_NANO_O = input('Newlib Nano Optimization (-O2):') or "O2"
+
 
 def copy_and_backup(src, dst, ext='.old'):
   if os.path.exists(dst + ext):
@@ -38,16 +43,16 @@ fn = revert_backup if is_revert else copy_and_backup
 
 ZEPHYR_FILES_TREE = {
   'include/zephyr/arch/riscv': [
-    './csr.h'
+    'csr.h'
   ],
   'include/zephyr/toolchain': [
-    './mwdt.h', './gcc.h'
+    'mwdt.h', 'gcc.h'
   ],
   'arch/riscv/core': [
-    './isr.S', './reset.S', './switch.S', 'fatal.c', 'thread.c'
+    'isr.S', 'reset.S', 'switch.S', 'fatal.c', 'thread.c'
   ],
   'kernel': [
-    './init.c', './Kconfig'
+    'init.c', 'Kconfig'
   ],
   'lib/libc/newlib': [
     'libc-hooks.c'
@@ -57,30 +62,36 @@ ZEPHYR_FILES_TREE = {
   ]
 }
 
-print(action, "zephyr files", end=" ")
+print(action, "zephyr files")
+
 for path, files in ZEPHYR_FILES_TREE.items():
   for file in files:
-    fn(file, os.path.join(WORKDIR_PATH, 'zephyr', path, file))
+    fullpath = os.path.join('zephyr', path, file)
+    fn(fullpath, os.path.join(WORKDIR_PATH, fullpath))
 
 print('Done ✅')
 
-# !TODO!: Make newlib without nano as well
-print(action, "libc files", end=" ")
+print(action, "libc files")
 
-LIBC_FILES = ['./libc.a', './libg.a', './libm.a', './libc_nano.a', './libg_nano.a', './libm_nano.a', 'libgloss.a', 'libnosys_nano.a', 'libsim.a']
+LIBC_FILES = ['newlib/libc.a', 'newlib/libm.a']
+LIBC_NANO_FILES = ['newlib/nano/libc_nano.a', 'newlib/nano/libm_nano.a']
+if NEWLIB_NANO_O == "O2":
+  LIBC_NANO_FILES = ['newlib/nano/O2/libc_nano.a', 'newlib/nano/O2/libm_nano.a']
 
-for libc_file in LIBC_FILES:
-  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/', libc_file)
+for libc_file in [*LIBC_FILES, *LIBC_NANO_FILES]:
+  filename = os.path.basename(libc_file)
+  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/riscv64-zephyr-elf/lib/', filename)
   fn(libc_file, dst)
 
 print('Done ✅')
 
-print(action, "libgcc files", end=" ")
+print(action, "libgcc files")
 
-LIBGCC_FILES = ['./libgcc.a', './libgcov.a']
+LIBGCC_FILES = ['gcc/libgcc.a']
 
 for libgcc_file in LIBGCC_FILES:
-  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/12.1.0', libgcc_file)
+  filename = os.path.basename(libgcc_file)
+  dst = os.path.join(ZEPHYR_SDK_PATH, 'riscv64-zephyr-elf/lib/gcc/riscv64-zephyr-elf/12.1.0', filename)
   fn(libgcc_file, dst)
 
 print('Done ✅')

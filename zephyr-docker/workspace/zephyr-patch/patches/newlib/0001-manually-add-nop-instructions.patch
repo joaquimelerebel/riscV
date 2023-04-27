@@ -1,7 +1,7 @@
 From 743bf16fb081c9073dc4ad86f95a45d5ac241fd1 Mon Sep 17 00:00:00 2001
 From: noctisdark <diseven@outlook.fr>
 Date: Sun, 19 Mar 2023 11:04:41 +0100
-Subject: [PATCH 1/2] manually add nop instructions
+Subject: [PATCH 1/5] manually add nop instructions
 
 ---
  .gitignore                             |  1 +
@@ -18,7 +18,7 @@ index 13a554aa0..fccd95fd6 100644
 +++ b/.gitignore
 @@ -42,3 +42,4 @@ core
  !core/
-
+ 
  lost+found
 +newlib-out/
 \ No newline at end of file
@@ -28,23 +28,23 @@ index 5571e4704..0594ca760 100644
 +++ b/newlib/libc/machine/riscv/memcpy-asm.S
 @@ -14,6 +14,7 @@
  .global memcpy
- .type  memcpy, @function
+ .type	memcpy, @function
  memcpy:
 +  li zero, 2
    mv t1, a0
    beqz a2, 2f
-
+ 
 diff --git a/newlib/libc/machine/riscv/memmove.S b/newlib/libc/machine/riscv/memmove.S
 index 66d9cd494..2f99959da 100644
 --- a/newlib/libc/machine/riscv/memmove.S
 +++ b/newlib/libc/machine/riscv/memmove.S
 @@ -14,6 +14,7 @@
  .global memmove
- .type  memmove, @function
+ .type	memmove, @function
  memmove:
 +  li zero, 2
    beqz a2, 2f
-
+ 
    mv t1, a0
 diff --git a/newlib/libc/machine/riscv/memset.S b/newlib/libc/machine/riscv/memset.S
 index a717ae7fb..205a66598 100644
@@ -53,12 +53,12 @@ index a717ae7fb..205a66598 100644
 @@ -9,10 +9,13 @@
     http://www.opensource.org/licenses.
  */
-
+ 
 +// TODO: Optimize  this function, it's very important !
 +
  .text
  .global memset
- .type  memset, @function
+ .type	memset, @function
  memset:
 +  li zero, 2
  #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
@@ -102,7 +102,7 @@ index a717ae7fb..205a66598 100644
    ret
 @@ -97,7 +115,8 @@ memset:
    j .Lwordified
-
+ 
  .Lmisaligned:
 -  sll a3, a5, 2
 +  sll a3, a5, 3
@@ -119,17 +119,17 @@ index eef242e02..ae1f4d00a 100644
    .type   setjmp, @function
  setjmp:
 +  li zero, 2
-        REG_S ra,  0*SZREG(a0)
-        REG_S s0,  1*SZREG(a0)
-        REG_S s1,  2*SZREG(a0)
+ 	REG_S ra,  0*SZREG(a0)
+ 	REG_S s0,  1*SZREG(a0)
+ 	REG_S s1,  2*SZREG(a0)
 @@ -58,6 +59,7 @@ setjmp:
    .globl  longjmp
    .type   longjmp, @function
  longjmp:
 +  li zero, 2
-        REG_L ra,  0*SZREG(a0)
-        REG_L s0,  1*SZREG(a0)
-        REG_L s1,  2*SZREG(a0)
+ 	REG_L ra,  0*SZREG(a0)
+ 	REG_L s0,  1*SZREG(a0)
+ 	REG_L s1,  2*SZREG(a0)
 diff --git a/newlib/libc/machine/riscv/strcmp.S b/newlib/libc/machine/riscv/strcmp.S
 index eaf6d4b3c..c6da5ad63 100644
 --- a/newlib/libc/machine/riscv/strcmp.S
@@ -142,5 +142,6 @@ index eaf6d4b3c..c6da5ad63 100644
  #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
  1:
    lbu   a2, 0(a0)
---
+-- 
 2.39.2
+

@@ -1,0 +1,104 @@
+From 3c57d0d02c597f4bbce679818f6e025aa512e11f Mon Sep 17 00:00:00 2001
+From: noctisdark <diseven@outlook.fr>
+Date: Wed, 26 Apr 2023 11:32:06 +0200
+Subject: [PATCH 5/5] use correct number of arguments; fix access_end in
+ __heap_overflow_check__
+
+---
+ newlib/libc/machine/riscv/memcpy-asm.S | 2 +-
+ newlib/libc/machine/riscv/memmove.S    | 2 +-
+ newlib/libc/machine/riscv/memset.S     | 2 +-
+ newlib/libc/machine/riscv/setjmp.S     | 2 +-
+ newlib/libc/machine/riscv/strcmp.S     | 2 +-
+ newlib/libc/stdlib/nano-mallocr.c      | 5 +----
+ 6 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/newlib/libc/machine/riscv/memcpy-asm.S b/newlib/libc/machine/riscv/memcpy-asm.S
+index 7db18c5bb..6e4c14205 100644
+--- a/newlib/libc/machine/riscv/memcpy-asm.S
++++ b/newlib/libc/machine/riscv/memcpy-asm.S
+@@ -14,7 +14,7 @@
+ .global memcpy
+ .type	memcpy, @function
+ memcpy:
+-  li zero, 2
++  li zero, 14
+   addi sp, sp, -16
+   sw ra, 12(sp)
+   sw a0, 8(sp)
+diff --git a/newlib/libc/machine/riscv/memmove.S b/newlib/libc/machine/riscv/memmove.S
+index 2f99959da..92782943a 100644
+--- a/newlib/libc/machine/riscv/memmove.S
++++ b/newlib/libc/machine/riscv/memmove.S
+@@ -14,7 +14,7 @@
+ .global memmove
+ .type	memmove, @function
+ memmove:
+-  li zero, 2
++  li zero, 14
+   beqz a2, 2f
+ 
+   mv t1, a0
+diff --git a/newlib/libc/machine/riscv/memset.S b/newlib/libc/machine/riscv/memset.S
+index 74463f007..dc31adcb2 100644
+--- a/newlib/libc/machine/riscv/memset.S
++++ b/newlib/libc/machine/riscv/memset.S
+@@ -15,7 +15,7 @@
+ .global memset
+ .type	memset, @function
+ memset:
+-  li zero, 2
++  li zero, 14
+ #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+   mv t1, a0
+   beqz a2, 2f
+diff --git a/newlib/libc/machine/riscv/setjmp.S b/newlib/libc/machine/riscv/setjmp.S
+index ae1f4d00a..2000fcc88 100644
+--- a/newlib/libc/machine/riscv/setjmp.S
++++ b/newlib/libc/machine/riscv/setjmp.S
+@@ -15,7 +15,7 @@
+   .globl  setjmp
+   .type   setjmp, @function
+ setjmp:
+-  li zero, 2
++  li zero, 6
+ 	REG_S ra,  0*SZREG(a0)
+ 	REG_S s0,  1*SZREG(a0)
+ 	REG_S s1,  2*SZREG(a0)
+diff --git a/newlib/libc/machine/riscv/strcmp.S b/newlib/libc/machine/riscv/strcmp.S
+index c6da5ad63..7cbf544e4 100644
+--- a/newlib/libc/machine/riscv/strcmp.S
++++ b/newlib/libc/machine/riscv/strcmp.S
+@@ -19,7 +19,7 @@
+ .globl strcmp
+ .type  strcmp, @function
+ strcmp:
+-  li zero, 2
++  li zero, 10
+ #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+ 1:
+   lbu   a2, 0(a0)
+diff --git a/newlib/libc/stdlib/nano-mallocr.c b/newlib/libc/stdlib/nano-mallocr.c
+index 3c68375ba..2f7cd8689 100644
+--- a/newlib/libc/stdlib/nano-mallocr.c
++++ b/newlib/libc/stdlib/nano-mallocr.c
+@@ -351,15 +351,12 @@ chunk* find_ptr_chunk(void* ptr) {
+     if they are not the same, error
+ */
+ int __attribute__((weak)) __heap_overflow_check__(void* ptr, size_t size) {
+-//    printf("check overflow %x, %d\n", ptr, size);
+    chunk* c = find_ptr_chunk(ptr);
+    if ( !c ) return -2;
+ 
+-//    printf("found chunk %x of size: %d\n", c, c->size);
+-
+    void* start = c + CHUNK_OFFSET;
+    void* end = start + c->size;
+-   void* access_end = start + size;
++   void* access_end = ptr + size;
+ 
+    if ( access_end >= end ) return -1;
+    return 0;
+-- 
+2.39.2
+

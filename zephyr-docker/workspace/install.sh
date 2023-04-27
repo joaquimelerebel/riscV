@@ -7,14 +7,14 @@ export ZEPHYR_SDK_PATH=/opt/toolchains/zephyr-sdk-0.15.1
 
 # Install modifications
 cd /workdir/zephyr-patch
-echo "\n\n" | sudo /workdir/zephyr-patch/copy-zephyr-files.py
+echo "\n\n\n" | sudo /workdir/zephyr-patch/copy-files.py
 
 # Install GCC
 cd /opt/toolchains/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/
 
 cat << EOF | sudo tee riscv64-zephyr-elf-gcc.wrapper
 #!/bin/sh
-exec /opt/toolchains/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc.real -fplugin=/workdir/zephyr-patch/inst_plugin_cfi.so "\$@"
+exec /opt/toolchains/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc.real -fplugin=/workdir/zephyr-patch/gcc/inst_plugin_cfi.so "\$@"
 EOF
 sudo chmod +x riscv64-zephyr-elf-gcc.wrapper
 
