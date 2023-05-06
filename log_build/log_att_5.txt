@@ -1,0 +1,1724 @@
+-- west build: making build dir /workdir/build pristine
+-- west build: generating a build system
+Loading Zephyr default modules (Zephyr base).
+-- Application: /workdir/ripe
+-- Found Python3: /usr/bin/python3.8 (found suitable exact version "3.8.10") found components: Interpreter 
+-- Cache files will be written to: /root/.cache/zephyr
+-- Zephyr version: 3.2.99 (/workdir/zephyr)
+-- Found west (found suitable version "1.0.0", minimum required is "0.7.1")
+-- Board: cv32a6_zybo
+-- ZEPHYR_TOOLCHAIN_VARIANT not set, trying to locate Zephyr SDK
+-- Found host-tools: zephyr 0.15.1 (/opt/toolchains/zephyr-sdk-0.15.1)
+-- Found toolchain: zephyr 0.15.1 (/opt/toolchains/zephyr-sdk-0.15.1)
+-- Found Dtc: /opt/toolchains/zephyr-sdk-0.15.1/sysroots/x86_64-pokysdk-linux/usr/bin/dtc (found suitable version "1.6.0", minimum required is "1.4.6") 
+-- Found BOARD.dts: /workdir/zephyr/boards/riscv/cv32a6_zybo/cv32a6_zybo.dts
+node '/cpus/cpu@0' compatible 'ohwg,cva6' has unknown vendor prefix 'ohwg'
+node '/soc' compatible 'eth,cva6-bare-soc' has unknown vendor prefix 'eth'
+-- Generated zephyr.dts: /workdir/build/zephyr/zephyr.dts
+-- Generated devicetree_generated.h: /workdir/build/zephyr/include/generated/devicetree_generated.h
+-- Including generated dts.cmake file: /workdir/build/zephyr/dts.cmake
+Parsing /workdir/zephyr/Kconfig
+Loaded configuration '/workdir/zephyr/boards/riscv/cv32a6_zybo/cv32a6_zybo_defconfig'
+Merged configuration '/workdir/ripe/prj.conf'
+Configuration saved to '/workdir/build/zephyr/.config'
+Kconfig header saved to '/workdir/build/zephyr/include/generated/autoconf.h'
+
+warning: The choice symbol BOARD_CV32A6_ZYBO (defined at boards/riscv/cv32a6_zybo/Kconfig.board:3)
+was selected (set =y), but no symbol ended up as the choice selection. See
+http://docs.zephyrproject.org/latest/kconfig.html#CONFIG_BOARD_CV32A6_ZYBO and/or look up
+BOARD_CV32A6_ZYBO in the menuconfig/guiconfig interface. The Application Development Primer, Setting
+Configuration Values, and Kconfig - Tips and Best Practices sections of the manual might be helpful
+too.
+
+-- The C compiler identification is GNU 12.1.0
+-- The CXX compiler identification is GNU 12.1.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /opt/toolchains/zephyr-sdk-0.15.1/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /workdir/build
+-- west build: building application
+[1/105] Preparing syscall dependency handling
+
+[2/105] Generating include/generated/version.h
+-- Zephyr version: 3.2.99 (/workdir/zephyr), build: zephyr-v3.2.0-327-g869365ab012b
+[3/105] Generating misc/generated/syscalls_subdirs.trigger
+[4/105] Generating misc/generated/syscalls.json, misc/generated/struct_tags.json
+[5/105] Generating include/generated/syscall_dispatch.c, include/generated/syscall_list.h
+[6/105] Generating include/generated/driver-validation.h
+[7/105] Generating include/generated/kobj-types-enum.h, include/generated/otype-to-str.h, include/generated/otype-to-size.h
+[8/105] Building C object zephyr/CMakeFiles/offsets.dir/arch/riscv/core/offsets/offsets.c.obj
+> Function '_OffsetAbsSyms' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[9/105] Generating include/generated/offsets.h
+[10/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/crc16_sw.c.obj
+> Function 'crc16' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'crc16_reflect' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'crc16_ccitt' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'crc16_itu_t' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[11/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/crc8_sw.c.obj
+> Function 'crc8_ccitt' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'crc8' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[12/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/crc7_sw.c.obj
+> Function 'crc7_be' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[13/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/crc32c_sw.c.obj
+> Function 'crc32_c' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[14/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/crc32_sw.c.obj
+> Function 'crc32_ieee_update' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'crc32_ieee' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[15/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/dec.c.obj
+> Function 'u8_to_dec' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[16/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/hex.c.obj
+> Function 'char2hex' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'hex2char' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'bin2hex' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'hex2bin' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[17/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/timeutil.c.obj
+> Function 'time_days_from_civil' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'timeutil_timegm64' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'timeutil_timegm' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'timeutil_sync_state_update' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'timeutil_sync_state_set_skew' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'timeutil_sync_estimate_skew' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'timeutil_sync_ref_from_local' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'timeutil_sync_local_from_ref' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'timeutil_sync_skew_to_ppb' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[18/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/thread_entry.c.obj
+> Function 'z_thread_entry' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+  [indirect call]: prefix csrwi 0x3fe, 3
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[19/105] Building C object zephyr/CMakeFiles/zephyr.dir/misc/generated/configs.c.obj
+> Function '_ConfigAbsSyms' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[20/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/sem.c.obj
+> Function 'sys_sem_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_sem_give' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'sys_sem_take' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_sem_count_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[21/105] Building ASM object zephyr/CMakeFiles/zephyr.dir/soc/riscv/riscv-privilege/common/soc_irq.S.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[22/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/cbprintf.c.obj
+> Function 'cbprintf' uses 3 arguments it is variadic
+  [landing pad]: prefix li zero, 1038
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[23/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/multi_heap.c.obj
+> Function 'sys_multi_heap_init' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_multi_heap_add_heap' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_multi_heap_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+  [indirect call]: prefix csrwi 0x3fe, 4
+> Function 'sys_multi_heap_aligned_alloc' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+  [indirect call]: prefix csrwi 0x3fe, 4
+> Function 'sys_multi_heap_get_heap' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_multi_heap_free' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[24/105] Generating linker_zephyr_pre0.cmd
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[25/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/printk.c.obj
+> Function 'arch_printk_char_out' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'char_out' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'str_out' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '__printk_hook_install' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__printk_get_hook' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'vprintk' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_str_out' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'printk' uses 1 arguments it is variadic
+  [landing pad]: prefix li zero, 1030
+> Function 'vsnprintk' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'snprintk' uses 3 arguments it is variadic
+  [landing pad]: prefix li zero, 1038
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[26/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/fdtable.c.obj
+> Function '_check_fd' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '_find_fd_entry' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_fd_unref' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_fdtable_call_ioctl' uses 3 arguments it is variadic
+  [landing pad]: prefix li zero, 1038
+  [indirect call]: prefix csrwi 0x3fe, 3
+> Function 'z_fd_ref' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_get_fd_obj' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_get_fd_obj_and_vtable' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_reserve_fd' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_finalize_fd' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_free_fd' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_alloc_fd' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[27/105] Building ASM object zephyr/CMakeFiles/zephyr.dir/soc/riscv/riscv-privilege/common/vector.S.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[28/105] Generating linker_zephyr_pre1.cmd
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[29/105] Building C object zephyr/CMakeFiles/zephyr_pre0.dir/misc/empty_file.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[30/105] Building C object zephyr/CMakeFiles/zephyr.dir/soc/riscv/riscv-privilege/common/soc_common_irq.c.obj
+> Function 'arch_irq_enable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'arch_irq_disable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'arch_irq_is_enabled' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_riscv_irq_priority_set' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'soc_interrupt_init' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[31/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/assert.c.obj
+> Function 'assert_post_action' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'assert_print' uses 1 arguments it is variadic
+  [landing pad]: prefix li zero, 1030
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[32/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/bitarray.c.obj
+> Function 'setup_bundle_data' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'set_region' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Function 'set_clear_region' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'match_region' uses 6 arguments it is not variadic
+  [landing pad]: prefix li zero, 26
+> Function 'is_region_set_clear' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'sys_bitarray_set_bit' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_bitarray_clear_bit' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_bitarray_test_bit' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_test_and_set_bit' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_test_and_clear_bit' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_free' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_is_region_set' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_is_region_cleared' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_test_and_set_region' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'sys_bitarray_set_region' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_bitarray_clear_region' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[33/105] Building C object zephyr/CMakeFiles/zephyr.dir/subsys/logging/log_minimal.c.obj
+> Function 'z_log_minimal_level_to_char' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'minimal_hexdump_line_print' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_log_minimal_printk' uses 1 arguments it is variadic
+  [landing pad]: prefix li zero, 1030
+> Function 'z_log_minimal_vprintk' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_log_minimal_hexdump_print' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[34/105] Building C object zephyr/CMakeFiles/zephyr.dir/soc/riscv/riscv-privilege/common/idle.c.obj
+> Function 'arch_cpu_idle' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'arch_cpu_atomic_idle' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[35/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/heap-validate.c.obj
+> Function 'set_chunk_used' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'in_bounds' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'valid_chunk' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'get_alloc_info' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'rand32' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'rand_alloc_choice' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'rand_free_choice' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'rand_alloc_size' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'sys_heap_validate' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'sys_heap_stress' uses 9 arguments it is not variadic
+  [landing pad]: prefix li zero, 38
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'heap_print_info' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_heap_print_info' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[36/105] Building C object zephyr/arch/common/CMakeFiles/arch__common.dir/sw_isr_common.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[37/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/cbprintf_packaged.c.obj
+> Function 'cbprintf_via_va_list' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+  [indirect call]: prefix csrwi 0x3fe, 4
+> Function 'is_fmt_spec' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'get_package_len' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'append_string' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+  [indirect call]: prefix csrwi 0x3fe, 3
+> Function 'cbvprintf_package' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Function 'cbprintf_package' uses 4 arguments it is variadic
+  [landing pad]: prefix li zero, 1042
+> Function 'cbpprintf_external' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'is_ptr' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'cbprintf_package_convert' uses 7 arguments it is not variadic
+  [landing pad]: prefix li zero, 30
+  [indirect call]: prefix csrwi 0x3fe, 3
+  [indirect call]: prefix csrwi 0x3fe, 3
+  [indirect call]: prefix csrwi 0x3fe, 3
+  [indirect call]: prefix csrwi 0x3fe, 3
+  [indirect call]: prefix csrwi 0x3fe, 3
+  [indirect call]: prefix csrwi 0x3fe, 3
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[38/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/rb.c.obj
+> Function 'get_child' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'set_child' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'get_color' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'is_black' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'is_red' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'set_color' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'find_and_stack' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'get_side' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'rotate' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'fix_extra_red' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'fix_missing_black' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'stack_left_limb' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_rb_get_minmax' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'rb_insert' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'rb_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_rb_walk' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'z_rb_child' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_rb_is_black' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'rb_contains' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'z_rb_foreach_next' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[39/105] Building C object zephyr/arch/common/CMakeFiles/isr_tables.dir/isr_tables.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[40/105] Building C object zephyr/CMakeFiles/zephyr.dir/subsys/tracing/tracing_none.c.obj
+> Function 'sys_trace_isr_enter' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_trace_isr_exit' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_trace_isr_exit_to_scheduler' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_trace_idle' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[41/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/cbprintf_complete.c.obj
+> Function 'extract_decimal' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'extract_flags' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'extract_width' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'extract_prec' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'extract_length' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'extract_specifier' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'extract_conversion' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'conversion_radix' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'encode_uint' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'store_count' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'outs' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'z_cbvprintf_impl' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[42/105] Building ASM object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/isr.S.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[43/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/cpu_idle.c.obj
+> Function 'arch_cpu_idle' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'arch_cpu_atomic_idle' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[44/105] Building ASM object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/reset.S.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[45/105] Linking C static library zephyr/arch/common/libisr_tables.a
+[46/105] Building ASM object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/switch.S.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[47/105] Building C object CMakeFiles/app.dir/src/ripe_attack_generator.c.obj
+/workdir/ripe/src/ripe_attack_generator.c:39:48: warning: initialization of 'int (*)(const char *, int)' from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+   39 | static struct attackme data_struct = { "AAAA", &dummy_function };
+      |                                                ^
+/workdir/ripe/src/ripe_attack_generator.c:39:48: note: (near initialization for 'data_struct.func_ptr')
+/workdir/ripe/src/ripe_attack_generator.c:44:44: warning: initialization of 'uint32_t *' {aka 'unsigned int *'} from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+   44 | static uint32_t * data_mem_ptr_aux[64] = { &dummy_function };
+      |                                            ^
+/workdir/ripe/src/ripe_attack_generator.c:44:44: note: (near initialization for 'data_mem_ptr_aux[0]')
+/workdir/ripe/src/ripe_attack_generator.c:45:40: warning: initialization of 'uint32_t *' {aka 'unsigned int *'} from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+   45 | static uint32_t * data_mem_ptr[64] = { &dummy_function };
+      |                                        ^
+/workdir/ripe/src/ripe_attack_generator.c:45:40: note: (near initialization for 'data_mem_ptr[0]')
+/workdir/ripe/src/ripe_attack_generator.c: In function 'main':
+/workdir/ripe/src/ripe_attack_generator.c:200:12: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  200 |     return 0;
+      |            ^
+/workdir/ripe/src/ripe_attack_generator.c:120:1: note: declared here
+  120 | main(void)
+      | ^~~~
+/workdir/ripe/src/ripe_attack_generator.c: In function 'perform_attack':
+/workdir/ripe/src/ripe_attack_generator.c:231:27: warning: assignment to 'int (*)(const char *, int)' from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+  231 |     stack_struct.func_ptr = &dummy_function;
+      |                           ^
+/workdir/ripe/src/ripe_attack_generator.c:245:27: warning: assignment to 'int (*)(const char *, int)' from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+  245 |     heap_struct->func_ptr = dummy_function;
+      |                           ^
+/workdir/ripe/src/ripe_attack_generator.c:303:21: warning: passing argument 1 of 'build_shellcode' from incompatible pointer type [-Wincompatible-pointer-types]
+  303 |     build_shellcode(shellcode_nonop);
+      |                     ^~~~~~~~~~~~~~~
+      |                     |
+      |                     char **
+In file included from /workdir/ripe/src/ripe_attack_generator.c:15:
+/workdir/ripe/src/ripe_attack_generator.h:179:28: note: expected 'char *' but argument is of type 'char **'
+  179 | void build_shellcode(char *shellcode);
+      |                      ~~~~~~^~~~~~~~~
+/workdir/ripe/src/ripe_attack_generator.c:323:31: warning: assignment to 'long int *' from incompatible pointer type 'int *' [-Wincompatible-pointer-types]
+  323 |                 stack_mem_ptr = &stack_flag;
+      |                               ^
+/workdir/ripe/src/ripe_attack_generator.c:359:33: warning: assignment to 'long long int (*)[38]' from incompatible pointer type 'int *' [-Wincompatible-pointer-types]
+  359 |                 heap_jmp_buffer = (int *) malloc(sizeof(jmp_buf));
+      |                                 ^
+/workdir/ripe/src/ripe_attack_generator.c:371:30: warning: assignment to 'long int *' from incompatible pointer type 'int *' [-Wincompatible-pointer-types]
+  371 |                 heap_mem_ptr = heap_flag;
+      |                              ^
+/workdir/ripe/src/ripe_attack_generator.c:400:29: warning: assignment to 'long long int (*)[38]' from incompatible pointer type 'char *' [-Wincompatible-pointer-types]
+  400 |             heap_jmp_buffer = heap_buffer1;
+      |                             ^
+/workdir/ripe/src/ripe_attack_generator.c:415:29: warning: assignment to 'long int *' from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+  415 |             bss_mem_ptr_aux = &dummy_function;
+      |                             ^
+/workdir/ripe/src/ripe_attack_generator.c:416:29: warning: assignment to 'long int *' from incompatible pointer type 'int (*)(const char *)' [-Wincompatible-pointer-types]
+  416 |             bss_mem_ptr     = &dummy_function;
+      |                             ^
+/workdir/ripe/src/ripe_attack_generator.c:420:29: warning: assignment to 'long int *' from incompatible pointer type 'int **' [-Wincompatible-pointer-types]
+  420 |                 bss_mem_ptr = &bss_flag;
+      |                             ^
+/workdir/ripe/src/ripe_attack_generator.c:473:56: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+  473 |                     target_addr = (void *) heap_struct + 256;
+      |                                                        ^
+/workdir/ripe/src/ripe_attack_generator.c:556:32: warning: assignment to 'long long int (*)[38]' from incompatible pointer type 'long long int **' [-Wincompatible-pointer-types]
+  556 |             payload.jmp_buffer = &stack_jmp_buffer_param;
+      |                                ^
+/workdir/ripe/src/ripe_attack_generator.c:564:44: warning: assignment to 'long int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+  564 |             payload.stack_jmp_buffer_param = NULL;
+      |                                            ^
+/workdir/ripe/src/ripe_attack_generator.c:572:44: warning: assignment to 'long int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+  572 |             payload.stack_jmp_buffer_param = NULL;
+      |                                            ^
+/workdir/ripe/src/ripe_attack_generator.c:580:44: warning: assignment to 'long int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+  580 |             payload.stack_jmp_buffer_param = NULL;
+      |                                            ^
+/workdir/ripe/src/ripe_attack_generator.c:586:40: warning: assignment to 'long int *' from incompatible pointer type 'void **' [-Wincompatible-pointer-types]
+  586 |     payload.ptr_to_correct_return_addr = RET_ADDR_PTR;
+      |                                        ^
+/workdir/ripe/src/ripe_attack_generator.c:600:42: warning: assignment to 'void *' from 'long unsigned int' makes pointer from integer without a cast [-Wint-conversion]
+  600 |                     payload.overflow_ptr = (uintptr_t) &rop_target;
+      |                                          ^
+/workdir/ripe/src/ripe_attack_generator.c:607:42: warning: assignment to 'void *' from 'unsigned int' makes pointer from integer without a cast [-Wint-conversion]
+  607 |                     payload.overflow_ptr = 0xdeadbeef;
+      |                                          ^
+/workdir/ripe/src/ripe_attack_generator.c:643:65: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+  643 |                     payload.overflow_ptr = (void *) heap_struct + 256;
+      |                                                                 ^
+/workdir/ripe/src/ripe_attack_generator.c: In function 'build_payload':
+/workdir/ripe/src/ripe_attack_generator.c:906:28: warning: assignment to 'char *' from incompatible pointer type 'char **' [-Wincompatible-pointer-types]
+  906 |             shellcode      = shellcode_nonop;
+      |                            ^
+/workdir/ripe/src/ripe_attack_generator.c:892:45: warning: unused variable 'temp_char_ptr' [-Wunused-variable]
+  892 |     char * shellcode, * temp_char_buffer, * temp_char_ptr;
+      |                                             ^~~~~~~~~~~~~
+/workdir/ripe/src/ripe_attack_generator.c:892:25: warning: unused variable 'temp_char_buffer' [-Wunused-variable]
+  892 |     char * shellcode, * temp_char_buffer, * temp_char_ptr;
+      |                         ^~~~~~~~~~~~~~~~
+/workdir/ripe/src/ripe_attack_generator.c: In function 'dop_target':
+/workdir/ripe/src/ripe_attack_generator.c:1007:18: warning: passing argument 2 of 'iof' makes integer from pointer without a cast [-Wint-conversion]
+ 1007 |         iof(buf, &auth_loc);
+      |                  ^~~~~~~~~
+      |                  |
+      |                  size_t * {aka unsigned int *}
+/workdir/ripe/src/ripe_attack_generator.c:65:26: note: expected 'uint32_t' {aka 'unsigned int'} but argument is of type 'size_t *' {aka 'unsigned int *'}
+   65 | iof(char * buf, uint32_t iv);
+      |                 ~~~~~~~~~^~
+/workdir/ripe/src/ripe_attack_generator.c: In function 'set_low_buf':
+/workdir/ripe/src/ripe_attack_generator.c:1032:10: warning: assignment to 'char *' from incompatible pointer type 'char (*)[1024]' [-Wincompatible-pointer-types]
+ 1032 |     *buf = &low_buf;
+      |          ^
+/workdir/ripe/src/ripe_attack_generator.c: In function 'build_shellcode':
+/workdir/ripe/src/ripe_attack_generator.c:1083:62: warning: pointer to a function used in arithmetic [-Wpointer-arith]
+ 1083 |                 hex_to_string(attack_addr, &shellcode_target + 0x1000);
+      |                                                              ^
+/workdir/ripe/src/ripe_attack_generator.c:1083:62: warning: passing argument 2 of 'hex_to_string' makes integer from pointer without a cast [-Wint-conversion]
+ 1083 |                 hex_to_string(attack_addr, &shellcode_target + 0x1000);
+      |                                            ~~~~~~~~~~~~~~~~~~^~~~~~~~
+      |                                                              |
+      |                                                              void (*)()
+/workdir/ripe/src/ripe_attack_generator.h:180:38: note: expected 'size_t' {aka 'unsigned int'} but argument is of type 'void (*)()'
+  180 | void hex_to_string(char *str, size_t val);
+      |                               ~~~~~~~^~~
+/workdir/ripe/src/ripe_attack_generator.c:1085:44: warning: passing argument 2 of 'hex_to_string' makes integer from pointer without a cast [-Wint-conversion]
+ 1085 |                 hex_to_string(attack_addr, &shellcode_target);
+      |                                            ^~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            void (*)()
+/workdir/ripe/src/ripe_attack_generator.h:180:38: note: expected 'size_t' {aka 'unsigned int'} but argument is of type 'void (*)()'
+  180 | void hex_to_string(char *str, size_t val);
+      |                               ~~~~~~~^~~
+/workdir/ripe/src/ripe_attack_generator.c: In function 'set_low_buf':
+/workdir/ripe/src/ripe_attack_generator.c:1032:10: warning: storing the address of local variable 'low_buf' in '*buf' [-Wdangling-pointer=]
+ 1032 |     *buf = &low_buf;
+      |     ~~~~~^~~~~~~~~~
+/workdir/ripe/src/ripe_attack_generator.c:1028:10: note: 'low_buf' declared here
+ 1028 |     char low_buf[1024];
+      |          ^~~~~~~
+/workdir/ripe/src/ripe_attack_generator.c:1028:10: note: 'buf' declared here
+> Function 'dummy_function' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'shellcode_target' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'ret2libc_target' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'rop_target' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'hex_to_bin' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'print_current_test_parameters' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'build_payload' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'lj_func' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'homebrew_memcpy' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'set_low_buf' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'iof' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'dop_target' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'data_leak' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'hex_to_string' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'format_instruction' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'build_shellcode' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'perform_attack' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 1
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'is_attack_possible' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'try_attack' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'main' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[48/105] Building C object zephyr/CMakeFiles/zephyr.dir/lib/os/heap.c.obj
+> Function 'set_chunk_used' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'chunk_mem' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'free_list_remove_bidx' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'free_list_add_bidx' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'split_chunks' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'merge_chunks' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'mem_to_chunkid' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'free_list_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'free_list_add' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'free_chunk' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'alloc_chunk' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_heap_free' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_heap_usable_size' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_heap_alloc' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_heap_aligned_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_heap_aligned_realloc' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'sys_heap_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[49/105] Linking C static library zephyr/arch/common/libarch__common.a
+[50/105] Linking C static library app/libapp.a
+[51/105] Linking C static library zephyr/libzephyr.a
+[52/105] Building C object zephyr/drivers/timer/CMakeFiles/drivers__timer.dir/riscv_machine_timer.c.obj
+> Function 'get_hart_mtimecmp' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'set_mtimecmp' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'mtime' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_clock_driver_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'timer_isr' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'sys_clock_set_timeout' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_clock_elapsed' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_clock_cycle_get_32' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_clock_cycle_get_64' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[53/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/prep_c.c.obj
+> Function '_PrepC' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[54/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/reboot.c.obj
+> Function 'sys_arch_reboot' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[55/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/smp.c.obj
+> Function 'arch_start_cpu' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Function 'z_riscv_secondary_cpu_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[56/105] Building C object zephyr/drivers/interrupt_controller/CMakeFiles/drivers__interrupt_controller.dir/intc_plic.c.obj
+> Function 'plic_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'plic_irq_handler' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'riscv_plic_irq_enable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'riscv_plic_irq_disable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'riscv_plic_irq_is_enabled' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'riscv_plic_set_priority' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'riscv_plic_get_irq' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[57/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/thread.c.obj
+> Function 'arch_new_thread' uses 7 arguments it is not variadic
+  [landing pad]: prefix li zero, 30
+> Function 'z_riscv_switch_nx_thread_stack' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[58/105] Linking C static library zephyr/drivers/interrupt_controller/libdrivers__interrupt_controller.a
+[59/105] Building C object zephyr/drivers/console/CMakeFiles/drivers__console.dir/uart_console.c.obj
+> Function 'console_out' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 2
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'uart_console_hook_install' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'uart_console_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'uart_register_input' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[60/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/banner.c.obj
+> Function 'boot_banner' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[61/105] Linking C static library zephyr/drivers/console/libdrivers__console.a
+[62/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/main_weak.c.obj
+> Function 'main' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[63/105] Building C object zephyr/drivers/timer/CMakeFiles/drivers__timer.dir/sys_clock_init.c.obj
+> Function 'sys_clock_set_timeout' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_clock_idle_exit' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[64/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/version.c.obj
+> Function 'sys_kernel_version_get' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[65/105] Linking C static library zephyr/drivers/timer/libdrivers__timer.a
+[66/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/irq_manage.c.obj
+> Function 'z_irq_spurious' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[67/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/device.c.obj
+> Function 'device_supported_handles_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'device_visitor' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+  [indirect call]: prefix csrwi 0x3fe, 2
+> Function 'z_device_state_init' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_sys_init_run_level' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'z_device_get_all_static' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_device_is_ready' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_device_get_binding' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'device_required_foreach' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'device_supported_foreach' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[68/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/errno.c.obj
+> Function 'z_impl_z_errno' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[69/105] Building C object zephyr/drivers/serial/CMakeFiles/drivers__serial.dir/uart_ns16550.c.obj
+> Function 'clock_control_get_rate' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+  [indirect call]: prefix csrwi 0x3fe, 3
+> Function 'set_baud_rate' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'uart_ns16550_config_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'uart_ns16550_poll_in' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'uart_ns16550_poll_out' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'uart_ns16550_err_check' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'uart_ns16550_configure' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'uart_ns16550_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[70/105] Building C object zephyr/lib/libc/newlib/CMakeFiles/lib__libc__newlib.dir/libc-hooks.c.obj
+/workdir/zephyr/lib/libc/newlib/libc-hooks.c: In function '__ptr_overflow_check__':
+/workdir/zephyr/lib/libc/newlib/libc-hooks.c:288:26: warning: comparison of distinct pointer types lacks a cast
+  288 |         if ( size && ptr >= ((char *)HEAP_BASE) ) {
+      |                          ^~
+/workdir/zephyr/lib/libc/newlib/libc-hooks.c:290:26: warning: comparison of distinct pointer types lacks a cast
+  290 |                 if ( ptr > ((char *)HEAP_BASE) + heap_sz) {
+      |                          ^
+/workdir/zephyr/lib/libc/newlib/libc-hooks.c:295:24: warning: implicit declaration of function '__heap_overflow_check__'; did you mean '__ptr_overflow_check__'? [-Wimplicit-function-declaration]
+  295 |                 return __heap_overflow_check__(ptr, size);
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~
+      |                        __ptr_overflow_check__
+> Function 'malloc_prepare' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '_stdout_hook_default' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '_stdin_hook_default' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function '__stdout_hook_install' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__stdin_hook_install' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_zephyr_read_stdin' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 0
+> Function 'z_impl_zephyr_write_stdout' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+  [indirect call]: prefix csrwi 0x3fe, 1
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function '_read' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function '_write' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function '_open' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '_close' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '_lseek' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function '_isatty' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '_kill' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '_getpid' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function '_fstat' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '_exit' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__ptr_overflow_check__' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '_sbrk' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_init_recursive' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_close' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_close_recursive' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_acquire' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_acquire_recursive' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_try_acquire' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_try_acquire_recursive' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_release' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__retarget_lock_release_recursive' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function '__errno' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function '__chk_fail' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function '_gettimeofday' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[71/105] Linking C static library zephyr/lib/libc/newlib/liblib__libc__newlib.a
+[72/105] Linking C static library zephyr/drivers/serial/libdrivers__serial.a
+[73/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/idle.c.obj
+> Function 'z_pm_save_idle_exit' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'idle' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[74/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/mem_slab.c.obj
+> Function 'create_free_list' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'init_mem_slab_module' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_mem_slab_init' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'k_mem_slab_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_mem_slab_free' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_mem_slab_runtime_stats_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[75/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/kheap.c.obj
+> Function 'k_heap_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'statics_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_heap_aligned_alloc' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'k_heap_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_heap_free' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[76/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/fatal.c.obj
+> Function 'reason_to_str' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'thread_name_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'coredump' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'coredump_memory_dump' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'coredump_buffer_output' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'coredump_query' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'coredump_cmd' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'arch_system_halt' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_sys_fatal_error_handler' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_fatal_halt' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_fatal_error' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[77/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/system_work_q.c.obj
+> Function 'k_sys_work_q_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[78/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/sem.c.obj
+> Function 'z_impl_k_sem_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_sem_give' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_sem_take' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_sem_reset' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[79/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/stack.c.obj
+> Function 'k_stack_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_stack_alloc_init' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_stack_cleanup' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_stack_push' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_stack_pop' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[80/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/init.c.obj
+> Function 'init_idle_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'bg_thread_main' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_swap_unlocked' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'switch_to_main_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_early_memset' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_early_memcpy' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_bss_zero' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_init_cpu' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'prepare_multithreading' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_cstart' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[81/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/msg_q.c.obj
+> Function 'k_msgq_init' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'z_impl_k_msgq_alloc_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_msgq_cleanup' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_msgq_put' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_msgq_get_attrs' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_msgq_get' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_msgq_peek' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_msgq_purge' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[82/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/thread.c.obj
+> Function 'copy_bytes' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'setup_thread_stack' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_thread_foreach' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_thread_foreach_unlocked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_is_in_isr' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_thread_essential_set' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_thread_essential_clear' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_is_thread_essential' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_thread_name_set' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_thread_name_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_thread_name_copy' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_thread_state_str' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_thread_start' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'schedule_new_thread' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_init_thread_base' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'z_setup_new_thread' uses 10 arguments it is not variadic
+  [landing pad]: prefix li zero, 42
+> Function 'z_impl_k_thread_create' uses 10 arguments it is not variadic
+  [landing pad]: prefix li zero, 42
+> Function 'z_init_static_threads' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'k_thread_user_mode_enter' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'z_impl_k_float_disable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_float_enable' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_stack_space_get' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_thread_stack_space_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_thread_runtime_stats_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_thread_runtime_stats_all_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[83/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/mailbox.c.obj
+> Function 'mbox_message_match' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'init_mbox_module' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'mbox_message_put' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'mbox_async_alloc' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'mbox_message_dispose' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_mbox_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_mbox_put' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_mbox_async_put' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_mbox_data_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'mbox_message_data_check' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_mbox_get' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[84/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/mempool.c.obj
+> Function 'z_heap_aligned_alloc' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_free' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_thread_aligned_alloc' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[85/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/condvar.c.obj
+> Function 'z_impl_k_condvar_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_condvar_signal' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_condvar_broadcast' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_condvar_wait' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[86/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/queue.c.obj
+> Function 'sys_sflist_append' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_sflist_append_list' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_sflist_insert' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_sflist_remove' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_sflist_find_and_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'prepare_thread_to_run' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'queue_insert' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Function 'z_queue_node_peek' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_queue_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_queue_cancel_wait' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_queue_insert' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_queue_append' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_queue_prepend' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_queue_alloc_append' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_queue_alloc_prepend' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_queue_append_list' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_queue_merge_slist' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_queue_get' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_queue_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_queue_unique_append' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_queue_peek_head' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_queue_peek_tail' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[87/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/timer.c.obj
+> Function 'z_timer_expiration_handler' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'k_timer_init' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_timer_start' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_impl_k_timer_stop' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'z_impl_k_timer_status_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_timer_status_sync' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[88/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/timeout.c.obj
+> Function 'first' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'next' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'remove_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'elapsed' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'next_timeout' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'timeout_rem' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_add_timeout' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_abort_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_timeout_remaining' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_timeout_expires' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_get_next_timeout_expiry' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_set_timeout_expiry' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'sys_clock_announce' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'sys_clock_tick_get' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'sys_clock_tick_get_32' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_uptime_ticks' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_busy_wait' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'sys_clock_timeout_end_calc' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[89/105] Building C object zephyr/arch/arch/riscv/core/CMakeFiles/arch__riscv__core.dir/fatal.c.obj
+> Function 'cause_str' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'bad_stack_pointer' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_riscv_fatal_error' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function '_Fault' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[90/105] Linking C static library zephyr/arch/arch/riscv/core/libarch__riscv__core.a
+[91/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/work.c.obj
+> Function 'sys_slist_insert' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_slist_remove' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'sys_slist_find_and_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'queue_remove_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'cancel_async_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'notify_queue_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'queue_submit_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'submit_to_queue_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'work_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'handle_flush' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'finalize_cancel_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'init_work_cancel' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'cancel_sync_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'work_queue_main' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+  [indirect call]: prefix csrwi 0x3fe, 1
+> Function 'schedule_for_queue_locked' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'unschedule_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'cancel_delayable_async_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_init' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'init_flusher' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'queue_flusher_locked' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'work_flush_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_busy_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_work_submit_to_queue' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_submit_to_queue' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_submit' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_flush' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_cancel' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_cancel_sync' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_queue_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_queue_start' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Function 'k_work_queue_drain' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_queue_unplug' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_init_delayable' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_delayable_busy_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_schedule_for_queue' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_work_schedule' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_reschedule_for_queue' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'k_work_reschedule' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_cancel_delayable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_work_cancel_delayable_sync' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_work_flush_delayable' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[92/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/mutex.c.obj
+> Function 'new_prio_for_inheritance' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'adjust_owner_prio' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_mutex_init' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_mutex_lock' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_mutex_unlock' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[93/105] Building C object zephyr/kernel/CMakeFiles/kernel.dir/sched.c.obj
+> Function 'sliceable' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'thread_active_elsewhere' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'pended_on_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'add_thread_timeout' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_sched_prio_cmp' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_reset_time_slice' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_sched_time_slice_set' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_unpend_thread_no_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_sched_lock' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_swap_next_thread' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_swap_irqlock' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_reschedule_irqlock' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_swap' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_reschedule' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_get_next_switch_handle' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_priq_dumb_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'unpend_thread_no_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_unpend_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_priq_dumb_best' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'update_cache' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'move_thread_to_end_of_prio_q' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'slice_expired_locked' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_time_slice' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_move_thread_to_end_of_prio_q' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'ready_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_ready_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_sched_start' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_thread_resume' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_thread_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'unpend_all' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'unready_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'add_to_waitq_locked' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'pend' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_pend_thread' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_pend_curr_irqlock' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_pend_curr' uses 4 arguments it is not variadic
+  [landing pad]: prefix li zero, 18
+> Function 'z_set_prio' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_thread_priority_set' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_impl_k_thread_suspend' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'k_sched_unlock' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'end_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_unpend1_no_timeout' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_unpend_first_thread' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_priq_rb_lessthan' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_priq_rb_add' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_priq_rb_remove' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_priq_rb_best' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_priq_mq_best' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_unpend_all' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'init_ready_q' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_sched_init' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_thread_priority_get' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_thread_priority_set' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'k_can_yield' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_yield' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_tick_sleep' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_sleep' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_usleep' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_wakeup' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_z_current_get' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_impl_k_is_preempt_thread' uses 0 arguments it is not variadic
+  [landing pad]: prefix li zero, 2
+> Function 'z_thread_abort' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_thread_abort' uses 1 arguments it is not variadic
+  [landing pad]: prefix li zero, 6
+> Function 'z_impl_k_thread_join' uses 2 arguments it is not variadic
+  [landing pad]: prefix li zero, 10
+> Function 'z_sched_wake' uses 3 arguments it is not variadic
+  [landing pad]: prefix li zero, 14
+> Function 'z_sched_wait' uses 5 arguments it is not variadic
+  [landing pad]: prefix li zero, 22
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[94/105] Linking C static library zephyr/kernel/libkernel.a
+[95/105] Linking C executable zephyr/zephyr_pre0.elf
+
+[96/105] Generating dev_handles.c
+[97/105] Building C object zephyr/CMakeFiles/zephyr_pre1.dir/misc/empty_file.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[98/105] Building C object zephyr/CMakeFiles/zephyr_pre1.dir/dev_handles.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[99/105] Linking C executable zephyr/zephyr_pre1.elf
+
+[100/105] Generating linker.cmd
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[101/105] Generating isr_tables.c, isrList.bin
+[102/105] Building C object zephyr/CMakeFiles/zephyr_final.dir/misc/empty_file.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[103/105] Building C object zephyr/CMakeFiles/zephyr_final.dir/isr_tables.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[104/105] Building C object zephyr/CMakeFiles/zephyr_final.dir/dev_handles.c.obj
+> Instrumentation plugin 'inst_plugin_cfi @ 0.1' was loaded onto GCC
+RUNTIME_CALL_ANNOTATION = 1 | RUNTIME_ARG_CHECK_ANNOTATION = 1
+RUNTIME_ARG_CHECK = 1
+RUNTIME_RET_ANNOTATION = 0
+[105/105] Linking C executable zephyr/zephyr.elf
+Memory region         Used Size  Region Size  %age Used
+             RAM:       59540 B         1 GB      0.01%
+        IDT_LIST:          0 GB         2 KB      0.00%
