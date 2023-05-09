@@ -1,8 +1,0 @@
-notes d'installation :
-
-il faut faire attention d'ajouter vivado/src dans le path pour que ca marche 
-
-ne pas oublier d'installer les boards de chez digilent
-le plus simple est d'utiliser leur script dans le github 
-dans le Makefile il faut modifier la ligne 
-digilentinc.com:zybo-z7-20:part0:1.0 en digilentinc.com:zybo-z7-20:part0:1.1
